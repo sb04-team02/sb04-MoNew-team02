@@ -1,11 +1,11 @@
-# **{팀 이름}**
+# **{TEAM2 - MoNew}**
 
 (팀 협업 문서 링크 게시)
 
 ## **팀원 구성**
 
 김민수 (개인 Github 링크)\
-김이준 (개인 Github 링크)\
+김이준 (estherleejunkim@gmail.com)\
 문은서 (개인 Github 링크)\
 신은수 (개인 Github 링크)\
 안중원 (개인 Github 링크)\
