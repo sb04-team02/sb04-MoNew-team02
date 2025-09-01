@@ -1,29 +1,34 @@
 # **{TEAM2 - MoNew}**
 
-(팀 협업 문서 링크 게시)
+[팀 노션](https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1)
 
 ## **팀원 구성**
 
-김민수 (개인 Github 링크)\
+김민수 (kms_1015@naver.com)\
 김이준 (estherleejunkim@gmail.com)\
-문은서 (개인 Github 링크)\
-신은수 (개인 Github 링크)\
-안중원 (개인 Github 링크)\
-이지현 ( 링크 )
+문은서 (munes6034@gmail.com)\
+신은수 (sin9801@naver.com)\
+안중원 (anjoongwon517@gmail.com)\
+이지현 (devlee1011@gmail.com)
 
 ---
 
 ## **프로젝트 소개**
 
-- 프로그래밍 교육 사이트의 Spring 백엔드 시스템 구축
+- MongoDB 및 PostgreSQL 백업 및 복구 시스템
+- 흩어진 뉴스를 한 곳에, 관심 있는 주제만 모아보세요!\
+  모뉴(MoNew)는 다양한 뉴스 출처를 통합하여 관심사 기반으로 뉴스를 저장하는 뉴스 통합 관리 플랫폼입니다.\
+  관심 있는 주제의 기사가 등록되면 실시간 알림을 받고, 댓글과 좋아요를 통해 다른 사용자와 의견을 나눌 수 있는 소셜 기능도 함께 제공됩니다. 
 - 프로젝트 기간: 2025.09.01 ~ 2024.09.23
 
 ---
 
 ## **기술 스택**
 
-- Backend: Spring Boot, Spring Security, Spring Data JPA
-- Database: MySQL
+- Backend: Java, Spring Boot, Spring Data JPA, Lombok, Spring Actuator, MapStruct
+- Database: MongoDB, PostgreSQL
+- CI/CD: ECS, Docker, GitHub Actions
+- Testing: JUnit, Mockito, Swagger
 - 공통 Tool: Git & Github, Discord
 
 ---
@@ -31,7 +36,7 @@
 ## **팀원별 구현 기능 상세**
 
 ### **김민수**
-
+관심사 관리
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **소셜 로그인 API**
@@ -42,7 +47,7 @@
 
 ### **김이준**
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+활동 내역 관리 + CI/CD(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **회원별 권한 관리**
     - Spring Security를 활용하여 사용자 역할에 따른 권한 설정
@@ -52,7 +57,7 @@
 
 ### **문은서**
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+알림 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **수강생 정보 관리 API**
     - `GET` 요청을 사용하여 학생의 수강 정보를 조회하는 API 엔드포인트 개발
@@ -62,7 +67,7 @@
 
 ### **신은수**
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+댓글 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **관리자 API**
     - `@PathVariable`을 사용한 동적 라우팅 기능 구현
@@ -74,7 +79,7 @@
 
 ### **안중원**
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+뉴스 기사 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **학생 시간 정보 관리 API**
     - 학생별 시간 정보를 `GET` 요청을 사용하여 조회하는 API 구현
@@ -86,7 +91,7 @@
 
 ### **이지현**
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+사용자 관리 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
 - **학생 시간 정보 관리 API**
     - 학생별 시간 정보를 `GET` 요청을 사용하여 조회하는 API 구현
