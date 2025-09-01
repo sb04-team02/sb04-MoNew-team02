@@ -1,6 +1,6 @@
 # **{TEAM2 - MoNew}**
 
-[팀 노션](https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1)
+[🔗팀 노션](https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1)
 
 ## **팀원 구성**
 
