@@ -27,7 +27,7 @@
 
 - Backend: Java, Spring Boot, Spring Data JPA, Lombok, Spring Actuator, MapStruct
 - Database: MongoDB, PostgreSQL
-- CI/CD: ECS, Docker, GitHub Actions
+- Cloud & CI/CD: S3, ECS, Docker, GitHub Actions
 - Testing: JUnit, Mockito, Swagger
 - 공통 Tool: Git & Github, Discord
 
