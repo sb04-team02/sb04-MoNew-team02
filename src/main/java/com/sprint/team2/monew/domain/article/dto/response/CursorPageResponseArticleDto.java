@@ -10,5 +10,5 @@ public record CursorPageResponseArticleDto(
         int size,
         long totalElements,
         boolean hasNext
-        ) {
+) {
 }
