@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 숨김 파일 ###
+!.gitignore
+!.dockerignore
+.env
