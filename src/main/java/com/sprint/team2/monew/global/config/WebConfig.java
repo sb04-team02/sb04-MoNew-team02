@@ -1,0 +1,33 @@
+package com.sprint.team2.monew.global.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+  @Override
+  public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+    for (HttpMessageConverter<?> converter : converters) {
+      // JSON 변환기만 찾아서
+      if (converter instanceof MappingJackson2HttpMessageConverter) {
+        MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+
+        // 기본 문자셋을 UTF-8로 설정
+        jsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
+
+        // 지원하는 미디어 타입에 charset=UTF-8 명시
+        jsonConverter.setSupportedMediaTypes(
+            Collections.singletonList(new MediaType("application", "json", StandardCharsets.UTF_8))
+        );
+      }
+    }
+  }
+}
