@@ -1,7 +1,9 @@
 package com.sprint.team2.monew.domain.comment.entity;
 
+import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.base.DeletableEntity;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
+import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

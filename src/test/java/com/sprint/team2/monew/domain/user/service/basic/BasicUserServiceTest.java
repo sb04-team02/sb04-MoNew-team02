@@ -18,9 +18,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BasicUserServiceTest {
@@ -54,17 +57,28 @@ class BasicUserServiceTest {
         ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
         user.setUpdatedAt(user.getCreatedAt());
         //
-        userDto = new UserDto(userId, email, nickname, user.getCreatedAt());
+        userDto = new UserDto(userId,
+                email,
+                nickname,
+                user.getCreatedAt()
+        );
     }
 
     @Test
     @DisplayName("사용자 생성 성공")
     void createUser_Success() {
         // given
+        UserRegisterRequest request = new UserRegisterRequest(email, nickname, password);
+        given(userRepository.existsByEmail(eq(email))).willReturn(false);
+        given(userRepository.save(any(User.class))).willReturn(user);
+        given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         // when
+        UserDto result = userService.create(request);
 
         // then
+        assertThat(result).isEqualTo(userDto);
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
