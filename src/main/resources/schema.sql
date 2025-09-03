@@ -40,8 +40,8 @@ CREATE TABLE articles
     title         VARCHAR(50)         NOT NULL,
     publish_date  TIMESTAMPTZ         NOT NULL,
     summary       VARCHAR(100)        NOT NULL,
-    comment_count BIGINT,
-    view_count    BIGINT,
+    comment_count BIGINT              NOT NULL DEFAULT 0,
+    view_count    BIGINT              NOT NULL DEFAULT 0,
     interest_id   uuid,
     FOREIGN KEY (interest_id) REFERENCES interests (id) ON DELETE SET NULL
 );
