@@ -3,18 +3,22 @@ package com.sprint.team2.monew.domain.subscription.entity;
 import com.sprint.team2.monew.domain.base.BaseEntity;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name="subscriptions")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Subscription extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
-    User user;
+    private User user;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "interest_id", nullable = false)
-    Interest interest;
+    private Interest interest;
 }
