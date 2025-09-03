@@ -1,0 +1,12 @@
+# ignoring Gradle cache and build outputs
+.gradle
+/build
+
+# ignoring IDE files and local logs
+.idea
+*.iml
+*.log
+
+# ignoring Git files
+.git
+.gitignore

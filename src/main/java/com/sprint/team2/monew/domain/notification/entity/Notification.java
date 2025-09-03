@@ -1,0 +1,32 @@
+package com.sprint.team2.monew.domain.notification.entity;
+
+import com.sprint.team2.monew.domain.base.UpdatableEntity;
+import jakarta.persistence.*;
+import lombok.Getter;
+
+
+import java.util.UUID;
+
+@Entity
+@Getter
+@Table(name = "notification")
+public class Notification extends UpdatableEntity {
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "resource_type", length = 50, nullable = false)
+    private ResourceType resourceType;
+
+    @Column(name = "resource_id")
+    private UUID resourceId;
+
+    @Column(name = "confirmed")
+    private boolean confirmed = false;
+
+}
