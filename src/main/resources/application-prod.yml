@@ -8,12 +8,15 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     properties:
+#      hibernate:
+#        format_sql: false
       hibernate:
-        format_sql: false
+        ddl-auto: validate
 
   sql:
     init:
-      mode: always
+#      mode: always
+      mode: never
 
 logging:
   level:
