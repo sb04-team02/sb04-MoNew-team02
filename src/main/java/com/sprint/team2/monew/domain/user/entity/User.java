@@ -1,6 +1,6 @@
 package com.sprint.team2.monew.domain.user.entity;
 
-import com.sprint.team2.monew.domain.base.UpdatableEntity;
+import com.sprint.team2.monew.domain.base.DeletableEntity;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends UpdatableEntity {
+public class User extends DeletableEntity {
 
-    @Column(length = 100, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(length = 60, nullable = false)
+    @Column(length = 20, nullable = false)
     private String password;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 20, nullable = false)
     private String nickname;
 
     public User(String email, String password, String nickname) {
