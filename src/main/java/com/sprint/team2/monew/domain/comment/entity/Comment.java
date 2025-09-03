@@ -1,22 +1,42 @@
 package com.sprint.team2.monew.domain.comment.entity;
 
 import com.sprint.team2.monew.domain.base.DeletableEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.sprint.team2.monew.domain.like.entity.Reaction;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
 @NoArgsConstructor
 @Getter
 public class Comment extends DeletableEntity {
-    @Column(name = "content", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
+    private Article article;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "like_count", nullable = false)
     private String likeCount;
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reaction> likes = new ArrayList<>();
 
+    public void update(String content) {
+        this.content = content;
+    }
+
+    public int getLikeCount() {
+        return likes.size();
+    }
 }
