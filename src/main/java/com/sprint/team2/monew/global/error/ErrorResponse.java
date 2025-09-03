@@ -1,26 +1,39 @@
 package com.sprint.team2.monew.global.error;
 
-import com.team1.hrbank.global.constant.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ErrorResponse {
 
+  private String code;
+  private Map<String, Object> details;
+  private String exceptionType;
   private String message;
-  private String details;
   private int status;
-  private LocalDateTime timestamp;
+  private Instant timestamp;
 
-  public ErrorResponse(ErrorCode code) {
-    this.message = code.getMessage();
-    this.status = code.getStatus();
-    this.details = code.getDetails();
-    this.timestamp = LocalDateTime.now();
+  public ErrorResponse(BusinessException exception) {
+    this.code = exception.getErrorCodeName();
+    this.details = exception.getDetails();
+    this.exceptionType = exception.getClass().getSimpleName();
+    this.message = exception.getMessage();
+    this.status = exception.getStatus();
+    this.timestamp = Instant.now();
   }
 
+  public ErrorResponse(Exception exception, int status) {
+    this.code = exception.getClass().getSimpleName();
+    this.details = new HashMap<>();
+    this.exceptionType = exception.getClass().getSimpleName();
+    this.message = exception.getMessage();
+    this.status = status;
+    this.timestamp = Instant.now();
+  }
 }
