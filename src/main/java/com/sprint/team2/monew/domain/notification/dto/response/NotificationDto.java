@@ -1,4 +1,4 @@
-package com.sprint.team2.monew.domain.notification.dto;
+package com.sprint.team2.monew.domain.notification.dto.response;
 
 import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 
