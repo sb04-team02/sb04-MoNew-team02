@@ -1,6 +1,6 @@
 package com.sprint.team2.monew.global.error;
 
-import com.team1.hrbank.global.constant.ErrorCode;
+import com.sprint.team2.monew.global.constant.ErrorCode;
 
 public class BusinessException extends RuntimeException {
 
