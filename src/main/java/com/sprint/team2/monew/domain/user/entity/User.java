@@ -5,13 +5,12 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends DeletableEntity {
 
@@ -23,12 +22,6 @@ public class User extends DeletableEntity {
 
     @Column(length = 20, nullable = false)
     private String nickname;
-
-    public User(String email, String password, String nickname) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-    }
 
     public void update(String newNickname) {
         if (!StringUtils.isBlank(newNickname) && !newNickname.equals(this.nickname)) {
