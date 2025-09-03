@@ -23,6 +23,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
     log.error("커스텀 예외 발생: code={}, message={}", e.getErrorCode(), e.getMessage(), e);
     return ResponseEntity.status(e.getErrorCode().getStatus())
-        .body(new ErrorResponse(e));
+            .body(new ErrorResponse(e));
   }
 }
