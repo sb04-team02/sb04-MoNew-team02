@@ -14,13 +14,13 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends DeletableEntity {
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(length = 20, nullable = false)
+    @Column(name = "password", length = 20, nullable = false)
     private String password;
 
-    @Column(length = 20, nullable = false)
+    @Column(name = "nickname", length = 20, nullable = false)
     private String nickname;
 
     public void update(String newNickname) {
