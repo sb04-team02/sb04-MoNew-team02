@@ -1,14 +1,48 @@
 package com.sprint.team2.monew.domain.interest.service.basic;
 
+import com.sprint.team2.monew.domain.interest.entity.Interest;
+import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
+import com.sprint.team2.monew.domain.subscription.entity.Subscription;
+import com.sprint.team2.monew.domain.subscription.exception.SubscriptionNotFoundException;
+import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BasicInterestService implements InterestService {
     private final InterestRepository interestRepository;
     private final InterestMapper interestMapper;
+    private final SubscriptionRepository subscriptionRepository;
+
+    public void unsubscribe(UUID interestId, UUID userId) {
+        log.info("[구독] 구독 취소 호출");
+        Subscription subscription = validateSubscription(interestId, userId);
+        Interest interest = validateInterest(interestId);
+        interest.decreaseSubscriber();
+        subscriptionRepository.delete(subscription);
+        log.info("[구독] 구독 취소 완료");
+    }
+
+    private Subscription validateSubscription(UUID interestId, UUID userId) {
+        return subscriptionRepository.findByUser_IdAndInterest_Id(userId, interestId)
+                .orElseThrow(() -> {
+                    log.error("[구독] 해당 관심사를 구독중이 아닙니다. userId = {}, interestId = {}", userId, interestId);
+                    throw SubscriptionNotFoundException.notFound(interestId, userId);
+        });
+    }
+
+    private Interest validateInterest(UUID interestId) {
+        return interestRepository.findById(interestId).orElseThrow(() -> {
+            log.error("[관심사] 해당 관심사가 존재하지 않음");
+            throw InterestNotFoundException.notFound(interestId);
+        });
+    }
 }
