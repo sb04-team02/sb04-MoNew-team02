@@ -23,11 +23,19 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody @Valid UserRegisterRequest request) {
-        log.info("사용자 생성 요청: {}", request);
-        UserDto createdUser = userService.create(request);
-        log.debug("사용자 생성 응답: {}", createdUser);
+        log.info("[USER] 등록 요청 수신 - email={}, nickname={}",
+                request.email(),
+                request.nickname()
+        );
+        UserDto createdUserDto = userService.create(request);
+        log.info("[USER] 등록 응답 - id={}, email={}, nickname={}, createdAt={}",
+                createdUserDto.id(),
+                createdUserDto.email(),
+                createdUserDto.nickname(),
+                createdUserDto.createdAt()
+        );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdUser);
+                .body(createdUserDto);
     }
 }

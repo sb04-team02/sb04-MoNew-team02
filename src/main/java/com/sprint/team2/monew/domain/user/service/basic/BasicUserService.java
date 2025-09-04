@@ -21,7 +21,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto create(UserRegisterRequest userRegisterRequest) {
-        log.debug("사용자 생성 시작: {}", userRegisterRequest);
+        log.info("[USER] 생성 시작 - email={}, nickname={}",
+                userRegisterRequest.email(),
+                userRegisterRequest.nickname()
+        );
 
         String email = userRegisterRequest.email();
         String password = userRegisterRequest.password();
@@ -33,7 +36,7 @@ public class BasicUserService implements UserService {
 
         User savedUser = userRepository.save(new User(email, password, nickname));
         UserDto result = userMapper.toDto(savedUser);
-        log.info("사용자 생성 완료: id={}", result.id());
+        log.info("[USER] 생성 완료 - userId={}", result.id());
         return result;
     }
 }
