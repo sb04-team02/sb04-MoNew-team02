@@ -2,14 +2,11 @@ package com.sprint.team2.monew.interest.service;
 
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
-import com.sprint.team2.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.interest.repository.UserRepository;
-import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.subscription.entity.Subscription;
-import com.sprint.team2.monew.domain.subscription.entity.User;
 import com.sprint.team2.monew.domain.subscription.exception.SubscriptionErrorCode;
 import com.sprint.team2.monew.domain.subscription.mapper.SubscriptionMapper;
 import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;

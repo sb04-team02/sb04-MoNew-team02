@@ -1,28 +1,46 @@
 package com.sprint.team2.monew.global.error;
 
 import com.sprint.team2.monew.global.constant.ErrorCode;
+import lombok.Getter;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
 public class BusinessException extends RuntimeException {
 
-  private final ErrorCode errorCode;
+    private final ErrorCode errorCode;
+    private final Instant timestamp;
+    private final Map<String, Object> details;
 
-  public BusinessException(ErrorCode errorCode) {
-    this.errorCode = errorCode;
-  }
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+        this.timestamp = Instant.now();
+        this.details = new HashMap<>();
+    }
 
-  public int getStatus() {
-    return errorCode.getStatus();
-  }
+    public BusinessException(ErrorCode errorCode, Map<String, Object> details) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+        this.timestamp = Instant.now();
+        this.details = details;
+    }
 
-  public String getMessage() {
-    return errorCode.getMessage();
-  }
+    public void addDetail(String key, Object value) {
+        this.details.put(key, value);
+    }
 
-  public String getDetails() {
-    return errorCode.getDetails();
-  }
+    public int getStatus() {
+        return errorCode.getStatus();
+    }
 
-  public ErrorCode getErrorCode() {
-    return errorCode;
-  }
+    public String getMessage() {
+        return errorCode.getMessage();
+    }
+
+    public String getErrorCodeName() {
+        return errorCode.getErrorCodeName();
+    }
 }

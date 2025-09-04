@@ -4,6 +4,7 @@ import com.sprint.team2.monew.domain.base.UpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -15,9 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Interest extends UpdatableEntity {
-    @Column(nullable = false)
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Size(min = 1, max = 10)
+    @Column(nullable = false, name = "keywords")
     private List<String> keywords;
     @Column(name="subscription_count")
     private long subscriberCount;

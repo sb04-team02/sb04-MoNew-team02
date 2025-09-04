@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.subscription.entity;
 
 import com.sprint.team2.monew.domain.base.BaseEntity;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
+import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
