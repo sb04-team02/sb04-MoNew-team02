@@ -3,13 +3,14 @@ package com.sprint.team2.monew.interest.service;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
-import com.sprint.team2.monew.domain.interest.repository.UserRepository;
 import com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.subscription.entity.Subscription;
 import com.sprint.team2.monew.domain.subscription.exception.SubscriptionErrorCode;
 import com.sprint.team2.monew.domain.subscription.mapper.SubscriptionMapper;
 import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
+import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.global.error.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,11 +49,11 @@ public class InterestServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         UUID interestId = UUID.randomUUID();
-        Subscription subscription = new Subscription(new User(), new Interest());
+        Subscription subscription = new Subscription(new User("email@email.com","password","nickname"), new Interest());
         SubscriptionDto subscriptionDto = new SubscriptionDto(UUID.randomUUID(),interestId,"name",List.of("keyword1","keyword2"),1,LocalDateTime.now());
         given(subscriptionRepository.save(any(Subscription.class))).willReturn(subscription);
         given(subscriptionMapper.toDto(any(Subscription.class))).willReturn(subscriptionDto);
-        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(new User()));
+        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(new User("email@email.com","password","nickname")));
         given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(new Interest()));
 
         // when
@@ -99,9 +100,9 @@ public class InterestServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         UUID interestId = UUID.randomUUID();
-        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(new User()));
+        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(new User("email@email.com","password","nickname")));
         given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(new Interest()));
-        given(subscriptionRepository.existsByUserIdAndInterestId(any(UUID.class), any(UUID.class))).willReturn(true);
+        given(subscriptionRepository.existsByInterest_IdAndUser_Id(any(UUID.class), any(UUID.class))).willReturn(true);
 
         // when & then
         Exception exception = assertThrows(BusinessException.class, () -> {
