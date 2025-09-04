@@ -68,6 +68,7 @@ public class InterestServiceTest {
         Interest interest = new Interest(interestRegisterRequest);
         InterestDto interestDto = new InterestDto(UUID.randomUUID(),"스포츠", List.of("축구","야구","농구"),0L,false);
         given(interestRepository.existsBySimilarityNameGreaterThan80Percent("스포츠")).willReturn(false);
+        given(interestMapper.toEntity(interestRegisterRequest)).willReturn(interest);
         given(interestRepository.save(interest)).willReturn(interest);
         given(interestMapper.toDto(interest)).willReturn(interestDto);
 

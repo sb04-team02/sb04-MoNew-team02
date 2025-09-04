@@ -22,9 +22,9 @@ public class InterestController {
 
     @PostMapping
     public ResponseEntity create(@Valid @RequestBody InterestRegisterRequest interestRegisterRequest) {
-        log.info("POST /api/interests/create 호출");
+        log.info("[관심사] 생성 컨트롤러 호출");
         InterestDto response = interestService.create(interestRegisterRequest);
-        log.debug("interest/create 응답 생성 id={}",response.id());
+        log.info("[관심사] 생성 컨트롤러 응답 생성 id={}",response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
