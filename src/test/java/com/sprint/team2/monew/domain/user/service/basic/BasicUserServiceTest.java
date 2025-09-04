@@ -49,7 +49,7 @@ class BasicUserServiceTest {
         // given
         // 이메일 중복 검증 통과
         given(userRepository.existsByEmail(eq(email))).willReturn(false);
-        
+
         // userRepository.save 반환 설정
         given(userRepository.save(any(User.class))).willReturn(user);
 
@@ -60,6 +60,7 @@ class BasicUserServiceTest {
                 nickname,
                 LocalDateTime.now()
         );
+        given(userMapper.toEntity(request)).willReturn(user);
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         // when

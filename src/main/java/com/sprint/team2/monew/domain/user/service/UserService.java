@@ -5,5 +5,5 @@ import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 
 public interface UserService {
 
-    UserDto create(UserRegisterRequest userRegisterRequest);
+    UserDto create(UserRegisterRequest request);
 }
