@@ -1,8 +1,15 @@
 package com.sprint.team2.monew.domain.user.controller;
 
+import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
+import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,5 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("api/users")
 public class UserController {
+
     private final UserService userService;
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest request) {
+        log.info("[사용자] 로그인 요청 수신 - email={}", request.email());
+        UserDto createdUserDto = userService.login(request);
+        log.info("[사용자] 로그인 응답 - id={}, email={}, nickname={}, createdAt={}",
+                createdUserDto.id(),
+                createdUserDto.email(),
+                createdUserDto.nickname(),
+                createdUserDto.createdAt()
+        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(createdUserDto);
+    }
 }
