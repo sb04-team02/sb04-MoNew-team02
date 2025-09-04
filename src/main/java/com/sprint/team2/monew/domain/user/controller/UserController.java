@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.user.controller;
 
+import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserRegisterRequest;
 import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.service.UserService;
@@ -36,6 +37,21 @@ public class UserController {
         );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .body(createdUserDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest request) {
+        log.info("[사용자] 로그인 요청 수신");
+        UserDto createdUserDto = userService.login(request);
+        log.info("[사용자] 로그인 응답 - id={}, email={}, nickname={}, createdAt={}",
+                createdUserDto.id(),
+                createdUserDto.email(),
+                createdUserDto.nickname(),
+                createdUserDto.createdAt()
+        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(createdUserDto);
     }
 }
