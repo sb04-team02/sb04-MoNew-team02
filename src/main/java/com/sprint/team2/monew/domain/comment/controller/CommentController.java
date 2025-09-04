@@ -31,6 +31,10 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
+    /**
+     * 댓글 수정
+     * POST /comments
+     */
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDto> update(
             @PathVariable UUID commentId,
