@@ -5,7 +5,6 @@ import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-
 import java.util.UUID;
 
 @Entity
