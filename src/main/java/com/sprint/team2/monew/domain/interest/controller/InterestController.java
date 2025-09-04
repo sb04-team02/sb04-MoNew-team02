@@ -19,8 +19,9 @@ public class InterestController {
     @PostMapping(value = "/{interest-id}/subscriptions")
     public ResponseEntity subscriptions(@PathVariable("interest-id") UUID interestId,
                                         @RequestHeader("MoNew-Request-User-ID") UUID userId) {
-        log.debug("subscriptions for interest with id {}", interestId);
+        log.info("[관심사] 구독 등록 호출 interestId = {}, userId = {}", interestId, userId);
         SubscriptionDto response = interestService.subscribe(interestId,userId);
+        log.info("[관심사] 구독 등록 응답 완료 id = {}", response.id());
         return ResponseEntity.ok(response);
     }
 
