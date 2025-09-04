@@ -38,7 +38,6 @@ class BasicUserServiceTest {
     @Test
     @DisplayName("사용자 생성 성공")
     void createUser_Success() {
-        // given
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         String email = "test@test.com";
@@ -46,7 +45,8 @@ class BasicUserServiceTest {
         String nickname = "test";
         User user = new User(email, password, nickname);
         UserRegisterRequest request = new UserRegisterRequest(email, nickname, password);
-        
+
+        // given
         // 이메일 중복 검증 통과
         given(userRepository.existsByEmail(eq(email))).willReturn(false);
         
@@ -73,13 +73,13 @@ class BasicUserServiceTest {
     @Test
     @DisplayName("이미 존재하는 이메일로 사용자 생성 시도 시 실패")
     void createUser_WithExistingEmail_ThrowsException() {
-        // given
         // 기본 변수 및 객체 설정
         String email = "test@test.com";
         String password = "test1234";
         String nickname = "test";
         UserRegisterRequest request = new UserRegisterRequest(email, nickname, password);
 
+        // given
         // 이메일 중복 감지
         given(userRepository.existsByEmail(eq(email))).willReturn(true);
 
