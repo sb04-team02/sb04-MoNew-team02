@@ -27,16 +27,13 @@ public class Comment extends DeletableEntity {
     private String content;
 
     @Column(name = "like_count", nullable = false)
-    private String likeCount;
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reaction> likes = new ArrayList<>();
+    private long likeCount = 0L;
 
     public void update(String content) {
         this.content = content;
     }
 
-    public int getLikeCount() {
-        return likes.size();
+    public long getLikeCount() {
+        return this.likeCount;
     }
 }
