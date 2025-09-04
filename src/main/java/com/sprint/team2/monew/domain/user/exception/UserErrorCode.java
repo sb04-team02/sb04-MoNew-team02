@@ -1,6 +1,5 @@
 package com.sprint.team2.monew.domain.user.exception;
 
-import com.sprint.team2.monew.global.constant.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,5 @@
 package com.sprint.team2.monew.domain.user.exception;
 
-import com.sprint.team2.monew.global.constant.ErrorCode;
-
 public class ForbiddenUserAuthorityException extends UserException {
     public ForbiddenUserAuthorityException(ErrorCode errorCode) {
         super(errorCode);

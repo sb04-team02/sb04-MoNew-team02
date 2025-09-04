@@ -1,6 +1,5 @@
 package com.sprint.team2.monew.global.error;
 
-import com.sprint.team2.monew.global.constant.ErrorCode;
 import lombok.Getter;
 
 import java.time.Instant;
