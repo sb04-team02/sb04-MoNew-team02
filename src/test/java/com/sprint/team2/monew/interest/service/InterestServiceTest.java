@@ -50,6 +50,7 @@ public class InterestServiceTest {
         InterestDto interestDto = new InterestDto(UUID.randomUUID(),"스포츠", List.of("축구","야구","농구"),0L,false);
         given(interestRepository.save(interest)).willReturn(interest);
         given(interestMapper.toDto(interest)).willReturn(interestDto);
+        given(interestMapper.toEntity(interestRegisterRequest)).willReturn(interest);
 
         // when
         InterestDto savedInterestDto = interestService.create(interestRegisterRequest);
