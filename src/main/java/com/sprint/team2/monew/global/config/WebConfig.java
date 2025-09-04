@@ -1,9 +1,11 @@
 package com.sprint.team2.monew.global.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.charset.StandardCharsets;
@@ -11,8 +13,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+  private final MDCLoggingInterceptor mdcLoggingInterceptor;
 
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(mdcLoggingInterceptor)
+            .addPathPatterns("/**"); // 모든 요청에 적용
+  }
   @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
     for (HttpMessageConverter<?> converter : converters) {
