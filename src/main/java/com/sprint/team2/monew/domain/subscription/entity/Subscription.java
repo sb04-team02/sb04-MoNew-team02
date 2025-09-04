@@ -16,10 +16,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Subscription extends BaseEntity {
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
 }
