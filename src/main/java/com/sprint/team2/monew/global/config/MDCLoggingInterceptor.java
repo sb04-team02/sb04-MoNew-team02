@@ -13,6 +13,7 @@ public class MDCLoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         MDC.put("requestId", UUID.randomUUID().toString());
+        MDC.put("requestIP", request.getRemoteAddr());
         MDC.put("requestMethod", request.getMethod());
         MDC.put("requestUrl", request.getRequestURI());
         return true;
