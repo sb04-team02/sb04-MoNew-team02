@@ -17,8 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,14 +77,9 @@ class UserControllerTest {
         // then
         MvcResult result = resultActions.andReturn();
         String json = result.getResponse().getContentAsString();
-        UserDto responseDto = objectMapper.readValue(json, UserDto.class);
-
-        assertAll(
-                () -> assertEquals(userId, responseDto.id()),
-                () -> assertEquals(email, responseDto.email()),
-                () -> assertEquals(nickname, responseDto.nickname()),
-                () -> assertEquals(createdAt, responseDto.createdAt())
-        );
+        UserDto resultDto = objectMapper.readValue(json, UserDto.class);
+        assertThat(userDto).isEqualTo(resultDto);
+        resultActions.andExpect(status().isCreated());
     }
 
     @Test
