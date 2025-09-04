@@ -10,6 +10,6 @@ public interface SubscriptionMapper {
     @Mapping(target = "interestId", expression = "java(subscription.getInterest().getId())")
     @Mapping(target = "interestName", expression = "java(subscription.getInterest().getName())")
     @Mapping(target = "interestKeywords", expression = "java(subscription.getInterest().getKeywords())")
-    @Mapping(target = "interestSubscriberCount", constant = "0L")
+    @Mapping(target = "interestSubscriberCount", expression = "java(subscription.getInterest().getSubscriberCount())")
     SubscriptionDto toDto(Subscription subscription);
 }
