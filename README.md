@@ -103,6 +103,10 @@
   
 ---
 
+# 테스트 
+[![codecov](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02/graph/badge.svg)](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02)
+---
+
 ## **파일 구조**
 
 ```
