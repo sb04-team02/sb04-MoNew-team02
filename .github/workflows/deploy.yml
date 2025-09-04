@@ -1,0 +1,5 @@
+name: CD Workflow - Building & PUshing to ECR
+
+on:
+  push:
+    branches: [ "develop" ]
