@@ -35,11 +35,7 @@ public class BasicUserService implements UserService {
         }
 
         UserDto userDto = userMapper.toDto(user);
-        log.info("[사용자] 로그인 성공 - id={}, email={}, nickname={}, createdAt={}",
-                userDto.id(),
-                userDto.email(),
-                userDto.nickname(),
-                userDto.createdAt());
+        log.info("[사용자] 로그인 성공 - id={}", userDto.id());
         return userDto;
     }
 }
