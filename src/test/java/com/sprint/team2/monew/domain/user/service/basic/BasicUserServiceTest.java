@@ -6,14 +6,12 @@ import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,40 +35,31 @@ class BasicUserServiceTest {
     @InjectMocks
     private BasicUserService userService;
 
-    private UUID userId;
-    private String email;
-    private String password;
-    private String nickname;
-    //
-    private User user;
-    private UserDto userDto;
-
-    @BeforeEach
-    void setUp() {
-        userId = UUID.randomUUID();
-        email = "user@test.com";
-        password = "password";
-        nickname = "user";
-        //
-        user = new User(email, password, nickname);
-        ReflectionTestUtils.setField(user, "id", userId);
-        ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
-        user.setUpdatedAt(user.getCreatedAt());
-        //
-        userDto = new UserDto(userId,
-                email,
-                nickname,
-                user.getCreatedAt()
-        );
-    }
-
     @Test
     @DisplayName("사용자 생성 성공")
     void createUser_Success() {
         // given
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
         UserRegisterRequest request = new UserRegisterRequest(email, nickname, password);
+        
+        // 이메일 중복 검증 통과
         given(userRepository.existsByEmail(eq(email))).willReturn(false);
+        
+        // userRepository.save 반환 설정
         given(userRepository.save(any(User.class))).willReturn(user);
+
+        // Dto
+        UserDto userDto = new UserDto(
+                userId,
+                email,
+                nickname,
+                LocalDateTime.now()
+        );
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         // when
@@ -85,10 +74,17 @@ class BasicUserServiceTest {
     @DisplayName("이미 존재하는 이메일로 사용자 생성 시도 시 실패")
     void createUser_WithExistingEmail_ThrowsException() {
         // given
+        // 기본 변수 및 객체 설정
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
         UserRegisterRequest request = new UserRegisterRequest(email, nickname, password);
+
+        // 이메일 중복 감지
         given(userRepository.existsByEmail(eq(email))).willReturn(true);
 
         // when & then
+        // 이메일 중복 검증 실패 -> EmailAlreadyExistsException
         assertThatThrownBy(() -> userService.create(request))
                 .isInstanceOf(EmailAlreadyExistsException.class);
     }

@@ -21,6 +21,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto create(UserRegisterRequest userRegisterRequest) {
+        log.debug("사용자 생성 시작: {}", userRegisterRequest);
+
         String email = userRegisterRequest.email();
         String password = userRegisterRequest.password();
         String nickname = userRegisterRequest.nickname();
@@ -29,8 +31,9 @@ public class BasicUserService implements UserService {
             throw EmailAlreadyExistsException.emailDuplicated(email);
         }
 
-        User user = new User(email, password, nickname);
-        userRepository.save(user);
-        return userMapper.toDto(user);
+        User savedUser = userRepository.save(new User(email, password, nickname));
+        UserDto result = userMapper.toDto(savedUser);
+        log.info("사용자 생성 완료: id={}", result.id());
+        return result;
     }
 }
