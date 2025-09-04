@@ -22,15 +22,24 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto login(UserLoginRequest request) {
+        log.info("[사용자] 로그인 시작");
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(InvalidUserCredentialsException::invalidEmailOrPassword);
+                .orElseThrow(() -> {
+                        log.error("[사용자] 로그인 실패 - 이메일 혹은 비밀번호가 잘못됨");
+                        return InvalidUserCredentialsException.invalidEmailOrPassword();
+                });
 
         if (!user.getPassword().equals(request.password())) {
+            log.error("[사용자] 로그인 실패 - 이메일 혹은 비밀번호가 잘못됨");
             throw InvalidUserCredentialsException.invalidEmailOrPassword();
         }
 
         UserDto userDto = userMapper.toDto(user);
-
+        log.info("[사용자] 로그인 성공 - id={}, email={}, nickname={}, createdAt={}",
+                userDto.id(),
+                userDto.email(),
+                userDto.nickname(),
+                userDto.createdAt());
         return userDto;
     }
 }

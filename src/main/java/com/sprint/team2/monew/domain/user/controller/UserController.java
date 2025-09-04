@@ -23,7 +23,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest request) {
-        log.info("[사용자] 로그인 요청 수신 - email={}", request.email());
+        log.info("[사용자] 로그인 요청 수신");
         UserDto createdUserDto = userService.login(request);
         log.info("[사용자] 로그인 응답 - id={}, email={}, nickname={}, createdAt={}",
                 createdUserDto.id(),
