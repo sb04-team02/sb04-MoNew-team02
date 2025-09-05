@@ -1,4 +1,4 @@
-package com.sprint.team2.monew.interest.controller;
+package com.sprint.team2.monew.domain.interest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.interest.controller.InterestController;
@@ -163,4 +163,21 @@ public class InterestControllerTest {
         // then
         resultActions.andExpect(status().is5xxServerError());
     }
+
+    @DisplayName("관심사 ID를 받아서 삭제한다.")
+    @Test
+    void deleteInterestShouldSucceed() throws Exception {
+        // 본문 생성
+        UUID interestId = UUID.randomUUID();
+
+        // given
+        doNothing().when(interestService).delete(interestId);
+
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interest-id}",interestId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isNoContent());
+    }
+
 }

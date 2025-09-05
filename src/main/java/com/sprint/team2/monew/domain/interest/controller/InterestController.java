@@ -45,4 +45,13 @@ public class InterestController {
         log.info("[구독] 구독 취소 응답 완료");
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping(value = "/{interest-id}")
+    public ResponseEntity delete(@PathVariable("interest-id") UUID interestId) {
+        log.info("[관심사] 관심사 삭제 요청 id = {}", interestId);
+        interestService.delete(interestId);
+        log.info("[관심사] 관심사 삭제 응답 완료");
+        return ResponseEntity.noContent().build();
+
+    }
 }

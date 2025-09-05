@@ -10,4 +10,5 @@ public interface InterestService {
     void unsubscribe(UUID interestId, UUID userId);
     InterestDto create(InterestRegisterRequest interestRegisterRequest);
     SubscriptionDto subscribe(UUID interestId, UUID userId);
+    void delete(UUID interestId);
 }

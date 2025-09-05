@@ -1,9 +1,10 @@
-package com.sprint.team2.monew.interest.service;
+package com.sprint.team2.monew.domain.interest.service;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
+import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService;
@@ -228,5 +229,36 @@ public class InterestServiceTest {
         then(subscriptionRepository).should(times(1)).delete(subscription);
         then(interestRepository).should(times(1)).findById(interestId);
         assertEquals(0,interest.getSubscriberCount());
+    }
+
+    @DisplayName("관심사 ID가 주어지면 해당 ID가 데이터베이스에 존재하면 성공적으로 삭제된다.")
+    @Test
+    void deleteInterestShouldSucceedWithValidInterestId() {
+        // given
+        UUID interestId = UUID.randomUUID();
+        Interest interest = new Interest("name", List.of("keyword1","keyword2"),1);
+        given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(interest));
+        willDoNothing().given(subscriptionRepository).deleteByInterest(interest);
+        willDoNothing().given(interestRepository).delete(interest);
+
+        // when
+        interestService.delete(interestId);
+
+        // then
+        then(interestRepository).should(times(1)).findById(interestId);
+        then(subscriptionRepository).should(times(1)).deleteByInterest(interest);
+        then(interestRepository).should(times(1)).delete(interest);
+    }
+
+    @DisplayName("주어지는 관심사 ID가 데이터베이스에 존재하지 않으면 삭제할 수 없다.")
+    @Test
+    void deleteInterestShouldFailWithInvalidInterestId() {
+        // given
+        UUID interestId = UUID.randomUUID();
+        given(interestRepository.findById(interestId)).willReturn(Optional.empty());
+
+        // When & then
+        Exception exception = assertThrows(InterestNotFoundException.class, () -> interestService.delete(interestId));
+        assertEquals("관심사를 찾을 수 없습니다.", exception.getMessage());
     }
 }
