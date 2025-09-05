@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -118,5 +120,47 @@ public class InterestControllerTest {
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
         resultActions.andExpect(status().isInternalServerError());
+    }
+
+    @DisplayName("구독 취소 시 userId와 interestId를 통해 해당하는 구독을 취소합니다.")
+    @Test
+    void unsubscribe() throws Exception{
+        // 본문 생성
+        UUID userId = UUID.randomUUID();
+        UUID interestId = UUID.randomUUID();
+
+        // given
+        doNothing().when(interestService).unsubscribe(userId, interestId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                        .header("Monew-Request-User-ID",userId)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @DisplayName("헤더에 Monew-Request-User-ID가 존재하지 않으면 실패합니다.")
+    @Test
+    void unsubscribeShouldFailWhenInvalidUserIdOrInterestId() throws Exception{
+        // 본문 생성
+        UUID userId = UUID.randomUUID();
+        UUID interestId = UUID.randomUUID();
+
+        // given
+        doNothing().when(interestService).unsubscribe(userId, interestId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                        .header("Monew-Request-Fail-ID",userId)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        // then
+        resultActions.andExpect(status().is5xxServerError());
     }
 }
