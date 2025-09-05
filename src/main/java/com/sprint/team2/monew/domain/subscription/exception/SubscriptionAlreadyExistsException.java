@@ -1,8 +1,5 @@
 package com.sprint.team2.monew.domain.subscription.exception;
 
-import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
-import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
-
 import java.util.UUID;
 
 public class SubscriptionAlreadyExistsException extends SubscriptionException {

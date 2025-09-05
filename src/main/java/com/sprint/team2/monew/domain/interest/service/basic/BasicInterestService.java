@@ -1,7 +1,9 @@
 package com.sprint.team2.monew.domain.interest.service.basic;
 
+import com.sprint.team2.monew.domain.interest.dto.InterestDto;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
-import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
+import com.sprint.team2.monew.domain.interest.exception.InterestAlreadyExistsSimilarityNameException;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
@@ -9,13 +11,11 @@ import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.subscription.entity.Subscription;
 import com.sprint.team2.monew.domain.subscription.exception.SubscriptionAlreadyExistsException;
-import com.sprint.team2.monew.domain.subscription.exception.SubscriptionErrorCode;
 import com.sprint.team2.monew.domain.subscription.mapper.SubscriptionMapper;
 import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +32,18 @@ public class BasicInterestService implements InterestService {
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionMapper subscriptionMapper;
     private final UserRepository userRepository;
+
+    @Transactional
+    @Override
+    public InterestDto create(InterestRegisterRequest interestRegisterRequest) {
+        log.info("[관심사] 생성 서비스 호출");
+        validInterestName(interestRegisterRequest.name());
+        Interest interest = interestMapper.toEntity(interestRegisterRequest);
+        interestRepository.save(interest);
+        InterestDto interestDto = interestMapper.toDto(interest);
+        log.info("[관심사] 생성 완료, Id = {}", interestDto.id());
+        return interestDto;
+    }
 
     @Override
     @Transactional
@@ -67,4 +79,15 @@ public class BasicInterestService implements InterestService {
             throw SubscriptionAlreadyExistsException.alreadyExists(interestId, userId);
         }
     }
+
+    private void validInterestName(String name) {
+        if (interestRepository.existsBySimilarityNameGreaterThan80Percent(name)){
+            log.error("[관심사] 생성 실패: 유사한 관심사 존재 name = {}",name);
+            throw InterestAlreadyExistsSimilarityNameException.alreadyExistsSimilarityName(name);
+        }
+    }
+
+
+
+
 }

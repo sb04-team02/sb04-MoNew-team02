@@ -24,8 +24,14 @@ RUN ./gradlew --no-daemon dependencies || true
 
 # moving MY src to container's src
 COPY --chown=gradle:gradle src ./src
-# create .jar file in container
+# create .jar file in container (UNCOMMENT THIS LATER)
 RUN ./gradlew clean build --no-daemon --no-parallel -x test
+
+#====== temp ======= (COMMENT THIS OUT LATER)
+#RUN mkdir -p /app/build/libs
+#RUN touch /app/build/libs/placeholder-app.jar
+#====== temp over======
+
 # verification
 RUN ls -l /app/build/libs
 
@@ -38,4 +44,6 @@ ENV JVM_OPTS=""
 # copying only the built .jar file (in previous build stage - builder) to final image
 COPY --from=builder /app/build/libs/*.jar app.jar
 EXPOSE 80
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+#ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
