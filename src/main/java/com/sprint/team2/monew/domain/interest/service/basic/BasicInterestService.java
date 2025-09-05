@@ -112,6 +112,9 @@ public class BasicInterestService implements InterestService {
 
     private Subscription validateSubscription(UUID interestId, UUID userId) {
         return subscriptionRepository.findByUser_IdAndInterest_Id(userId, interestId)
-                .orElseThrow(() -> SubscriptionNotFoundException.notFound(interestId, userId));
+                .orElseThrow(() -> {
+                    log.error("[구독] 해당 유저는 해당 관심사를 구독중이 아님. userId= {}, interestId = {}", userId, interestId);
+                    return SubscriptionNotFoundException.notFound(interestId, userId);
+                });
     }
 }
