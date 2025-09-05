@@ -6,13 +6,18 @@ import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
+import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
+import com.sprint.team2.monew.domain.comment.exception.CommentForbiddenException;
+import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.basic.BasicCommentService;
 import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -91,7 +96,8 @@ public class CommentServiceTest {
     // ===== registerComment =====
 
     @Test
-    void 댓글_생성_성공_저장_및_매핑() {
+    @DisplayName("댓글 생성 성공")
+    void createComment_Success() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -134,7 +140,8 @@ public class CommentServiceTest {
     }
 
     @Test
-    void 댓글_생성_실패_사용자없음() {
+    @DisplayName("사용자가 존재하지 않아 댓글 생성 실패")
+    void createComment_Fail_UserNotFound() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -144,15 +151,16 @@ public class CommentServiceTest {
 
         // when & then
         assertThatThrownBy(() -> commentService.registerComment(request))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("User not found");
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("사용자 정보가 없습니다.");
         verify(userRepository).findById(userId);
         verifyNoMoreInteractions(userRepository);
         verifyNoInteractions(articleRepository, commentRepository, commentMapper);
     }
 
     @Test
-    void 댓글_생성_실패_게시글없음() {
+    @DisplayName("뉴스기사가 존재하지 않아 댓글 생성 실패")
+    void createComment_Fail_ArticleNotFound() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -172,7 +180,8 @@ public class CommentServiceTest {
     }
 
     @Test
-    void 댓글_생성_실패_빈내용() {
+    @DisplayName("빈 내용으로 인해 댓글 생성 실패")
+    void createComment_Fail_BlankContent() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -187,7 +196,7 @@ public class CommentServiceTest {
 
         // when & then
         assertThatThrownBy(() -> commentService.registerComment(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CommentContentRequiredException.class)
                 .hasMessageContaining("댓글 내용을 입력해주세요");
         verifyNoInteractions(commentRepository); // 저장 시도 없어야 함
     }
@@ -195,7 +204,8 @@ public class CommentServiceTest {
     // ===== updateComment =====
 
     @Test
-    void 댓글_수정_성공() {
+    @DisplayName("댓글 수정 성공")
+    void updateComment_Success() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
@@ -218,39 +228,42 @@ public class CommentServiceTest {
     }
 
     @Test
-    void 댓글_수정_실패_댓글없음() {
+    @DisplayName("댓글이 존재하지 않아 수정 실패")
+    void updateComment_Fail_CommentNotFound() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, ownerId, new CommentUpdateRequest("수정")))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Comment not found");
+                .isInstanceOf(ContentNotFoundException.class)
+                .hasMessageContaining("댓글을 찾을 수 없습니다.");
     }
 
     @Test
-    void 댓글_수정_실패_권한없음_본인아님() {
+    @DisplayName("권한 없음 - 본인 댓글 아님")
+    void updateComment_Fail_Forbidden_NotOwner() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, otherUserId, new CommentUpdateRequest("수정")))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(CommentForbiddenException.class)
                 .hasMessageContaining("본인의 댓글만");
     }
 
     @Test
-    void 댓글_수정_실패_빈내용() {
+    @DisplayName("빈 내용으로 댓글 수정 실패")
+    void updateComment_Fail_BlankContent() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, ownerId, new CommentUpdateRequest("   ")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("수정할 댓글 내용을 입력해주세요");
+                .isInstanceOf(CommentContentRequiredException.class)
+                .hasMessageContaining("댓글 내용을 입력해주세요.");
         verify(commentRepository).findById(commentId);
         verifyNoMoreInteractions(commentRepository);
         verifyNoInteractions(commentMapper);
