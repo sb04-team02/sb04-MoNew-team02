@@ -3,13 +3,17 @@ package com.sprint.team2.monew.domain.notification.entity;
 import com.sprint.team2.monew.domain.base.UpdatableEntity;
 import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "notifications")
+@Setter
+@Table(name = "notification")
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Notification extends UpdatableEntity {
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
