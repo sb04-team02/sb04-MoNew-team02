@@ -22,4 +22,5 @@ public interface ArticleMapper {
     @Mapping(target = "viewedByMe", constant = "false")
     ArticleDto toArticleDto(Map<String, String> items);
 
+    Article toEntity(ArticleDto articleDto);
 }
