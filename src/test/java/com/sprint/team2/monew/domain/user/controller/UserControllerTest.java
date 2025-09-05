@@ -80,7 +80,7 @@ class UserControllerTest {
         MvcResult result = resultActions.andReturn();
         String json = result.getResponse().getContentAsString();
         UserDto resultDto = objectMapper.readValue(json, UserDto.class);
-        assertThat(userDto).isEqualTo(resultDto);
+        assertThat(resultDto).isEqualTo(userDto);
         resultActions.andExpect(status().isCreated());
     }
 
@@ -142,7 +142,7 @@ class UserControllerTest {
         MvcResult result = resultActions.andReturn();
         String json = result.getResponse().getContentAsString();
         UserDto resultDto = objectMapper.readValue(json, UserDto.class);
-        assertThat(userDto).isEqualTo(resultDto);
+        assertThat(resultDto).isEqualTo(userDto);
         resultActions.andExpect(status().isOk());
     }
 
@@ -200,13 +200,14 @@ class UserControllerTest {
                             return httpRequest;
                         })
                         .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .header("Monew-Request-User-ID", loginUserId.toString())
         );
 
         // then
         MvcResult result = resultActions.andReturn();
         String json = result.getResponse().getContentAsString();
         UserDto resultDto = objectMapper.readValue(json, UserDto.class);
-        assertThat(userDto).isEqualTo(resultDto);
+        assertThat(resultDto).isEqualTo(userDto);
         resultActions.andExpect(status().isOk());
     }
 
