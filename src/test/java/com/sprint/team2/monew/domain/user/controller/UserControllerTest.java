@@ -39,7 +39,7 @@ class UserControllerTest {
     // 등록 테스트
     @Test
     @DisplayName("사용자 등록 성공 테스트")
-    void createUser_Success() throws Exception {
+    void createUserSuccess() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         String email = "test@test.com";
@@ -86,7 +86,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("사용자 등록 실패 테스트 - 유효하지 않은 요청")
-    void createUser_Failure_InvalidRequest() throws Exception {
+    void createUserFailureInvalidRequest() throws Exception {
         // 요청 생성
         UserRegisterRequest request = new UserRegisterRequest(
                 "invalid-email",  // 이메일 형식 위반
@@ -105,7 +105,7 @@ class UserControllerTest {
     // 로그인 테스트
     @Test
     @DisplayName("로그인 성공 테스트")
-    void loginUser_Success() throws Exception {
+    void loginUserSuccess() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         String email = "test@test.com";
@@ -148,7 +148,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("로그인 실패 테스트 - 유효하지 않은 요청")
-    void loginUser_Failure_InvalidRequest() throws Exception {
+    void loginUserFailureInvalidRequest() throws Exception {
         // 요청 생성
         UserLoginRequest request = new UserLoginRequest(
                 "invalid-email", // 이메일 형식 위반
@@ -165,7 +165,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("업데이트 성공 테스트")
-    void updateUser_Success() throws Exception {
+    void updateUserSuccess() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         UUID loginUserId = userId;
@@ -213,7 +213,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("업데이트 실패 테스트 - 유효하지 않은 요청")
-    void updateUser_Failure_InvalidRequest() throws Exception {
+    void updateUserFailureInvalidRequest() throws Exception {
         // 요청 생성
         UUID userId = UUID.randomUUID();
         UserUpdateRequest request = new UserUpdateRequest("testtesttesttesttesttest");

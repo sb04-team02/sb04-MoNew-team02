@@ -44,7 +44,7 @@ class BasicUserServiceTest {
     // 생성 테스트
     @Test
     @DisplayName("사용자 생성 성공")
-    void createUser_Success() {
+    void createUserSuccess() {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         String email = "test@test.com";
@@ -80,7 +80,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("이미 존재하는 이메일로 사용자 생성 시도 시 실패")
-    void createUser_WithExistingEmail_ThrowsException() {
+    void createUserWithExistingEmailThrowsException() {
         // 기본 변수 및 객체 설정
         String email = "test@test.com";
         String password = "test1234";
@@ -100,7 +100,7 @@ class BasicUserServiceTest {
     // 로그인 테스트
     @Test
     @DisplayName("사용자 로그인 성공")
-    void loginUser_Success() {
+    void loginUserSuccess() {
         // 기본 변수 및 객체 설정
         String email = "test@test.com";
         String password = "test1234";
@@ -130,7 +130,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 이메일로 로그인 시도 시 실패")
-    void loginUser_InvalidEmail_ThrowsException() {
+    void loginUserInvalidEmailThrowsException() {
         // 기본 변수 및 객체 설정
         String email = "test@test.com";
         String password = "test1234";
@@ -147,7 +147,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("일치하지 않는 비밀번호로 로그인 시도 시 실패")
-    void loginUser_InvalidPassword_ThrowsException() {
+    void loginUserInvalidPasswordThrowsException() {
         // 기본 변수 및 객체 설정
         String email = "test@test.com";
         String password = "test1234";
@@ -168,7 +168,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 정보 수정 성공")
-    void updateUser_Success() {
+    void updateUserSuccess() {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
         UUID userId = UUID.randomUUID();
@@ -198,8 +198,23 @@ class BasicUserServiceTest {
     }
 
     @Test
+    @DisplayName("로그인된 사용자 id와 다른 사용자 id로 정보 수정 시도 시 실패")
+    void updateUserMismatchLoginUserIdThrowsException() {
+        // 기본 변수 및 객체 설정
+        UserUpdateRequest request = new UserUpdateRequest("newNickname");
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = UUID.randomUUID();
+
+        // 로그인된 UUID와 정보 수정을 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
+
+        // when & then
+        assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
+                .isInstanceOf(ForbiddenUserAuthorityException.class);
+    }
+
+    @Test
     @DisplayName("유효하지 않은 사용자 id로 정보 수정 시도 시 실패")
-    void updateUser_InvalidUserId_ThrowsException() {
+    void updateUserInvalidUserIdThrowsException() {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
         UUID userId = UUID.randomUUID();
@@ -212,27 +227,5 @@ class BasicUserServiceTest {
         // when & then
         assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
                 .isInstanceOf(UserNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("로그인된 사용자 id와 다른 사용자 id로 정보 수정 시도 시 실패")
-    void updateUser_MismatchLoginUserId_ThrowsException() {
-        // 기본 변수 및 객체 설정
-        UserUpdateRequest request = new UserUpdateRequest("newNickname");
-        UUID userId = UUID.randomUUID();
-        String email = "test@test.com";
-        String password = "test1234";
-        String nickname = "test";
-        User user = new User(email, password, nickname);
-        UUID loginUserId = UUID.randomUUID();
-
-        // given
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-        // 로그인된 UUID와 정보 수정을 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
-
-        // when & then
-        assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
-                .isInstanceOf(ForbiddenUserAuthorityException.class);
     }
 }
