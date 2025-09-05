@@ -12,6 +12,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User extends DeletableEntity {
 
     @Column(name = "email", unique = true, nullable = false)

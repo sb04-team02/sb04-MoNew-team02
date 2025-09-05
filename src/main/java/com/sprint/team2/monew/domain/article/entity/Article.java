@@ -1,7 +1,7 @@
 package com.sprint.team2.monew.domain.article.entity;
 
 import com.sprint.team2.monew.domain.base.DeletableEntity;
-import com.sprint.team2.monew.domain.base.UpdatableEntity;
+import com.sprint.team2.monew.domain.interest.entity.Interest;
 import jakarta.persistence.*;
 import lombok.*;
 

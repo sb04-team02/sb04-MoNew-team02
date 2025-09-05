@@ -1,18 +1,18 @@
 package com.sprint.team2.monew.domain.notification.entity;
 
 import com.sprint.team2.monew.domain.base.UpdatableEntity;
+import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
-
 
 import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "notification")
+@Table(name = "notifications")
 public class Notification extends UpdatableEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
