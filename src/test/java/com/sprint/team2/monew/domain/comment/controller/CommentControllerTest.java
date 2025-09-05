@@ -41,7 +41,7 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("댓글 작성 성공 - 201")
-    void createComment_Success_201() throws Exception {
+    void createCommentSuccess() throws Exception {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -79,7 +79,7 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("댓글 작성 실패 - 검증 오류 400")
-    void createComment_Fail_BadRequest() throws Exception {
+    void createCommentFailValidationBadRequest() throws Exception {
         // given: content가 @NotBlank 위반
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -99,7 +99,7 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("댓글 수정 성공 - 200")
-    void updateComment_Success_200() throws Exception {
+    void updateCommentSuccess() throws Exception {
         // given
         UUID commentId = UUID.randomUUID();
         UUID requesterId = UUID.randomUUID();
@@ -135,7 +135,7 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("댓글 수정 실패 - 잘못된 입력(빈 내용)-400")
-    void updateComment_Fail_BadRequest_400() throws Exception {
+    void updateCommentFailValidationBadRequest() throws Exception {
         // given
         UUID commentId = UUID.randomUUID();
         UUID requesterId = UUID.randomUUID();

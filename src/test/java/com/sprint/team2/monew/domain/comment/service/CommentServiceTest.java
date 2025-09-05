@@ -97,7 +97,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("댓글 생성 성공")
-    void createComment_Success() {
+    void createCommentSuccess() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -141,7 +141,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("사용자가 존재하지 않아 댓글 생성 실패")
-    void createComment_Fail_UserNotFound() {
+    void createCommentShouldFailWhenUserNotFound() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -160,7 +160,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("뉴스기사가 존재하지 않아 댓글 생성 실패")
-    void createComment_Fail_ArticleNotFound() {
+    void createCommentShouldFailWhenArticleNotFound() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -181,7 +181,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("빈 내용으로 인해 댓글 생성 실패")
-    void createComment_Fail_BlankContent() {
+    void createCommentShouldFailWhenContentIsBlank() {
         // given
         UUID articleId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -205,7 +205,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("댓글 수정 성공")
-    void updateComment_Success() {
+    void updateCommentSuccess() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
@@ -229,7 +229,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("댓글이 존재하지 않아 수정 실패")
-    void updateComment_Fail_CommentNotFound() {
+    void updateCommentShouldFailWhenCommentNotFound() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.empty());
 
@@ -242,7 +242,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("권한 없음 - 본인 댓글 아님")
-    void updateComment_Fail_Forbidden_NotOwner() {
+    void updateCommentShouldFailForNonOwner() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
@@ -255,7 +255,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("빈 내용으로 댓글 수정 실패")
-    void updateComment_Fail_BlankContent() {
+    void updateCommentShouldFailWhenContentIsBlank() {
         // given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
