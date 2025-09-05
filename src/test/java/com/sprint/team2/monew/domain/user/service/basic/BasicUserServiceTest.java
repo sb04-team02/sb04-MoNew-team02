@@ -4,8 +4,10 @@ import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserRegisterRequest;
 import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.entity.User;
-import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
+import com.sprint.team2.monew.domain.user.exception.ForbiddenUserAuthorityException;
+import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -161,5 +163,63 @@ class BasicUserServiceTest {
         // when & then
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(InvalidUserCredentialsException.class);
+    }
+
+    @Test
+    @DisplayName("논리적 사용자 삭제 성공")
+    void deleteLogicallyUser_Success() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+
+        // given
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // when
+        userService.deleteLogically(userId, loginUserId);
+
+        // then
+        assertThat(user.getDeletedAt()).isNotNull();
+        assertThat(user.getDeletedAt()).isBeforeOrEqualTo(LocalDateTime.now());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자에 대해 논리적 삭제 시도 시 실패")
+    void deleteLogicallyUser_InvalidUser_ThrowsException() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        // given
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("로그인된 사용자와 다른 사용자 id로 논리적 삭제 시도 시 실패")
+    void deleteLogicallyUser_MismatchLoginId_ThrowsException() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = UUID.randomUUID();
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+
+        // given
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // 로그인된 UUID와 논리적 삭제 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
+                .isInstanceOf(ForbiddenUserAuthorityException.class);
     }
 }
