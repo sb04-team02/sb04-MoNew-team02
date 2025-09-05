@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface NotificationService {
 
-    NotificationDto notifyInterestArticleRegistered(InterestArticleRegisteredEvent event);
-
-    NotificationDto notifyCommentLiked(CommentLikedEvent event);
+//    NotificationDto notifyInterestArticleRegistered(InterestArticleRegisteredEvent event);
+//
+//    NotificationDto notifyCommentLiked(CommentLikedEvent event);
 
     void confirmNotification(UUID notificationId);
 
