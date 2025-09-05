@@ -30,9 +30,11 @@ public class Article extends DeletableEntity {
     @Column(name = "summary", nullable = false, length = 100)
     private String summary;
 
+    @Builder.Default
     @Column(name = "comment_count", nullable = false)
     private long commentCount = 0L;
 
+    @Builder.Default
     @Column(name = "view_count", nullable = false)
     private long viewCount = 0L;
 
