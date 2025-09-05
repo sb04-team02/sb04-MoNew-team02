@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class SubscriptionAlreadyExistsException extends SubscriptionException {
     public SubscriptionAlreadyExistsException() {
-        super(SubscriptionErrorCode.ALREADY_EXISTS_SUBSCRIPTION);
+        super(SubscriptionErrorCode.SUBSCRIPTION_ALREADY_EXISTS);
     }
 
     public static SubscriptionAlreadyExistsException alreadyExists(UUID interestId, UUID userId) {

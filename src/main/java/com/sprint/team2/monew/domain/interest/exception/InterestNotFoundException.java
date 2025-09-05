@@ -1,6 +1,5 @@
 package com.sprint.team2.monew.domain.interest.exception;
 
-
 import java.util.UUID;
 
 public class InterestNotFoundException extends InterestException {
