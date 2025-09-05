@@ -22,8 +22,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -237,23 +236,24 @@ class UserControllerTest {
 
     @Test
     @DisplayName("논리적 삭제 성공 테스트")
-    void deleteLogicallyUser_Success() throws Exception {
+    void deleteLogicallyUserSuccess() throws Exception {
         // 기본 객체 생성
-
-        // 요청 생성
-
-        // 본문 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
 
         // given
+        willDoNothing().given(userService).deleteLogically(userId, loginUserId);
 
-        // when
-
-        // then
+        // when & then
+        mockMvc.perform(delete("/api/users/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("논리적 삭제 실패 테스트 - 존재하지 않는 사용자")
-    void deleteLogicallyUser_Failure_UserNotFound() throws Exception {
+    void deleteLogicallyUserFailureUserNotFound() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         UUID loginUserId = userId;
@@ -271,7 +271,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("논리적 삭제 실패 테스트 - 삭제 권한 없음")
-    void deleteLogicallyUser_Failure_ForbiddenUserAuthority() throws Exception {
+    void deleteLogicallyUserFailureForbiddenUserAuthority() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         UUID loginUserId = UUID.randomUUID();

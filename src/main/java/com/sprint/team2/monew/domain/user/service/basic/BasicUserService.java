@@ -77,7 +77,7 @@ public class BasicUserService implements UserService {
         log.info("[사용자] 정보 수정 시작");
         if (!loginUserId.equals(userId)) {
             log.error("[사용자] 정보 수정 실패 - 해당 사용자에 대한 권한이 없음 id={}", userId);
-            throw ForbiddenUserAuthorityException.forUpdate();
+            throw ForbiddenUserAuthorityException.forUpdate(userId, loginUserId);
         }
 
         User user = userRepository.findById(userId)

@@ -253,7 +253,7 @@ class BasicUserServiceTest {
     // 삭제 테스트 - 논리 삭제
     @Test
     @DisplayName("논리적 사용자 삭제 성공")
-    void deleteLogicallyUser_Success() {
+    void deleteLogicallyUserSuccess() {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         UUID loginUserId = userId;
@@ -275,7 +275,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 사용자에 대해 논리적 삭제 시도 시 실패")
-    void deleteLogicallyUser_InvalidUser_ThrowsException() {
+    void deleteLogicallyUserInvalidUserThrowsException() {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         UUID loginUserId = userId;
@@ -290,7 +290,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("로그인된 사용자와 다른 사용자 id로 논리적 삭제 시도 시 실패")
-    void deleteLogicallyUser_MismatchLoginId_ThrowsException() {
+    void deleteLogicallyUserMismatchLoginIdThrowsException() {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         UUID loginUserId = UUID.randomUUID();
