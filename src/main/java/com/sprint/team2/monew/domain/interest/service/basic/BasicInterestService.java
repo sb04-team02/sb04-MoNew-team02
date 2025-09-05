@@ -1,6 +1,9 @@
 package com.sprint.team2.monew.domain.interest.service.basic;
 
+import com.sprint.team2.monew.domain.interest.dto.InterestDto;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
+import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
@@ -8,9 +11,11 @@ import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.entity.Subscription;
 import com.sprint.team2.monew.domain.subscription.exception.SubscriptionNotFoundException;
 import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
+import com.sprint.team2.monew.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -22,6 +27,20 @@ public class BasicInterestService implements InterestService {
     private final InterestMapper interestMapper;
     private final SubscriptionRepository subscriptionRepository;
 
+    @Transactional
+    @Override
+    public InterestDto create(InterestRegisterRequest interestRegisterRequest) {
+        log.info("[관심사] 생성 서비스 호출");
+        validInterestName(interestRegisterRequest.name());
+        Interest interest = interestMapper.toEntity(interestRegisterRequest);
+        interestRepository.save(interest);
+        InterestDto interestDto = interestMapper.toDto(interest);
+        log.info("[관심사] 생성 완료, Id = {}", interestDto.id());
+        return interestDto;
+    }
+
+    @Override
+    @Transactional
     public void unsubscribe(UUID interestId, UUID userId) {
         log.info("[구독] 구독 취소 호출");
         Subscription subscription = validateSubscription(interestId, userId);
@@ -29,6 +48,13 @@ public class BasicInterestService implements InterestService {
         interest.decreaseSubscriber();
         subscriptionRepository.delete(subscription);
         log.info("[구독] 구독 취소 완료");
+    }
+
+    private void validInterestName(String name) {
+        if (interestRepository.existsBySimilarityNameGreaterThan80Percent(name)){
+            log.error("[관심사] 생성 실패: 유사한 관심사 존재 name = {}",name);
+            throw new BusinessException(InterestErrorCode.INTEREST_ALREADY_EXISTS_SIMILARITY_NAME);
+        }
     }
 
     private Subscription validateSubscription(UUID interestId, UUID userId) {

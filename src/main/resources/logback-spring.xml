@@ -9,7 +9,7 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yy}-%d{MM}-%d{dd} %d{HH}:%d{mm}:%d{ss} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] -
+            <pattern>%d{yy}-%d{MM}-%d{dd} %d{HH}:%d{mm}:%d{ss} [%X{requestIP} | %X{requestId} | %X{requestMethod} | %X{requestUrl}] -
                 %msg%n
             </pattern>
         </encoder>
