@@ -5,16 +5,20 @@ import com.sprint.team2.monew.domain.base.DeletableEntity;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "comments")
-@NoArgsConstructor
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comment extends DeletableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,16 +33,13 @@ public class Comment extends DeletableEntity {
     private String content;
 
     @Column(name = "like_count", nullable = false)
-    private String likeCount;
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reaction> likes = new ArrayList<>();
+    private long likeCount = 0L;
 
     public void update(String content) {
         this.content = content;
     }
 
-    public int getLikeCount() {
-        return likes.size();
+    public long getLikeCount() {
+        return this.likeCount;
     }
 }
