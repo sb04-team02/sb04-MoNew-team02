@@ -174,7 +174,6 @@ class UserControllerTest {
         UUID userId = UUID.randomUUID();
         UUID loginUserId = userId;
         String email = "test@test.com";
-        String nickname = "테스트";
         LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
 
         // 요청 생성
