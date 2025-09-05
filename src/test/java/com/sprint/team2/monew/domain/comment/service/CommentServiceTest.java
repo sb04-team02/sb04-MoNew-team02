@@ -214,9 +214,9 @@ public class CommentServiceTest {
                 "수정된 내용", 0L, false, LocalDateTime.now()
         );
         given(commentMapper.toDto(any(Comment.class), eq(false))).willReturn(expected);
+        CommentUpdateRequest req = new CommentUpdateRequest("수정된 내용");
 
         // when
-        CommentUpdateRequest req = new CommentUpdateRequest("수정된 내용");
         CommentDto result = commentService.updateComment(commentId, ownerId, req);
 
         // then
