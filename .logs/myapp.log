@@ -1,39 +1,156 @@
-25-09-05 09:31:50 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 2408 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 09:31:50 [ |  |  | ] -
+25-09-04 19:03:46 [127.0.0.1 | 5b5558cd-2ede-480d-9d05-c65f43900d6b | POST | /api/users/login] -
+                Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.team2.monew.domain.user.dto.response.UserDto> com.sprint.team2.monew.domain.user.controller.UserController.login(com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest) with 2 errors: [Field error in object 'userLoginRequest' on field 'email': rejected value [invalid-email]; codes [Email.userLoginRequest.email,Email.email,Email.java.lang.String,Email]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userLoginRequest.email,email]; arguments []; default message [email],[Ljakarta.validation.constraints.Pattern$Flag;@2094869b,.*]; default message [유효한 이메일 주소를 입력해주세요]] [Field error in object 'userLoginRequest' on field 'password': rejected value [testtesttesttesttesttest]; codes [Size.userLoginRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userLoginRequest.password,password]; arguments []; default message [password],20,6]; default message [비밀번호는 6자 이상 20자 이하로 작성해주세요]] ]
+25-09-05 10:28:39 [ |  |  | ] -
+                Starting InterestControllerTest using Java 17.0.12 with PID 16711 (started by apple in /Users/apple/Documents/codeit/sb04-MoNew-team02)
+25-09-05 10:28:39 [ |  |  | ] -
                 No active profile set, falling back to 1 default profile: "default"
-25-09-05 09:31:51 [ |  |  | ] -
+25-09-05 10:28:42 [ |  |  | ] -
                 Initializing Spring TestDispatcherServlet ''
-25-09-05 09:31:51 [ |  |  | ] -
+25-09-05 10:28:42 [ |  |  | ] -
                 Initializing Servlet ''
-25-09-05 09:31:51 [ |  |  | ] -
+25-09-05 10:28:42 [ |  |  | ] -
                 Completed initialization in 1 ms
-25-09-05 09:31:51 [ |  |  | ] -
-                Started CommentControllerTest in 1.872 seconds (process running for 2.689)
-25-09-05 09:31:52 [127.0.0.1 | 6707362e-8bd7-4ad4-96c8-56a548f389f0 | POST | /api/comments] -
-                댓글 작성 요청: articleId=0ddf3bbc-469b-4465-9214-b5c38b132a5d, userId=2ea4eb4d-6c94-4608-9d45-6443be235735
-25-09-05 09:31:52 [127.0.0.1 | 6707362e-8bd7-4ad4-96c8-56a548f389f0 | POST | /api/comments] -
-                댓글 작성 성공: commentId=876a86b9-0c74-44e3-91ec-d2ca24bc4cdb, articleId=0ddf3bbc-469b-4465-9214-b5c38b132a5d, userId=2ea4eb4d-6c94-4608-9d45-6443be235735
-25-09-05 09:32:06 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 2442 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 09:32:06 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 09:32:08 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 09:32:08 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 09:32:08 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 09:32:08 [ |  |  | ] -
-                Started CommentControllerTest in 1.935 seconds (process running for 2.712)
-25-09-05 09:32:08 [127.0.0.1 | fcee2155-8547-40b4-82b4-83afa28c34d3 | POST | /api/comments] -
+25-09-05 10:28:42 [ |  |  | ] -
+                Started InterestControllerTest in 3.121 seconds (process running for 9.204)
+25-09-05 10:28:42 [127.0.0.1 | d32cc971-37d8-4f1e-b0e2-4acf93652b3f | DELETE | /api/interests/5965d358-c3b8-430d-8dcf-8502c59c6717/subscriptions] -
+                예상치 못한 오류 발생: Required request header 'Monew-Request-User-ID' for method parameter type UUID is not present
+org.springframework.web.bind.MissingRequestHeaderException: Required request header 'Monew-Request-User-ID' for method parameter type UUID is not present
+	at org.springframework.web.method.annotation.RequestHeaderMethodArgumentResolver.handleMissingValue(RequestHeaderMethodArgumentResolver.java:87)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.handleMissingValue(AbstractNamedValueMethodArgumentResolver.java:234)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125)
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doDelete(FrameworkServlet.java:936)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:596)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165)
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
+	at com.sprint.team2.monew.interest.controller.InterestControllerTest.unsubscribeShouldFailWhenInvalidUserIdOrInterestId(InterestControllerTest.java:157)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
+	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+25-09-05 10:28:42 [127.0.0.1 | 5c590ef1-13d1-4f21-aada-49c2d23a9d79 | POST | /api/interests/19b27669-9151-419e-b65a-77b8534476d9/subscriptions] -
+                [관심사] 구독 등록 호출 interestId = 19b27669-9151-419e-b65a-77b8534476d9, userId = 1db383ae-8e37-449b-98f6-e3ba24d26618
+25-09-05 10:28:42 [127.0.0.1 | 5c590ef1-13d1-4f21-aada-49c2d23a9d79 | POST | /api/interests/19b27669-9151-419e-b65a-77b8534476d9/subscriptions] -
+                [관심사] 구독 등록 응답 완료 id = 84e8e2d8-b3b2-4a43-9130-995c4831d62a
+25-09-05 10:28:42 [127.0.0.1 | 53e73c2c-b4ef-467b-bddc-aa654d2d182b | POST | /api/interests] -
                 Failure in @ExceptionHandler com.sprint.team2.monew.global.error.GlobalExceptionHandler#handleValidationExceptions(MethodArgumentNotValidException)
 com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니다.
 	at com.sprint.team2.monew.global.error.GlobalExceptionHandler.handleValidationExceptions(GlobalExceptionHandler.java:42)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
 	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
 	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
@@ -67,11 +184,11 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
 	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
 	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
-	at com.sprint.team2.monew.domain.comment.controller.CommentControllerTest.댓글_작성_실패_검증오류_400(CommentControllerTest.java:84)
+	at com.sprint.team2.monew.interest.controller.InterestControllerTest.createInterestShouldFailWhenKeywordsIsEmpty(InterestControllerTest.java:78)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
 	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
 	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
@@ -143,7 +260,7 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
 	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
 	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
@@ -158,227 +275,22 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
-25-09-05 09:32:08 [127.0.0.1 | fcee2155-8547-40b4-82b4-83afa28c34d3 | POST | /api/comments] -
-                Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.team2.monew.domain.comment.dto.CommentDto> com.sprint.team2.monew.domain.comment.controller.CommentController.createComment(com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest): [Field error in object 'commentRegisterRequest' on field 'content': rejected value []; codes [NotBlank.commentRegisterRequest.content,NotBlank.content,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [commentRegisterRequest.content,content]; arguments []; default message [content]]; default message [댓글 내용을 입력해주세요]] ]
-25-09-05 09:32:25 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 2471 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 09:32:25 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 09:32:27 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 09:32:27 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 09:32:27 [ |  |  | ] -
-                Completed initialization in 2 ms
-25-09-05 09:32:27 [ |  |  | ] -
-                Started CommentControllerTest in 2.096 seconds (process running for 2.808)
-25-09-05 09:32:27 [127.0.0.1 | 4114b2c7-bd96-452a-9ea4-306ceadb9a4d | PATCH | /api/comments/48854a0d-e02a-4339-af2c-ebd9aff7426a] -
-                댓글 수정 요청: commentId=48854a0d-e02a-4339-af2c-ebd9aff7426a, requesterUserId=f60071c1-91ac-40b8-afc5-26383cb4ac50
-25-09-05 09:32:27 [127.0.0.1 | 4114b2c7-bd96-452a-9ea4-306ceadb9a4d | PATCH | /api/comments/48854a0d-e02a-4339-af2c-ebd9aff7426a] -
-                댓글 수정 성공: commentId=48854a0d-e02a-4339-af2c-ebd9aff7426a
-25-09-05 09:32:41 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 2507 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 09:32:41 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 09:32:42 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 09:32:42 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 09:32:42 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 09:32:42 [ |  |  | ] -
-                Started CommentControllerTest in 1.916 seconds (process running for 2.742)
-25-09-05 09:32:42 [127.0.0.1 | dc4f6710-e4d2-4040-b9b8-72f5a2986916 | PATCH | /api/comments/2fdf16ad-2445-44e2-9e70-8e0d1283016f] -
-                댓글 수정 요청: commentId=2fdf16ad-2445-44e2-9e70-8e0d1283016f, requesterUserId=a7093434-e51c-461b-b2f3-fefa55f64437
-25-09-05 09:32:42 [127.0.0.1 | dc4f6710-e4d2-4040-b9b8-72f5a2986916 | PATCH | /api/comments/2fdf16ad-2445-44e2-9e70-8e0d1283016f] -
-                예상치 못한 오류 발생: 403 FORBIDDEN "본인의 댓글만 수정할 수 있습니다."
-org.springframework.web.server.ResponseStatusException: 403 FORBIDDEN "본인의 댓글만 수정할 수 있습니다."
-	at com.sprint.team2.monew.domain.comment.controller.CommentController.update(CommentController.java:50)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
+25-09-05 10:28:42 [127.0.0.1 | 53e73c2c-b4ef-467b-bddc-aa654d2d182b | POST | /api/interests] -
+                Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity com.sprint.team2.monew.domain.interest.controller.InterestController.create(com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest): [Field error in object 'interestRegisterRequest' on field 'keywords': rejected value [[]]; codes [Size.interestRegisterRequest.keywords,Size.keywords,Size.java.util.List,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [interestRegisterRequest.keywords,keywords]; arguments []; default message [keywords],10,1]; default message [키워드는 1개 이상이어야 하며 10개까지 가능합니다.]] ]
+25-09-05 10:28:42 [127.0.0.1 | 7f05a89b-39cf-468d-b3f3-a75e33597928 | POST | /api/interests/a8f9384a-8048-4695-92d2-2f2e393a06c1/subscriptions] -
+                예상치 못한 오류 발생: Required request header 'MoNew-Request-User-ID' for method parameter type UUID is not present
+org.springframework.web.bind.MissingRequestHeaderException: Required request header 'MoNew-Request-User-ID' for method parameter type UUID is not present
+	at org.springframework.web.method.annotation.RequestHeaderMethodArgumentResolver.handleMissingValue(RequestHeaderMethodArgumentResolver.java:87)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.handleMissingValue(AbstractNamedValueMethodArgumentResolver.java:234)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125)
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181)
 	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
 	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)
 	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)
 	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
 	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:888)
-	at org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
-	at com.sprint.team2.monew.domain.comment.controller.CommentControllerTest.댓글_수정_실패_권한없음_403(CommentControllerTest.java:142)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
-	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
-	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
-	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
-	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
-	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
-	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
-25-09-05 11:43:31 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 5743 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 11:43:31 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 11:43:32 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 11:43:32 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 11:43:32 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 11:43:32 [ |  |  | ] -
-                Started CommentControllerTest in 2.109 seconds (process running for 2.896)
-25-09-05 11:43:33 [127.0.0.1 | b02ea248-2b90-4850-b7da-2dc149104cb3 | POST | /api/comments] -
-                댓글 작성 요청: articleId=54cafc99-6ba9-4967-91c0-f3b29d8b46b4, userId=a48891dd-df0a-4585-b25c-c4832a7352e4
-25-09-05 11:43:33 [127.0.0.1 | b02ea248-2b90-4850-b7da-2dc149104cb3 | POST | /api/comments] -
-                댓글 작성 성공: commentId=91060769-2553-4b5b-99de-caaaa6797df2, articleId=54cafc99-6ba9-4967-91c0-f3b29d8b46b4, userId=a48891dd-df0a-4585-b25c-c4832a7352e4
-25-09-05 11:43:41 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 5769 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 11:43:41 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 11:43:43 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 11:43:43 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 11:43:43 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 11:43:43 [ |  |  | ] -
-                Started CommentControllerTest in 1.82 seconds (process running for 2.636)
-25-09-05 11:43:43 [127.0.0.1 | f5a7f4a8-847f-4e13-ad19-6bc375a1d89b | PATCH | /api/comments/492ebb7e-f949-4bd1-ac95-7f47ac434ca6] -
-                댓글 수정 요청: commentId=492ebb7e-f949-4bd1-ac95-7f47ac434ca6, requesterUserId=2f6be305-1fcc-40b4-bbfa-3e05f8a50230
-25-09-05 11:43:43 [127.0.0.1 | f5a7f4a8-847f-4e13-ad19-6bc375a1d89b | PATCH | /api/comments/492ebb7e-f949-4bd1-ac95-7f47ac434ca6] -
-                댓글 수정 성공: commentId=492ebb7e-f949-4bd1-ac95-7f47ac434ca6
-25-09-05 11:43:47 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 5792 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 11:43:47 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 11:43:49 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 11:43:49 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 11:43:49 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 11:43:49 [ |  |  | ] -
-                Started CommentControllerTest in 1.801 seconds (process running for 2.638)
-25-09-05 11:43:49 [127.0.0.1 | 825e08b6-1d48-4fdf-9e4e-63d74b07cbb8 | POST | /api/comments] -
-                Failure in @ExceptionHandler com.sprint.team2.monew.global.error.GlobalExceptionHandler#handleValidationExceptions(MethodArgumentNotValidException)
-com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니다.
-	at com.sprint.team2.monew.global.error.GlobalExceptionHandler.handleValidationExceptions(GlobalExceptionHandler.java:42)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
-	at org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver.doResolveHandlerMethodException(ExceptionHandlerExceptionResolver.java:471)
-	at org.springframework.web.servlet.handler.AbstractHandlerMethodExceptionResolver.doResolveException(AbstractHandlerMethodExceptionResolver.java:73)
-	at org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver.resolveException(AbstractHandlerExceptionResolver.java:182)
-	at org.springframework.web.servlet.handler.HandlerExceptionResolverComposite.resolveException(HandlerExceptionResolverComposite.java:80)
-	at org.springframework.web.servlet.DispatcherServlet.processHandlerException(DispatcherServlet.java:1360)
-	at org.springframework.test.web.servlet.TestDispatcherServlet.processHandlerException(TestDispatcherServlet.java:146)
-	at org.springframework.web.servlet.DispatcherServlet.processDispatchResult(DispatcherServlet.java:1161)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1106)
 	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
 	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
 	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
@@ -401,11 +313,11 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
 	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
 	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
-	at com.sprint.team2.monew.domain.comment.controller.CommentControllerTest.createComment_Fail_BadRequest(CommentControllerTest.java:87)
+	at com.sprint.team2.monew.interest.controller.InterestControllerTest.subscribeShouldFailWhenHeaderNotFound(InterestControllerTest.java:117)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
 	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
 	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
@@ -477,7 +389,7 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
 	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
 	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
@@ -492,30 +404,265 @@ com.sprint.team2.monew.global.error.DomainException: 잘못된 입력값입니�
 	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
-25-09-05 11:43:49 [127.0.0.1 | 825e08b6-1d48-4fdf-9e4e-63d74b07cbb8 | POST | /api/comments] -
-                Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.team2.monew.domain.comment.dto.CommentDto> com.sprint.team2.monew.domain.comment.controller.CommentController.createComment(com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest): [Field error in object 'commentRegisterRequest' on field 'content': rejected value []; codes [NotBlank.commentRegisterRequest.content,NotBlank.content,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [commentRegisterRequest.content,content]; arguments []; default message [content]]; default message [댓글 내용을 입력해주세요]] ]
-25-09-05 11:43:55 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 5829 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 11:43:55 [ |  |  | ] -
+25-09-05 10:28:42 [127.0.0.1 | a7fd07e7-5792-4b3a-88b1-c271e9f4039e | DELETE | /api/interests/069594bd-a8f7-4920-b17d-d408b35f003e/subscriptions] -
+                [구독] DELETE /api/interests/{interest-id}/subscriptions 구독 취소 API 호출
+25-09-05 10:28:42 [127.0.0.1 | a7fd07e7-5792-4b3a-88b1-c271e9f4039e | DELETE | /api/interests/069594bd-a8f7-4920-b17d-d408b35f003e/subscriptions] -
+                [구독] 구독 취소 응답 완료
+25-09-05 10:28:42 [127.0.0.1 | 335ca0be-107c-4217-a437-2ba776bfeb63 | POST | /api/interests] -
+                [관심사] 생성 컨트롤러 호출
+25-09-05 10:28:42 [127.0.0.1 | 335ca0be-107c-4217-a437-2ba776bfeb63 | POST | /api/interests] -
+                [관심사] 생성 컨트롤러 응답 생성 id=6ba384bb-db55-48ec-9271-6f303c976d0b
+25-09-05 10:41:19 [ |  |  | ] -
+                Starting MonewApplication using Java 17.0.12 with PID 17251 (/Users/apple/Documents/codeit/sb04-MoNew-team02/build/classes/java/main started by apple in /Users/apple/Documents/codeit/sb04-MoNew-team02)
+25-09-05 10:41:19 [ |  |  | ] -
                 No active profile set, falling back to 1 default profile: "default"
-25-09-05 11:43:56 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 11:43:56 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 11:43:56 [ |  |  | ] -
+25-09-05 10:41:19 [ |  |  | ] -
+                Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-09-05 10:41:19 [ |  |  | ] -
+                Finished Spring Data repository scanning in 37 ms. Found 7 JPA repository interfaces.
+25-09-05 10:41:20 [ |  |  | ] -
+                Tomcat initialized with port 8080 (http)
+25-09-05 10:41:20 [ |  |  | ] -
+                Starting service [Tomcat]
+25-09-05 10:41:20 [ |  |  | ] -
+                Starting Servlet engine: [Apache Tomcat/10.1.44]
+25-09-05 10:41:20 [ |  |  | ] -
+                Initializing Spring embedded WebApplicationContext
+25-09-05 10:41:20 [ |  |  | ] -
+                Root WebApplicationContext: initialization completed in 870 ms
+25-09-05 10:41:20 [ |  |  | ] -
+                Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration': Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine suitable jdbc url
+25-09-05 10:41:20 [ |  |  | ] -
+                Stopping service [Tomcat]
+25-09-05 10:41:20 [ |  |  | ] -
+                
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-09-05 10:41:20 [ |  |  | ] -
+                
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+
+Reason: Failed to determine suitable jdbc url
+
+
+Action:
+
+Consider the following:
+	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
+	If you have database settings to be loaded from a particular profile you may need to activate it (no profiles are currently active).
+
+25-09-05 10:41:57 [ |  |  | ] -
+                Starting MonewApplication using Java 17.0.12 with PID 17294 (/Users/apple/Documents/codeit/sb04-MoNew-team02/build/classes/java/main started by apple in /Users/apple/Documents/codeit/sb04-MoNew-team02)
+25-09-05 10:41:57 [ |  |  | ] -
+                Running with Spring Boot v3.5.5, Spring v6.2.10
+25-09-05 10:41:57 [ |  |  | ] -
+                The following 1 profile is active: "dev"
+25-09-05 10:41:58 [ |  |  | ] -
+                Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-09-05 10:41:58 [ |  |  | ] -
+                Finished Spring Data repository scanning in 35 ms. Found 7 JPA repository interfaces.
+25-09-05 10:41:58 [ |  |  | ] -
+                Tomcat initialized with port 8080 (http)
+25-09-05 10:41:58 [ |  |  | ] -
+                Starting service [Tomcat]
+25-09-05 10:41:58 [ |  |  | ] -
+                Starting Servlet engine: [Apache Tomcat/10.1.44]
+25-09-05 10:41:58 [ |  |  | ] -
+                Initializing Spring embedded WebApplicationContext
+25-09-05 10:41:58 [ |  |  | ] -
+                Root WebApplicationContext: initialization completed in 817 ms
+25-09-05 10:41:58 [ |  |  | ] -
+                HHH000204: Processing PersistenceUnitInfo [name: default]
+25-09-05 10:41:58 [ |  |  | ] -
+                HHH000412: Hibernate ORM core version 6.6.26.Final
+25-09-05 10:41:58 [ |  |  | ] -
+                HHH000026: Second-level cache disabled
+25-09-05 10:41:58 [ |  |  | ] -
+                No LoadTimeWeaver setup: ignoring JPA class transformer
+25-09-05 10:41:58 [ |  |  | ] -
+                HikariPool-1 - Starting...
+25-09-05 10:41:58 [ |  |  | ] -
+                HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@35260785
+25-09-05 10:41:58 [ |  |  | ] -
+                HikariPool-1 - Start completed.
+25-09-05 10:41:58 [ |  |  | ] -
+                HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.18
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-09-05 10:41:59 [ |  |  | ] -
+                HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-09-05 10:41:59 [ |  |  | ] -
+                Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [like_count] in table [comments]; found [int8 (Types#BIGINT)], but expecting [varchar(255) (Types#VARCHAR)]
+25-09-05 10:41:59 [ |  |  | ] -
+                Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [like_count] in table [comments]; found [int8 (Types#BIGINT)], but expecting [varchar(255) (Types#VARCHAR)]
+25-09-05 10:41:59 [ |  |  | ] -
+                HikariPool-1 - Shutdown initiated...
+25-09-05 10:41:59 [ |  |  | ] -
+                HikariPool-1 - Shutdown completed.
+25-09-05 10:41:59 [ |  |  | ] -
+                Stopping service [Tomcat]
+25-09-05 10:41:59 [ |  |  | ] -
+                
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-09-05 10:41:59 [ |  |  | ] -
+                Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [like_count] in table [comments]; found [int8 (Types#BIGINT)], but expecting [varchar(255) (Types#VARCHAR)]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.team2.monew.MonewApplication.main(MonewApplication.java:10)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [like_count] in table [comments]; found [int8 (Types#BIGINT)], but expecting [varchar(255) (Types#VARCHAR)]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:431)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 15 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [like_count] in table [comments]; found [int8 (Types#BIGINT)], but expecting [varchar(255) (Types#VARCHAR)]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateColumnType(AbstractSchemaValidator.java:169)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:156)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:99)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:77)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:289)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	... 19 common frames omitted
+25-09-05 10:42:26 [ |  |  | ] -
+                Starting MonewApplication using Java 17.0.12 with PID 17349 (/Users/apple/Documents/codeit/sb04-MoNew-team02/build/classes/java/main started by apple in /Users/apple/Documents/codeit/sb04-MoNew-team02)
+25-09-05 10:42:26 [ |  |  | ] -
+                Running with Spring Boot v3.5.5, Spring v6.2.10
+25-09-05 10:42:26 [ |  |  | ] -
+                The following 1 profile is active: "dev"
+25-09-05 10:42:27 [ |  |  | ] -
+                Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-09-05 10:42:27 [ |  |  | ] -
+                Finished Spring Data repository scanning in 34 ms. Found 7 JPA repository interfaces.
+25-09-05 10:42:27 [ |  |  | ] -
+                Tomcat initialized with port 8080 (http)
+25-09-05 10:42:27 [ |  |  | ] -
+                Starting service [Tomcat]
+25-09-05 10:42:27 [ |  |  | ] -
+                Starting Servlet engine: [Apache Tomcat/10.1.44]
+25-09-05 10:42:27 [ |  |  | ] -
+                Initializing Spring embedded WebApplicationContext
+25-09-05 10:42:27 [ |  |  | ] -
+                Root WebApplicationContext: initialization completed in 975 ms
+25-09-05 10:42:27 [ |  |  | ] -
+                HHH000204: Processing PersistenceUnitInfo [name: default]
+25-09-05 10:42:27 [ |  |  | ] -
+                HHH000412: Hibernate ORM core version 6.6.26.Final
+25-09-05 10:42:27 [ |  |  | ] -
+                HHH000026: Second-level cache disabled
+25-09-05 10:42:27 [ |  |  | ] -
+                No LoadTimeWeaver setup: ignoring JPA class transformer
+25-09-05 10:42:27 [ |  |  | ] -
+                HikariPool-1 - Starting...
+25-09-05 10:42:27 [ |  |  | ] -
+                HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@39685204
+25-09-05 10:42:27 [ |  |  | ] -
+                HikariPool-1 - Start completed.
+25-09-05 10:42:27 [ |  |  | ] -
+                HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.18
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-09-05 10:42:28 [ |  |  | ] -
+                HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-09-05 10:42:28 [ |  |  | ] -
+                Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-09-05 10:42:28 [ |  |  | ] -
+                Hibernate is in classpath; If applicable, HQL parser will be used.
+25-09-05 10:42:28 [ |  |  | ] -
+                Exposing 4 endpoints beneath base path '/actuator'
+25-09-05 10:42:29 [ |  |  | ] -
+                Tomcat started on port 8080 (http) with context path '/'
+25-09-05 10:42:29 [ |  |  | ] -
+                Started MonewApplication in 3.088 seconds (process running for 3.366)
+25-09-05 10:42:46 [ |  |  | ] -
+                Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-09-05 10:42:46 [ |  |  | ] -
+                Initializing Servlet 'dispatcherServlet'
+25-09-05 10:42:46 [ |  |  | ] -
                 Completed initialization in 1 ms
-25-09-05 11:43:56 [ |  |  | ] -
-                Started CommentControllerTest in 1.87 seconds (process running for 2.716)
-25-09-05 11:43:57 [127.0.0.1 | a2eb58f4-9557-4049-bd13-061db889a299 | PATCH | /api/comments/c89cbd35-7683-4d2e-934b-3203b9801bcc] -
-                댓글 수정 요청: commentId=c89cbd35-7683-4d2e-934b-3203b9801bcc, requesterUserId=20d05aaf-1bdc-4f77-b980-cde6ac9657d1
-25-09-05 11:43:57 [127.0.0.1 | a2eb58f4-9557-4049-bd13-061db889a299 | PATCH | /api/comments/c89cbd35-7683-4d2e-934b-3203b9801bcc] -
-                예상치 못한 오류 발생: 403 FORBIDDEN "본인의 댓글만 수정할 수 있습니다."
-org.springframework.web.server.ResponseStatusException: 403 FORBIDDEN "본인의 댓글만 수정할 수 있습니다."
-	at com.sprint.team2.monew.domain.comment.controller.CommentController.update(CommentController.java:50)
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                [관심사] 생성 컨트롤러 호출
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                [관심사] 생성 서비스 호출
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                
+    SELECT
+        EXISTS(SELECT
+            1 
+        FROM
+            interests 
+        WHERE
+            bigm_similarity(name, ?) > 0.8);
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                binding parameter (1:VARCHAR) <- [테스트]
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                [관심사] 생성 실패: 유사한 관심사 존재 name = 테스트
+25-09-05 10:42:46 [0:0:0:0:0:0:0:1 | 71a7e03f-ca8c-47c5-9196-292b618edf92 | POST | /api/interests] -
+                커스텀 예외 발생: code=INTEREST_ALREADY_EXISTS_SIMILARITY_NAME, message=비슷한 관심사가 이미 존재합니다.
+com.sprint.team2.monew.domain.interest.exception.InterestAlreadyExistsSimilarityNameException: 비슷한 관심사가 이미 존재합니다.
+	at com.sprint.team2.monew.domain.interest.exception.InterestAlreadyExistsSimilarityNameException.alreadyExistsSimilarityName(InterestAlreadyExistsSimilarityNameException.java:9)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.validInterestName(BasicInterestService.java:98)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.create(BasicInterestService.java:41)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService$$SpringCGLIB$$0.create(<generated>)
+	at com.sprint.team2.monew.domain.interest.controller.InterestController.create(InterestController.java:26)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
 	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
 	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
@@ -525,137 +672,270 @@ org.springframework.web.server.ResponseStatusException: 403 FORBIDDEN "본인의
 	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
 	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
 	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:888)
-	at org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
 	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
-	at com.sprint.team2.monew.domain.comment.controller.CommentControllerTest.updateComment_Fail_Forbidden_403(CommentControllerTest.java:147)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                [관심사] 생성 컨트롤러 호출
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                [관심사] 생성 서비스 호출
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                
+    SELECT
+        EXISTS(SELECT
+            1 
+        FROM
+            interests 
+        WHERE
+            bigm_similarity(name, ?) > 0.8);
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (1:VARCHAR) <- [테스트1]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                [관심사] 생성 완료, Id = f3fcaa19-42cc-4e74-83d7-98bf726ca559
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                
+    insert 
+    into
+        interests
+        (created_at, keywords, name, subscription_count, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (1:TIMESTAMP) <- [2025-09-05T10:42:55.476594]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (2:ARRAY) <- [[락, 발라드, 재즈]]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (3:VARCHAR) <- [테스트1]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (4:BIGINT) <- [0]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (5:TIMESTAMP) <- [2025-09-05T10:42:55.500032]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                binding parameter (6:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:42:55 [0:0:0:0:0:0:0:1 | 9b822b74-afe1-4faa-a948-825a28f1de30 | POST | /api/interests] -
+                [관심사] 생성 컨트롤러 응답 생성 id=f3fcaa19-42cc-4e74-83d7-98bf726ca559
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독 등록 호출 interestId = f3fcaa19-42cc-4e74-83d7-98bf726ca559, userId = 2e97d734-d69a-4ba0-b337-aec4fc9880ea
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 등록 호출
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        i1_0.id,
+        i1_0.created_at,
+        i1_0.keywords,
+        i1_0.name,
+        i1_0.subscription_count,
+        i1_0.updated_at 
+    from
+        interests i1_0 
+    where
+        i1_0.id=?
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id 
+    from
+        subscriptions s1_0 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    where
+        i1_0.id=? 
+        and u1_0.id=? 
+    fetch
+        first ? rows only
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:INTEGER) <- [1]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독자 증가
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 등록 완료 id = 015bbf43-ab2a-4d23-a515-92e074d3e64a
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    insert 
+    into
+        subscriptions
+        (created_at, interest_id, user_id, id) 
+    values
+        (?, ?, ?, ?)
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:TIMESTAMP) <- [2025-09-05T10:44:55.773467]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:UUID) <- [015bbf43-ab2a-4d23-a515-92e074d3e64a]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    update
+        interests 
+    set
+        keywords=?,
+        name=?,
+        subscription_count=?,
+        updated_at=? 
+    where
+        id=?
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:ARRAY) <- [[락, 발라드, 재즈]]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:VARCHAR) <- [테스트1]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:BIGINT) <- [1]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:TIMESTAMP) <- [2025-09-05T10:44:55.780272]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (5:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:55 [0:0:0:0:0:0:0:1 | e9fc8c3b-0cf5-48f9-a097-b47975135329 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독 등록 응답 완료 id = 015bbf43-ab2a-4d23-a515-92e074d3e64a
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독 등록 호출 interestId = f3fcaa19-42cc-4e74-83d7-98bf726ca559, userId = 2e97d734-d69a-4ba0-b337-aec4fc9880ea
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 등록 호출
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        i1_0.id,
+        i1_0.created_at,
+        i1_0.keywords,
+        i1_0.name,
+        i1_0.subscription_count,
+        i1_0.updated_at 
+    from
+        interests i1_0 
+    where
+        i1_0.id=?
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id 
+    from
+        subscriptions s1_0 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    where
+        i1_0.id=? 
+        and u1_0.id=? 
+    fetch
+        first ? rows only
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:INTEGER) <- [1]
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 이미 구독 중인 관심사를 구독할 수 없음, userId = 2e97d734-d69a-4ba0-b337-aec4fc9880ea, interestId = f3fcaa19-42cc-4e74-83d7-98bf726ca559
+25-09-05 10:44:58 [0:0:0:0:0:0:0:1 | a105dfce-22da-4872-8668-6cc1dd462cbd | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                커스텀 예외 발생: code=SUBSCRIPTION_ALREADY_EXISTS, message=해당 관심사를 이미 구독중입니다.
+com.sprint.team2.monew.domain.subscription.exception.SubscriptionAlreadyExistsException: 해당 관심사를 이미 구독중입니다.
+	at com.sprint.team2.monew.domain.subscription.exception.SubscriptionAlreadyExistsException.alreadyExists(SubscriptionAlreadyExistsException.java:11)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.validateDuplicateSubscription(BasicInterestService.java:91)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.subscribe(BasicInterestService.java:55)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
-	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
-	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
-	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService$$SpringCGLIB$$0.subscribe(<generated>)
+	at com.sprint.team2.monew.domain.interest.controller.InterestController.subscriptions(InterestController.java:35)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
-	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
-	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
-	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
-25-09-05 11:52:44 [ |  |  | ] -
-                Starting CommentControllerTest using Java 17.0.15 with PID 6045 (started by sin-eunsu in /Users/sin-eunsu/codeitproject/sb04-MoNew-team02)
-25-09-05 11:52:44 [ |  |  | ] -
-                No active profile set, falling back to 1 default profile: "default"
-25-09-05 11:52:45 [ |  |  | ] -
-                Initializing Spring TestDispatcherServlet ''
-25-09-05 11:52:45 [ |  |  | ] -
-                Initializing Servlet ''
-25-09-05 11:52:45 [ |  |  | ] -
-                Completed initialization in 1 ms
-25-09-05 11:52:45 [ |  |  | ] -
-                Started CommentControllerTest in 1.72 seconds (process running for 2.491)
-25-09-05 11:52:46 [127.0.0.1 | 05b6503f-c35c-4350-961c-2478d8239fae | PATCH | /api/comments/7f2e469f-7070-432f-9ce0-2fe5101abfed] -
-                댓글 수정 요청: commentId=7f2e469f-7070-432f-9ce0-2fe5101abfed, requesterUserId=9bd184c8-b83e-45cf-a33c-e43f23571fb5
-25-09-05 11:52:46 [127.0.0.1 | 05b6503f-c35c-4350-961c-2478d8239fae | PATCH | /api/comments/7f2e469f-7070-432f-9ce0-2fe5101abfed] -
-                커스텀 예외 발생: code=COMMENT_CONTENT_REQUIRED, message=댓글 내용을 입력해주세요.
-com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException: 댓글 내용을 입력해주세요.
-	at com.sprint.team2.monew.domain.comment.controller.CommentController.update(CommentController.java:50)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
 	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
 	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
@@ -665,112 +945,432 @@ com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException:
 	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
 	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
 	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:888)
-	at org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
 	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
 	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162)
-	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132)
-	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201)
-	at com.sprint.team2.monew.domain.comment.controller.CommentControllerTest.updateComment_Fail_BadRequest_400(CommentControllerTest.java:148)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] DELETE /api/interests/{interest-id}/subscriptions 구독 취소 API 호출
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 호출
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.interest_id,
+        s1_0.user_id 
+    from
+        subscriptions s1_0 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    where
+        u1_0.id=? 
+        and i1_0.id=?
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        i1_0.id,
+        i1_0.created_at,
+        i1_0.keywords,
+        i1_0.name,
+        i1_0.subscription_count,
+        i1_0.updated_at 
+    from
+        interests i1_0 
+    where
+        i1_0.id=?
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독자 감소
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 완료
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    update
+        interests 
+    set
+        keywords=?,
+        name=?,
+        subscription_count=?,
+        updated_at=? 
+    where
+        id=?
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:ARRAY) <- [[락, 발라드, 재즈]]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:VARCHAR) <- [테스트1]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:BIGINT) <- [0]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:TIMESTAMP) <- [2025-09-05T10:45:01.935889]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (5:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    delete 
+    from
+        subscriptions 
+    where
+        id=?
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [015bbf43-ab2a-4d23-a515-92e074d3e64a]
+25-09-05 10:45:01 [0:0:0:0:0:0:0:1 | 7cb5718a-0619-4db9-8337-8e1606ea9116 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 응답 완료
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] DELETE /api/interests/{interest-id}/subscriptions 구독 취소 API 호출
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 호출
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.interest_id,
+        s1_0.user_id 
+    from
+        subscriptions s1_0 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    where
+        u1_0.id=? 
+        and i1_0.id=?
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:03 [0:0:0:0:0:0:0:1 | 88d2680f-7d9a-43fb-a4f1-a99d3fc86f37 | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                커스텀 예외 발생: code=SUBSCRIPTION_NOT_FOUND, message=해당 유저는 해당 관심사를 구독중이 아닙니다.
+com.sprint.team2.monew.domain.subscription.exception.SubscriptionNotFoundException: 해당 유저는 해당 관심사를 구독중이 아닙니다.
+	at com.sprint.team2.monew.domain.subscription.exception.SubscriptionNotFoundException.notFound(SubscriptionNotFoundException.java:12)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.lambda$validateSubscription$2(BasicInterestService.java:104)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.validateSubscription(BasicInterestService.java:104)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService.unsubscribe(BasicInterestService.java:67)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
-	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
-	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
-	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
-	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728)
+	at com.sprint.team2.monew.domain.interest.service.basic.BasicInterestService$$SpringCGLIB$$0.unsubscribe(<generated>)
+	at com.sprint.team2.monew.domain.interest.controller.InterestController.unsubscribe(InterestController.java:44)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
-	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
-	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
-	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
-	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
-	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
-	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doDelete(FrameworkServlet.java:936)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:596)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독 등록 호출 interestId = f3fcaa19-42cc-4e74-83d7-98bf726ca559, userId = 2e97d734-d69a-4ba0-b337-aec4fc9880ea
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 등록 호출
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        i1_0.id,
+        i1_0.created_at,
+        i1_0.keywords,
+        i1_0.name,
+        i1_0.subscription_count,
+        i1_0.updated_at 
+    from
+        interests i1_0 
+    where
+        i1_0.id=?
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id 
+    from
+        subscriptions s1_0 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    where
+        i1_0.id=? 
+        and u1_0.id=? 
+    fetch
+        first ? rows only
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:INTEGER) <- [1]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독자 증가
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 등록 완료 id = 65a719ee-65e1-4d24-bd79-36de157db6b0
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    insert 
+    into
+        subscriptions
+        (created_at, interest_id, user_id, id) 
+    values
+        (?, ?, ?, ?)
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:TIMESTAMP) <- [2025-09-05T10:45:16.927329]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:UUID) <- [65a719ee-65e1-4d24-bd79-36de157db6b0]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    update
+        interests 
+    set
+        keywords=?,
+        name=?,
+        subscription_count=?,
+        updated_at=? 
+    where
+        id=?
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:ARRAY) <- [[락, 발라드, 재즈]]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:VARCHAR) <- [테스트1]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:BIGINT) <- [1]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:TIMESTAMP) <- [2025-09-05T10:45:16.932060]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (5:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:16 [0:0:0:0:0:0:0:1 | d005bc1f-1d2b-4c6b-900d-5b6167f77181 | POST | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독 등록 응답 완료 id = 65a719ee-65e1-4d24-bd79-36de157db6b0
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] DELETE /api/interests/{interest-id}/subscriptions 구독 취소 API 호출
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 호출
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.interest_id,
+        s1_0.user_id 
+    from
+        subscriptions s1_0 
+    left join
+        users u1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        interests i1_0 
+            on i1_0.id=s1_0.interest_id 
+    where
+        u1_0.id=? 
+        and i1_0.id=?
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        i1_0.id,
+        i1_0.created_at,
+        i1_0.keywords,
+        i1_0.name,
+        i1_0.subscription_count,
+        i1_0.updated_at 
+    from
+        interests i1_0 
+    where
+        i1_0.id=?
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [2e97d734-d69a-4ba0-b337-aec4fc9880ea]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [관심사] 구독자 감소
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 완료
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    update
+        interests 
+    set
+        keywords=?,
+        name=?,
+        subscription_count=?,
+        updated_at=? 
+    where
+        id=?
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:ARRAY) <- [[락, 발라드, 재즈]]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (2:VARCHAR) <- [테스트1]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (3:BIGINT) <- [0]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (4:TIMESTAMP) <- [2025-09-05T10:45:23.733578]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (5:UUID) <- [f3fcaa19-42cc-4e74-83d7-98bf726ca559]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                
+    delete 
+    from
+        subscriptions 
+    where
+        id=?
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                binding parameter (1:UUID) <- [65a719ee-65e1-4d24-bd79-36de157db6b0]
+25-09-05 10:45:23 [0:0:0:0:0:0:0:1 | 6a4c715e-0df6-4087-8ea5-215cb464386d | DELETE | /api/interests/f3fcaa19-42cc-4e74-83d7-98bf726ca559/subscriptions] -
+                [구독] 구독 취소 응답 완료
