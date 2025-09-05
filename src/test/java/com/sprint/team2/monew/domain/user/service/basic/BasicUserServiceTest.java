@@ -6,6 +6,7 @@ import com.sprint.team2.monew.domain.user.dto.request.UserUpdateRequest;
 import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
+import com.sprint.team2.monew.domain.user.exception.ForbiddenUserAuthorityException;
 import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
@@ -166,7 +167,7 @@ class BasicUserServiceTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("사용자 정보 수정 성공")
     void updateUser_Success() {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
@@ -175,6 +176,7 @@ class BasicUserServiceTest {
         String password = "test1234";
         String nickname = "test";
         User user = new User(email, password, nickname);
+        UUID loginUserId = userId;
 
         // Dto
         UserDto userDto = new UserDto(
@@ -189,7 +191,7 @@ class BasicUserServiceTest {
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         // when
-        UserDto result = userService.update(userId, request);
+        UserDto result = userService.update(userId, request, loginUserId);
 
         // then
         assertThat(result).isEqualTo(userDto);
@@ -201,13 +203,36 @@ class BasicUserServiceTest {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
         UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
 
         // given
         // 해당 UUID에 해당하는 유저를 찾지 못함 -> UserNotFoundException
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> userService.update(userId, request))
+        assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
                 .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("로그인된 사용자 id와 다른 사용자 id로 정보 수정 시도 시 실패")
+    void updateUser_MismatchLoginUserId_ThrowsException() {
+        // 기본 변수 및 객체 설정
+        UserUpdateRequest request = new UserUpdateRequest("newNickname");
+        UUID userId = UUID.randomUUID();
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+        UUID loginUserId = UUID.randomUUID();
+
+        // given
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // 로그인된 UUID와 정보 수정을 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
+
+        // when & then
+        assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
+                .isInstanceOf(ForbiddenUserAuthorityException.class);
     }
 }

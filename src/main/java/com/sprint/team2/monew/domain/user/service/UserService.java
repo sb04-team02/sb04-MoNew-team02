@@ -13,5 +13,5 @@ public interface UserService {
 
     UserDto login(UserLoginRequest request);
 
-    UserDto update(UUID userId, UserUpdateRequest request);
+    UserDto update(UUID userId, UserUpdateRequest request, UUID loginUserId);
 }

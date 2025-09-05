@@ -168,6 +168,7 @@ class UserControllerTest {
     void updateUser_Success() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
         String email = "test@test.com";
         String nickname = "테스트";
         LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
@@ -187,7 +188,7 @@ class UserControllerTest {
         );
 
         // given
-        given(userService.update(userId, request)).willReturn(userDto);
+        given(userService.update(userId, request, loginUserId)).willReturn(userDto);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -219,8 +220,8 @@ class UserControllerTest {
 
         // when & then
         mockMvc.perform(multipart("/api/users/{userId}", userId)
-                .content(content)
-                .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .with(httpRequest -> {
                             httpRequest.setMethod("PATCH");
                             return httpRequest;

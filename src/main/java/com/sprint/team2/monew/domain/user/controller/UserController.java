@@ -57,8 +57,9 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDto> update(@PathVariable("userId") UUID userId,
-                                          @RequestBody @Valid UserUpdateRequest request) {
-        UserDto updatedUserDto = userService.update(userId, request);
+                                          @RequestBody @Valid UserUpdateRequest request,
+                                          @RequestHeader("Monew-Request-User-ID") UUID loginUserId) {
+        UserDto updatedUserDto = userService.update(userId, request, loginUserId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUserDto);
