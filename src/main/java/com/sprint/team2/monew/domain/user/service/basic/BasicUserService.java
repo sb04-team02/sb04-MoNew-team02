@@ -79,7 +79,7 @@ public class BasicUserService implements UserService {
                 });
 
         if (!userId.equals(loginUserId)) {
-            throw ForbiddenUserAuthorityException.forDelete();
+            throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
         }
         user.setDeletedAt(LocalDateTime.now());
     }
