@@ -59,7 +59,10 @@ public class UserController {
     public ResponseEntity<UserDto> update(@PathVariable("userId") UUID userId,
                                           @RequestBody @Valid UserUpdateRequest request,
                                           @RequestHeader("Monew-Request-User-ID") UUID loginUserId) {
+        log.info("[사용자] 정보 수정 요청 수신");
         UserDto updatedUserDto = userService.update(userId, request, loginUserId);
+        log.info("[사용자] 정보 수정 응답 - nickname={}",
+                updatedUserDto.nickname());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUserDto);

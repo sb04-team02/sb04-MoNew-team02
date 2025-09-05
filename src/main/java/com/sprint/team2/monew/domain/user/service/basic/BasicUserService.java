@@ -67,17 +67,21 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto update(UUID userId, UserUpdateRequest request, UUID loginUserId) {
+        log.info("[사용자] 정보 수정 시작");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
+                    log.error("[사용자] 정보 수정 실패 - 존재하지 않는 사용자 id={}", userId);
                     return UserNotFoundException.withId(userId);
                 });
 
         if (!loginUserId.equals(userId)) {
+            log.error("[사용자] 정보 수정 실패 - 해당 사용자에 대한 권한이 없음 id={}", userId);
             throw ForbiddenUserAuthorityException.forUpdate();
         }
 
         user.update(request.nickname());
         UserDto userDto = userMapper.toDto(user);
+        log.info("[사용자] 정보 수정 성공 - id={}, nickname={}", userDto.id(), userDto.nickname());
         return userDto;
     }
 }
