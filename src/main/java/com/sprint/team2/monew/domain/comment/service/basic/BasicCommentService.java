@@ -6,10 +6,14 @@ import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
+import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
+import com.sprint.team2.monew.domain.comment.exception.CommentForbiddenException;
+import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
 import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +44,7 @@ public class BasicCommentService implements CommentService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> {
                     log.error("사용자가 존재하지 않음: userId={}", request.userId());
-                    return new EntityNotFoundException("User not found: " + request.userId());
+                    return new UserNotFoundException();
                 });
 
         Article article = articleRepository.findById(request.articleId())
@@ -57,7 +61,7 @@ public class BasicCommentService implements CommentService {
         if (comment.getContent() == null || comment.getContent().isBlank()) {
             log.error("댓글 생성 실패: 빈 댓글 (articleId={}, userId={})",
                     request.articleId(), request.userId());
-            throw new IllegalArgumentException("댓글 내용을 입력해주세요.");
+            throw CommentContentRequiredException.commentContentRequiredForCreate(request.articleId(), request.userId());
         }
         comment.setContent(comment.getContent().trim());
 
@@ -75,14 +79,14 @@ public class BasicCommentService implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
                     log.error("댓글을 찾을 수 없습니다: commentId={}", commentId);
-                    return new EntityNotFoundException("Comment not found: " + commentId);
+                    return new ContentNotFoundException();
                 });
 
         // 본인 댓글만 수정 가능
         if (requesterUserId != null && !comment.getUser().getId().equals(requesterUserId)) {
             log.error("본인의 댓글만 수정이 가능합니다: commentId={}, ownerId={}, requesterUserId={}",
                     commentId, comment.getUser().getId(), requesterUserId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 댓글만 수정할 수 있습니다.");
+            throw new CommentForbiddenException();
         }
 
         //업데이트 시 좋아요 유지되는 구문은 좋아요 도메인 작성 후 생성
@@ -91,7 +95,7 @@ public class BasicCommentService implements CommentService {
         if (request.content() == null || request.content().isBlank()) {
             log.error("댓글 수정 실패: 빈 댓글 (commentId={}, requesterUserId={})",
                     commentId, requesterUserId);
-            throw new IllegalArgumentException("수정할 댓글 내용을 입력해주세요.");
+            throw CommentContentRequiredException.commentContentRequiredForUpdate(commentId);
         }
 
         comment.update(request.content());
