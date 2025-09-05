@@ -2,16 +2,20 @@ package com.sprint.team2.monew.domain.user.service.basic;
 
 import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserRegisterRequest;
+import com.sprint.team2.monew.domain.user.dto.request.UserUpdateRequest;
 import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
 import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -57,6 +61,17 @@ public class BasicUserService implements UserService {
 
         UserDto userDto = userMapper.toDto(user);
         log.info("[사용자] 로그인 성공 - id={}", userDto.id());
+        return userDto;
+    }
+
+    @Override
+    public UserDto update(UUID userId, UserUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    return UserNotFoundException.withId(userId);
+                });
+        user.update(request.nickname());
+        UserDto userDto = userMapper.toDto(user);
         return userDto;
     }
 }
