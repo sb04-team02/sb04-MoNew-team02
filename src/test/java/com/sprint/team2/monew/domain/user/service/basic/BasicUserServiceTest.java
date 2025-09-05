@@ -6,7 +6,7 @@ import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
 import com.sprint.team2.monew.domain.user.exception.ForbiddenUserAuthorityException;
-import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
+import com.sprint.team2.monew.domain.user.exception.LoginFailedException;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -141,7 +141,7 @@ class BasicUserServiceTest {
 
         // when & then
         assertThatThrownBy(() -> userService.login(request))
-                .isInstanceOf(InvalidUserCredentialsException.class);
+                .isInstanceOf(LoginFailedException.class);
     }
 
     @Test
@@ -162,7 +162,27 @@ class BasicUserServiceTest {
 
         // when & then
         assertThatThrownBy(() -> userService.login(request))
-                .isInstanceOf(InvalidUserCredentialsException.class);
+                .isInstanceOf(LoginFailedException.class);
+    }
+
+    @Test
+    @DisplayName("논리적 삭제된 사용자로 로그인 시도 시 실패")
+    void loginUser_logicalDelete_ThrowsException() {
+        // 기본 변수 및 객체 설정
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        UserLoginRequest request = new UserLoginRequest(email, password);
+        User user = new User(email, "test12345", nickname);
+        user.setDeletedAt(LocalDateTime.now());
+
+        // given
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+
+        // when & then
+        // user.getDeletedAt()의 결과가 null이 아님 -> LoginFailedException
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(LoginFailedException.class);
     }
 
     @Test

@@ -6,7 +6,7 @@ import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.EmailAlreadyExistsException;
 import com.sprint.team2.monew.domain.user.exception.ForbiddenUserAuthorityException;
-import com.sprint.team2.monew.domain.user.exception.InvalidUserCredentialsException;
+import com.sprint.team2.monew.domain.user.exception.LoginFailedException;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -52,12 +52,18 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> {
                         log.error("[사용자] 로그인 실패 - 이메일 혹은 비밀번호가 잘못됨");
-                        return InvalidUserCredentialsException.invalidEmailOrPassword();
+                        return LoginFailedException.wrongEmailOrPassword();
                 });
+
+        if (user.getDeletedAt() != null) {
+            // 논리적 삭제이지만 물리적 삭제인것처럼 동작 (존재하지 않는 이메일)
+            log.error("[사용자] 로그인 실패 - 이메일 혹은 비밀번호가 잘못됨");
+            throw LoginFailedException.wrongEmailOrPassword();
+        }
 
         if (!user.getPassword().equals(request.password())) {
             log.error("[사용자] 로그인 실패 - 이메일 혹은 비밀번호가 잘못됨");
-            throw InvalidUserCredentialsException.invalidEmailOrPassword();
+            throw LoginFailedException.wrongEmailOrPassword();
         }
 
         UserDto userDto = userMapper.toDto(user);
