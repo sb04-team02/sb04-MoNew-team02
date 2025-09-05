@@ -7,10 +7,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Getter
 @Setter
 @Entity
@@ -40,10 +42,12 @@ public class Interest extends UpdatableEntity {
 
     public void increaseSubscriber() {
         this.subscriberCount++;
+        log.debug("[관심사] 구독자 증가");
     }
 
     public void decreaseSubscriber() {
         this.subscriberCount--;
+        log.debug("[관심사] 구독자 감소");
     }
 
     @Override
