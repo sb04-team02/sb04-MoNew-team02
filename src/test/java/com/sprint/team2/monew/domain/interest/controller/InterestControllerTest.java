@@ -180,4 +180,14 @@ public class InterestControllerTest {
         resultActions.andExpect(status().isNoContent());
     }
 
+    @DisplayName("관심사ID 형식이 올바르지 않으면 오류를 발생시킨다.")
+    @Test
+    void deleteInterestFailWhenInvalidInterestId() throws Exception {
+        long interestId = 1123L;
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interest-id}",interestId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isInternalServerError());
+    }
 }
