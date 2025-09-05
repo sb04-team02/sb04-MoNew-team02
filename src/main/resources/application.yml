@@ -49,3 +49,9 @@ info:
 logging:
   level:
     root: info
+
+naver:
+  api:
+    base-url: https://openapi.naver.com
+    naver-client-id: ${NAVER_CLIENT_ID}
+    naver-client-secret: ${NAVER_CLIENT_SECRET}
