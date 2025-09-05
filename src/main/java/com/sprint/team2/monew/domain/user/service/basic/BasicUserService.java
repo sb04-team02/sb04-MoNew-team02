@@ -76,7 +76,9 @@ public class BasicUserService implements UserService {
     public UserDto update(UUID userId, UserUpdateRequest request, UUID loginUserId) {
         log.info("[사용자] 정보 수정 시작");
         if (!loginUserId.equals(userId)) {
-            log.error("[사용자] 정보 수정 실패 - 해당 사용자에 대한 권한이 없음 id={}", userId);
+            log.error("[사용자] 정보 수정 실패 - 해당 사용자에 대한 권한이 없음 id={}, loginUserId={}",
+                    userId,
+                    loginUserId);
             throw ForbiddenUserAuthorityException.forUpdate(userId, loginUserId);
         }
 
@@ -94,14 +96,21 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteLogically(UUID userId, UUID loginUserId) {
+        log.info("[사용자] 논리적 삭제 시작 - id={}", userId);
+        if (!userId.equals(loginUserId)) {
+            log.error("[사용자] 논리적 삭제 실패 - 해당 사용자에 대한 권한이 없음 id={}, loginUserId={}",
+                    userId,
+                    loginUserId);
+            throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
+                    log.error("[사용자] 논리적 삭제 실패 - 존재하지 않는 사용자 id={}", userId);
                     return UserNotFoundException.withId(userId);
                 });
 
-        if (!userId.equals(loginUserId)) {
-            throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
-        }
         user.setDeletedAt(LocalDateTime.now());
+        log.info("[사용자] 논리적 삭제 성공 - id={}", userId);
     }
 }

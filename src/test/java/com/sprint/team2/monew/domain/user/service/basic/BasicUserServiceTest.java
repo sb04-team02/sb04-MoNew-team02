@@ -219,7 +219,7 @@ class BasicUserServiceTest {
     }
 
     @Test
-    @DisplayName("로그인된 사용자 id와 다른 사용자 id로 정보 수정 시도 시 실패")
+    @DisplayName("로그인된 사용자와 다른 사용자 id로 정보 수정 시도 시 실패")
     void updateUserMismatchLoginUserIdThrowsException() {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
@@ -294,13 +294,6 @@ class BasicUserServiceTest {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         UUID loginUserId = UUID.randomUUID();
-        String email = "test@test.com";
-        String password = "test1234";
-        String nickname = "test";
-        User user = new User(email, password, nickname);
-
-        // given
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
         // 로그인된 UUID와 논리적 삭제 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
 
