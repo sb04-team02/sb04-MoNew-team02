@@ -5,6 +5,8 @@ import com.sprint.team2.monew.domain.base.DeletableEntity;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +17,8 @@ import java.util.List;
 @Table(name = "comments")
 @NoArgsConstructor
 @Getter
+@Builder
+@AllArgsConstructor
 public class Comment extends DeletableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
