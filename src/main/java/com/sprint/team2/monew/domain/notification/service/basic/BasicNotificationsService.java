@@ -94,7 +94,7 @@ public class BasicNotificationsService implements NotificationService {
         User receiverUSer = userRepository.findById(receiverId)
                 .orElseThrow(() -> {
                     log.warn("[알림] 알림 이밴트 발행 실패 - 대상자 ID={}에 해당하는 사용자를 찾을 수 없음", receiverId);
-                    return new EntityNotFoundException("커스텀 예외로 대체 예정");
+                    return new UserNotFoundException();
                 });
         String content = String.format("[%s]님이 나의 댓글을 좋아합니다.", receiverUSer.getNickname());
 

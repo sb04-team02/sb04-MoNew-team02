@@ -143,7 +143,19 @@ public class NotificationServiceTest {
     @DisplayName("좋아요 알림 대상자인 댓글작성자가 탈퇴 등의 이유로 존재하지 않을 경우 예외 발생")
     void shouldThrowWhenReceiverDoesNotExist() {
         // given
+        Comment comment = TestCommentFactory.createComment();
 
+        UUID commentId = comment.getId();
+        UUID nonExistentUserId = UUID.randomUUID();
 
+        CommentLikedEvent event = new CommentLikedEvent(commentId, nonExistentUserId);
+
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
+
+        //when & then
+        assertThrows(UserNotFoundException.class, () -> {
+            notificationService.notifyCommentLiked(event);
+        });
     }
 }
