@@ -15,6 +15,7 @@ import com.sprint.team2.monew.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserDto create(UserRegisterRequest request) {
         log.info("[사용자] 생성 시작 - email={}, nickname={}",
                 request.email(),
@@ -48,6 +50,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto login(UserLoginRequest request) {
         log.info("[사용자] 로그인 시작");
         User user = userRepository.findByEmail(request.email())
@@ -73,6 +76,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(UUID userId, UserUpdateRequest request, UUID loginUserId) {
         log.info("[사용자] 정보 수정 시작");
         if (!loginUserId.equals(userId)) {
@@ -95,6 +99,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteLogically(UUID userId, UUID loginUserId) {
         log.info("[사용자] 논리적 삭제 시작 - id={}", userId);
         if (!userId.equals(loginUserId)) {
@@ -112,5 +117,19 @@ public class BasicUserService implements UserService {
 
         user.setDeletedAt(LocalDateTime.now());
         log.info("[사용자] 논리적 삭제 성공 - id={}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void deletePhysically(UUID userId, UUID loginUserId) {
+        if (!userId.equals(loginUserId)) {
+            throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
+        }
+
+        if (!userRepository.existsById(userId)) {
+            throw UserNotFoundException.withId(userId);
+        }
+
+        userRepository.deleteById(userId);
     }
 }

@@ -274,6 +274,20 @@ class BasicUserServiceTest {
     }
 
     @Test
+    @DisplayName("로그인된 사용자와 다른 사용자 id로 논리적 삭제 시도 시 실패")
+    void deleteLogicallyUserMismatchLoginIdThrowsException() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = UUID.randomUUID();
+
+        // 로그인된 UUID와 논리적 삭제 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
+                .isInstanceOf(ForbiddenUserAuthorityException.class);
+    }
+
+    @Test
     @DisplayName("존재하지 않는 사용자에 대해 논리적 삭제 시도 시 실패")
     void deleteLogicallyUserInvalidUserThrowsException() {
         // 기본 변수 및 객체 설정
@@ -288,9 +302,31 @@ class BasicUserServiceTest {
                 .isInstanceOf(UserNotFoundException.class);
     }
 
+    // 삭제 테스트 - 물리 삭제
     @Test
-    @DisplayName("로그인된 사용자와 다른 사용자 id로 논리적 삭제 시도 시 실패")
-    void deleteLogicallyUserMismatchLoginIdThrowsException() {
+    @DisplayName("물리적 삭제 성공")
+    void deletePhysicallyUserSuccess() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+
+        // given
+        given(userRepository.existsById(userId)).willReturn(true);
+
+        // when
+        userService.deletePhysically(userId, loginUserId);
+
+        // then
+        verify(userRepository).deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("로그인 사용자와 다른 사용자 id로 물리적 삭제 시도 시 실패")
+    void deletePhysicallyUserMismatchLoginIdThrowsException() {
         // 기본 변수 및 객체 설정
         UUID userId = UUID.randomUUID();
         UUID loginUserId = UUID.randomUUID();
@@ -298,7 +334,22 @@ class BasicUserServiceTest {
         // 로그인된 UUID와 논리적 삭제 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
 
         // when & then
-        assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
+        assertThatThrownBy(() -> userService.deletePhysically(userId, loginUserId))
                 .isInstanceOf(ForbiddenUserAuthorityException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자에 대해 물리적 삭제 시도 시 실패")
+    void deletePhysicallyUserInvalidUserThrowsException() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        // given
+        given(userRepository.existsById(userId)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> userService.deletePhysically(userId, loginUserId))
+                .isInstanceOf(UserNotFoundException.class);
     }
 }
