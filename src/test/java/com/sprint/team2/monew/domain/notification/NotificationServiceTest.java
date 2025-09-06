@@ -49,7 +49,7 @@ public class NotificationServiceTest {
 
     @Test
     @DisplayName("관심사 키워드와 매치되는 기사가 등록되면 알림 생성됨")
-    void shouldCreateNotification_whenArticleMatchesInterest() {
+    void shouldCreateNotificationWhenArticleMatchesInterest() {
         //given
         User user = TestUserFactory.createUser();
         Interest interest = TestInterestFactory.createInterest();
@@ -83,7 +83,7 @@ public class NotificationServiceTest {
 
     @Test
     @DisplayName("알림을 보내려는 사용자가 존재하지 않는 경우")
-    void shouldThrow_whenUserDoesNotExist() {
+    void shouldThrowWhenUserDoesNotExist() {
         // given
         Interest interest = TestInterestFactory.createInterest();
         Article article = TestArticleFactory.createArticle();

@@ -1,4 +1,4 @@
-name: CD Workflow - Building & PUshing to ECR
+name: CD Workflow - Building & Pushing to ECR
 
 on:
   push:
