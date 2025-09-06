@@ -17,5 +17,5 @@ public interface UserService {
 
     void deleteLogically(UUID userId, UUID loginUserId);
 
-    void deletePhysically(UUID userId, UUID loginUserId);
+    void deletePhysicallyByForce(UUID userId, UUID loginUserId);
 }

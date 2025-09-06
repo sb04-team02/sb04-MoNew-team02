@@ -121,7 +121,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public void deletePhysically(UUID userId, UUID loginUserId) {
+    public void deletePhysicallyByForce(UUID userId, UUID loginUserId) {
         if (!userId.equals(loginUserId)) {
             throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
         }

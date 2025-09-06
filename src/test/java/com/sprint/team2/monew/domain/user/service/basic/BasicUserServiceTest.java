@@ -318,7 +318,7 @@ class BasicUserServiceTest {
         given(userRepository.existsById(userId)).willReturn(true);
 
         // when
-        userService.deletePhysically(userId, loginUserId);
+        userService.deletePhysicallyByForce(userId, loginUserId);
 
         // then
         verify(userRepository).deleteById(userId);
@@ -334,7 +334,7 @@ class BasicUserServiceTest {
         // 로그인된 UUID와 논리적 삭제 시도중인 UUID가 다름 -> ForbiddenUserAuthorityException
 
         // when & then
-        assertThatThrownBy(() -> userService.deletePhysically(userId, loginUserId))
+        assertThatThrownBy(() -> userService.deletePhysicallyByForce(userId, loginUserId))
                 .isInstanceOf(ForbiddenUserAuthorityException.class);
     }
 
@@ -349,7 +349,7 @@ class BasicUserServiceTest {
         given(userRepository.existsById(userId)).willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> userService.deletePhysically(userId, loginUserId))
+        assertThatThrownBy(() -> userService.deletePhysicallyByForce(userId, loginUserId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 }
