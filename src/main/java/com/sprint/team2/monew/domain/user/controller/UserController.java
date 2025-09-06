@@ -78,4 +78,13 @@ public class UserController {
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    @DeleteMapping("/{userId}/hard")
+    public ResponseEntity<Void> deletePhysicallyByForce(@PathVariable("userId") UUID userId,
+                                                        @RequestHeader("Monew-Request-User-ID") UUID loginUserId) {
+        userService.deletePhysicallyByForce(userId, loginUserId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

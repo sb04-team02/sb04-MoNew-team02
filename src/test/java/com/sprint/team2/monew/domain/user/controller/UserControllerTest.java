@@ -39,7 +39,7 @@ class UserControllerTest {
     @MockitoBean
     private UserService userService;
 
-    // 등록 테스트
+    // 등록 API 테스트
     @Test
     @DisplayName("사용자 등록 성공 테스트")
     void createUserSuccess() throws Exception {
@@ -105,7 +105,7 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // 로그인 테스트
+    // 로그인 API 테스트
     @Test
     @DisplayName("로그인 성공 테스트")
     void loginUserSuccess() throws Exception {
@@ -166,7 +166,7 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // 업데이트 테스트
+    // 업데이트 API 테스트
     @Test
     @DisplayName("업데이트 성공 테스트")
     void updateUserSuccess() throws Exception {
@@ -233,6 +233,7 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // 논리적 삭제 API 테스트
     @Test
     @DisplayName("논리적 삭제 성공 테스트")
     void deleteLogicallyUserSuccess() throws Exception {
@@ -251,24 +252,6 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("논리적 삭제 실패 테스트 - 존재하지 않는 사용자")
-    void deleteLogicallyUserFailureUserNotFound() throws Exception {
-        // 기본 객체 생성
-        UUID userId = UUID.randomUUID();
-        UUID loginUserId = userId;
-
-        // given
-        willThrow(UserNotFoundException.withId(userId))
-                .given(userService).deleteLogically(userId, loginUserId);
-
-        // when & then
-        mockMvc.perform(delete("/api/users/{userId}", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     @DisplayName("논리적 삭제 실패 테스트 - 삭제 권한 없음")
     void deleteLogicallyUserFailureForbiddenUserAuthority() throws Exception {
         // 기본 객체 생성
@@ -284,5 +267,77 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Monew-Request-User-ID", loginUserId.toString()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("논리적 삭제 실패 테스트 - 사용자 정보 없음")
+    void deleteLogicallyUserFailureUserNotFound() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        // given
+        willThrow(UserNotFoundException.withId(userId))
+                .given(userService).deleteLogically(userId, loginUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/users/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                .andExpect(status().isNotFound());
+    }
+    
+    // 물리적 삭제 API 테스트
+    @Test
+    @DisplayName("물리적 삭제 성공 테스트")
+    void deletePhysicallyByForceUserSuccess() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        // given
+        willDoNothing().given(userService).deletePhysicallyByForce(userId, loginUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                .andExpect(status().isNoContent());
+    }
+    
+    @Test
+    @DisplayName("물리적 삭제 실패 테스트 - 삭제 권한 없음")
+    void deletePhysicallyByForceUserFailureForbiddenUserAuthority() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = UUID.randomUUID();
+
+        // given
+        willThrow(ForbiddenUserAuthorityException.forDelete(userId, loginUserId))
+                .given(userService).deletePhysicallyByForce(userId, loginUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("물리적 삭제 실패 테스트 - 사용자 정보 없음")
+    void deletePhysicallyByForceUserFailureUserNotFound() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        // given
+        willThrow(UserNotFoundException.withId(userId))
+                .given(userService).deletePhysicallyByForce(userId, loginUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                .andExpect(status().isNotFound());
     }
 }
