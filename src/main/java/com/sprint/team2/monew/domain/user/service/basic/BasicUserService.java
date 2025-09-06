@@ -122,14 +122,20 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public void deletePhysicallyByForce(UUID userId, UUID loginUserId) {
+        log.info("[사용자] 물리적 삭제 시작 - id={}", userId);
         if (!userId.equals(loginUserId)) {
+            log.error("[사용자] 물리적 삭제 실패 - 해당 사용자에 대한 권한이 없음 id={}, loginUserId={}",
+                    userId,
+                    loginUserId);
             throw ForbiddenUserAuthorityException.forDelete(userId, loginUserId);
         }
 
         if (!userRepository.existsById(userId)) {
+            log.error("[사용자] 물리적 삭제 실패 - 존재하지 않는 사용자 id={}", userId);
             throw UserNotFoundException.withId(userId);
         }
 
         userRepository.deleteById(userId);
+        log.info("[사용자] 물리적 삭제 성공 - id={}", userId);
     }
 }
