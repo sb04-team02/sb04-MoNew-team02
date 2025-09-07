@@ -14,6 +14,7 @@ import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,26 +47,34 @@ public class BasicReactionService implements ReactionService {
                     return ContentNotFoundException.contentNotFoundException(commentId);
                 });
 
-        // 2) 중복 방지
-        if (reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId())) {
-            log.error("좋아요 실패: 이미 좋아요됨 userId={}, commentId={}", user.getId(), comment.getId());
-            throw ReactionAlreadyExistsException.reactionAlreadyExists(commentId, user.getId());
+        try {
+            // 2) 중복 방지
+            if (reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId())) {
+                log.error("좋아요 실패: 이미 좋아요됨 userId={}, commentId={}", user.getId(), comment.getId());
+                throw ReactionAlreadyExistsException.reactionAlreadyExists(commentId, user.getId());
+            }
+
+            Reaction reaction = new Reaction();
+            reaction.setUser(user);
+            reaction.setComment(comment);
+
+            //유니크 위반을 즉시 드러내기 위해 flush
+            reactionRepository.saveAndFlush(reaction);
+
+            // ★ 원자적 +1 (동시성 안전)
+            commentRepository.incrementLikeCount(comment.getId());
+
+            CommentLikeDto dto = reactionMapper.toDto(reaction);
+            log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", dto.id(), dto.commentId(), dto.likedBy());
+            return dto;
+        } catch (DataIntegrityViolationException e) {
+            // 유니크 제약(동시 더블클릭 등) 최종 방어
+            log.error("좋아요 실패(유니크 위반): userId={}, commentId={}", user.getId(), comment.getId());
+            throw ReactionAlreadyExistsException.reactionAlreadyExists(comment.getId(), user.getId());
         }
+    }
 
-        Reaction reaction = new Reaction();
-        reaction.setUser(user);
-        reaction.setComment(comment);
+    public void unlikeComment(UUID commentId, UUID requesterUserId) {
 
-        //좋아요 카운트 증가
-        long before = comment.getLikeCount();
-        comment.setLikeCount(before + 1);
-        log.debug("likeCount 증가: {} -> {}", before, comment.getLikeCount());
-
-        Reaction save = reactionRepository.save(reaction);
-        log.debug("Reaction 저장 완료: reactionId={}", save.getId());
-
-        CommentLikeDto dto = reactionMapper.toDto(save);
-        log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", dto.id(), dto.commentId(), dto.likedBy());
-        return dto;
     }
 }
