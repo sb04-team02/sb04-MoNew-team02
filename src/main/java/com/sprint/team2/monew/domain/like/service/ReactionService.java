@@ -7,4 +7,6 @@ import java.util.UUID;
 public interface ReactionService {
     CommentLikeDto likeComment(UUID commentId, UUID requesterUserId);
 
+    void unlikeComment(UUID commentId, UUID requesterUserId);
+
 }
