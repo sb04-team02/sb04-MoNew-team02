@@ -30,4 +30,19 @@ public class ReactionController {
         log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", commentLikeDto.id(), commentLikeDto.commentId(), commentLikeDto.likedBy());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentLikeDto);
     }
+
+    /**
+     * 댓글 좋아요 취소
+     * DELETE /api/comments/{commentId}/comment-likes
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> unlikeComment(@PathVariable("commentId") UUID commentId,
+                                              @RequestHeader("Monew-Request-User-ID") UUID requesterUserId) {
+
+        log.info("댓글 좋아요 취소 요청 수신: commentId={}, requesterUserId={}", commentId, requesterUserId);
+        reactionService.unlikeComment(commentId, requesterUserId);
+
+        log.info("댓글 좋아요 취소 완료: commentId={}, requesterUserId={}", commentId, requesterUserId);
+        return ResponseEntity.ok().build();
+    }
 }

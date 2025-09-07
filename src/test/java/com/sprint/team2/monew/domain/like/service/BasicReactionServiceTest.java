@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.like.service;
 
+import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
 import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
@@ -9,7 +10,9 @@ import com.sprint.team2.monew.domain.like.mapper.ReactionMapper;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.like.service.basic.BasicReactionService;
 import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +27,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,10 +50,31 @@ public class BasicReactionServiceTest {
     private UUID commentId;
     private UUID requesterUserId;
     private User user;
+    private Article article;
     private Comment comment;
 
     private static void setId(Object entity, UUID id) {
         ReflectionTestUtils.setField(entity, "id", id);
+    }
+
+    @BeforeEach
+    void setUp() {
+        commentId = UUID.randomUUID();
+        requesterUserId = UUID.randomUUID();
+
+        user = User.builder()
+                .email("tester@example.com")
+                .password("pw")
+                .nickname("tester")
+                .build();
+        setId(user, requesterUserId);
+
+        comment = Comment.builder()
+                .user(user)
+                .article(article)
+                .content("내용")
+                .build();
+        setId(comment, commentId);
     }
 
     @Test
@@ -110,5 +136,66 @@ public class BasicReactionServiceTest {
 
         verify(commentRepository).findById(commentId);
         verifyNoInteractions(reactionRepository, reactionMapper);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 성공")
+    void likeCommentCancelSuccess() {
+        //given
+        Reaction reaction = Reaction.builder()
+                .user(user)
+                .comment(comment)
+                .build();
+        setId(reaction, UUID.randomUUID());
+
+        given(userRepository.findById(requesterUserId)).willReturn(Optional.of(user));
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(reactionRepository.findByUserIdAndCommentId(user.getId(), comment.getId())).willReturn(Optional.of(reaction));
+        given(reactionRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId())).willReturn(1);
+        given(commentRepository.decrementLikeCount(comment.getId())).willReturn(1);
+
+        //when
+        basicReactionService.unlikeComment(commentId, requesterUserId);
+
+        //then
+        then(userRepository).should().findById(requesterUserId);
+        then(commentRepository).should().findById(commentId);
+        then(reactionRepository).should().findByUserIdAndCommentId(user.getId(), comment.getId());
+        then(reactionRepository).should().deleteByUserIdAndCommentId(user.getId(), comment.getId());
+        then(commentRepository).should().decrementLikeCount(comment.getId());
+        then(userRepository).shouldHaveNoMoreInteractions();
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 실패 - 사용자가 존재하지 않음")
+    void likeCommentCancelFailUserNotFound() {
+        //given
+        given(userRepository.findById(requesterUserId)).willReturn(Optional.empty());
+
+        //when + then
+        assertThrows(UserNotFoundException.class,
+                () -> basicReactionService.unlikeComment(commentId, requesterUserId));
+
+        then(userRepository).should().findById(requesterUserId);
+        then(commentRepository).shouldHaveNoInteractions();
+        then(reactionRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 실패 - 댓글이 존재하지 않음")
+    void likeCommentCancelFailCommentNotFound() {
+        //given
+        given(userRepository.findById(requesterUserId)).willReturn(Optional.of(user));
+        given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+        //when + then
+        assertThrows(ContentNotFoundException.class,
+                () -> basicReactionService.unlikeComment(commentId, requesterUserId));
+
+        then(userRepository).should().findById(requesterUserId);
+        then(commentRepository).should().findById(commentId);
+        then(reactionRepository).shouldHaveNoInteractions();
     }
 }
