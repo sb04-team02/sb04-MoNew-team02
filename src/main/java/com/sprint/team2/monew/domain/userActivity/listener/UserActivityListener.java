@@ -10,6 +10,7 @@ import com.sprint.team2.monew.domain.userActivity.events.CommentActivityEvent;
 import com.sprint.team2.monew.domain.userActivity.events.CommentActivityLikeEvent;
 import com.sprint.team2.monew.domain.userActivity.events.SubscriptionUpdatedEvent;
 import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
+import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import java.util.List;
@@ -62,8 +63,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 구독 추가 시작 - interestId = {}",interestId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
     List<SubscriptionDto> subscriptionDtos = userActivity.getSubscriptions();
 
 //    if (!subscriptionDtos.contains(subscriptionDto)) {
@@ -85,13 +85,11 @@ public class UserActivityListener {
   public void handleSubscriptionDelete(SubscriptionUpdatedEvent event) {
     UUID userId = event.getId();
     UUID interestId = event.getInterestId();
-    SubscriptionDto subscriptionDto = userActivityMapper.toSubscriptionDto(event);
 
     log.info("[사용자 활동] 구독 삭제 시작 - interestId = {}",interestId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
 
     userActivity.getSubscriptions()
         .removeIf(s -> s.interestId().equals(event.getInterestId()));
@@ -112,8 +110,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 추가 시작 - commentId = {}",commentId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
     List<CommentActivityDto> commentActivityDtos = userActivity.getComments();
 
     commentActivityDtos.add(0, commentActivityDto);
@@ -136,8 +133,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 삭제 시작 - commentId = {}", commentId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
 
     userActivity.getComments()
         .removeIf(c -> c.id().equals(commentId));
@@ -159,8 +155,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId = {}",commentId);
 
     UserActivity userActivity = userActivityRepository.findById(commentUserId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + commentUserId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(commentUserId));
     List<CommentActivityLikeDto> commentActivityLikeDtos = userActivity.getCommentLikes();
 
 //    if (!commentActivityLikeDtos.contains(commentActivityLikeDto)) {
@@ -187,8 +182,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 좋아요 삭제 시작 - commentId = {}", commentId);
 
     UserActivity userActivity = userActivityRepository.findById(commentUserId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + commentUserId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(commentUserId));
 
     userActivity.getCommentLikes()
         .removeIf(c -> c.commentId().equals(commentId));
@@ -211,8 +205,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 읽은 기사 추가 시작 - articleId = {}", articleId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
-        // replace with custom error <<<<<<<<<<<<<<<<
-        .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
     List<ArticleViewDto> articleViewDtos = userActivity.getArticleViews();
 
 //    if (!articleViewDtos.contains(articleViewDto)) {
