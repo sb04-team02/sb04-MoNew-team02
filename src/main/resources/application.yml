@@ -5,6 +5,10 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  batch:
+    jdbc:
+      initialize-schema: always
+
   sql:
     init:
       encoding: UTF-8
@@ -60,6 +64,4 @@ naver:
   api:
     base-url: https://openapi.naver.com
     naver-client-id: ${NAVER_CLIENT_ID}
-#    naver-client-id: crXHRL561RVEulZYTvmc
     naver-client-secret: ${NAVER_CLIENT_SECRET}
-#    naver-client-secret: OwOrkJltQs
