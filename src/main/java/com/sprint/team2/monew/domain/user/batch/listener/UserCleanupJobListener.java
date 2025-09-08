@@ -16,8 +16,8 @@ public class UserCleanupJobListener implements JobExecutionListener {
 
     private final MeterRegistry registry;
     private Timer.Sample sample;
-    private final AtomicInteger running = new AtomicInteger(0); // 0: 멈춤, 1: 실행중
-    private final AtomicInteger currentSuccess = new AtomicInteger(0); // 0: 실패, 1: 성공
+    private final AtomicInteger running = new AtomicInteger(0);
+    private final AtomicInteger currentSuccess = new AtomicInteger(0);
     private final AtomicLong currentDeleteCount = new AtomicLong(0L);
 
     public UserCleanupJobListener(MeterRegistry registry) {
