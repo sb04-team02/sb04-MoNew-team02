@@ -18,4 +18,12 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
         returning like_count
     """, nativeQuery = true)
     long incrementLikeCountReturning(@Param("id") UUID commentId);
+
+    @Modifying
+    @Query("""
+           update Comment c 
+              set c.likeCount = case when c.likeCount > 0 then c.likeCount - 1 else 0 end
+            where c.id = :id
+           """)
+    int decrementLikeCount(@Param("id") UUID commentId);
 }

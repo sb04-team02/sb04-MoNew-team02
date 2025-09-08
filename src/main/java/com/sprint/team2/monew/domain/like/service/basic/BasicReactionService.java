@@ -6,6 +6,7 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.like.dto.CommentLikeDto;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.like.exception.ReactionAlreadyExistsException;
+import com.sprint.team2.monew.domain.like.exception.ReactionNotFoundException;
 import com.sprint.team2.monew.domain.like.mapper.ReactionMapper;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.like.service.ReactionService;
@@ -93,12 +94,11 @@ public class BasicReactionService implements ReactionService {
                     return ContentNotFoundException.contentNotFoundException(commentId);
                 });
 
-        Optional<Reaction> findLike = reactionRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
-        if (findLike.isEmpty()) {
-            log.info("좋아요 취소: 기존 Reaction 없음 -> 멱등 처리 userId={}, commentId={}", user.getId(), comment.getId());
-            return;
+        boolean exists = reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+        if (!exists) {
+            log.error("좋아요 취소 실패: 기존 Reaction 없음 userId={}, commentId={}", user.getId(), comment.getId());
+            throw ReactionNotFoundException.forUnlike(comment.getId(), user.getId());
         }
-        Reaction like = findLike.get();
 
         int deleted = reactionRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
         if (deleted > 0) {
