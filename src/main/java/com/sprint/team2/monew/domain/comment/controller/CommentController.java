@@ -7,6 +7,7 @@ import com.sprint.team2.monew.domain.comment.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +51,18 @@ public class CommentController {
         CommentDto dto = commentService.updateComment(commentId, requesterUserId, request);
         log.info("댓글 수정 성공: commentId={}", dto.id());
         return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * 댓글 논리 삭제
+     * DELETE /api/comments/{commentId}
+     */
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> softDeleteComment(@PathVariable UUID commentId) {
+        log.info("댓글 논리 삭제 요청 수신: commentId={}", commentId);
+        commentService.softDeleteComment(commentId);
+
+        log.info("댓글 논리 삭제 완료: commentId={}", commentId);
+        return ResponseEntity.noContent().build();
     }
 }

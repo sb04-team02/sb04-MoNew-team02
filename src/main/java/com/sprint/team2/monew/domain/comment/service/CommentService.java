@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface CommentService {
 
     CommentDto registerComment(CommentRegisterRequest request);
-
     CommentDto updateComment(UUID commentId, UUID requesterUserId, CommentUpdateRequest request);
+    void softDeleteComment(UUID commentId);
 }
