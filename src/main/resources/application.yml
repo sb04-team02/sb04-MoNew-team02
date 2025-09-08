@@ -17,10 +17,6 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
-  # 추가
-  profiles:
-    active: dev
-
 management:
   endpoints:
     web:
