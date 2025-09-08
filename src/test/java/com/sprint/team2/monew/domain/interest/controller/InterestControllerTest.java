@@ -1,9 +1,10 @@
-package com.sprint.team2.monew.interest.controller;
+package com.sprint.team2.monew.domain.interest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.interest.controller.InterestController;
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.global.error.GlobalExceptionHandler;
@@ -24,8 +25,7 @@ import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,7 +98,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .header("MoNew-Request-User-ID",userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -115,7 +115,7 @@ public class InterestControllerTest {
 
         // when & then
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -134,7 +134,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-User-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -155,12 +155,83 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-Fail-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
 
         // then
         resultActions.andExpect(status().is5xxServerError());
+    }
+
+    @DisplayName("관심사 ID를 받아서 삭제한다.")
+    @Test
+    void deleteInterestShouldSucceed() throws Exception {
+        // 본문 생성
+        UUID interestId = UUID.randomUUID();
+
+        // given
+        doNothing().when(interestService).delete(interestId);
+
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interestId}",interestId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isNoContent());
+    }
+
+    @DisplayName("관심사ID 형식이 올바르지 않으면 오류를 발생시킨다.")
+    @Test
+    void deleteInterestFailWhenInvalidInterestId() throws Exception {
+        long interestId = 1123L;
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interestId}",interestId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isInternalServerError());
+    }
+
+    @DisplayName("관심사 ID와 검증된 키워드가 주어지면 해당 관심사의 키워드 수정이 성공적으로 이루어진다.")
+    @Test
+    void updateInterestKeywordShouldSucceedWhenValidateInterestIdAndKeywords() throws Exception {
+        // 본문생성
+        UUID interestId = UUID.randomUUID();
+        InterestUpdateRequest interestUpdateRequest = new InterestUpdateRequest(List.of("updateKeyword1","updateKeyword2","updateKeyword3"));
+        String content = om.writeValueAsString(interestUpdateRequest);
+        InterestDto interestDto = new InterestDto(interestId,"name",List.of("updateKeyword1","updateKeyword2","updateKeyword3"),0L,false);
+        given(interestService.update(interestId,interestUpdateRequest)).willReturn(interestDto);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/interests/{interestId}",interestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("name"))
+                .andExpect(jsonPath("$.keywords.size()").value(3))
+                .andExpect(jsonPath("$.id").value(interestId.toString()));
+    }
+
+    @DisplayName("수정된 키워드가 하나도 존재하지 않으면 검증의 통과하지 못한다." +
+            "키워드가 존재하지 않으면 수정할 수 없다.")
+    @Test
+    void updateInterestKeywordsShouldFailWithEmptyKeywords() throws Exception {
+        // given
+        UUID interestId = UUID.randomUUID();
+        InterestUpdateRequest interestUpdateRequest = new InterestUpdateRequest(List.of());
+        String content = om.writeValueAsString(interestUpdateRequest);
+
+        // when & then
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/interests/{interestId}",interestId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isBadRequest());
     }
 }

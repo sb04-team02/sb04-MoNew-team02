@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.interest.controller;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import jakarta.validation.Valid;
@@ -28,8 +29,8 @@ public class InterestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping(value = "/{interest-id}/subscriptions")
-    public ResponseEntity subscriptions(@PathVariable("interest-id") UUID interestId,
+    @PostMapping(value = "/{interestId}/subscriptions")
+    public ResponseEntity subscriptions(@PathVariable("interestId") UUID interestId,
                                         @RequestHeader("MoNew-Request-User-ID") UUID userId) {
         log.info("[관심사] 구독 등록 호출 interestId = {}, userId = {}", interestId, userId);
         SubscriptionDto response = interestService.subscribe(interestId,userId);
@@ -37,12 +38,29 @@ public class InterestController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(value = "/{interest-id}/subscriptions")
-    public ResponseEntity unsubscribe(@PathVariable("interest-id") UUID interestId,
+    @DeleteMapping(value = "/{interestId}/subscriptions")
+    public ResponseEntity unsubscribe(@PathVariable("interestId") UUID interestId,
                                  @RequestHeader("Monew-Request-User-ID") UUID userId) {
         log.info("[구독] DELETE /api/interests/{interest-id}/subscriptions 구독 취소 API 호출");
         interestService.unsubscribe(interestId, userId);
         log.info("[구독] 구독 취소 응답 완료");
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/{interestId}")
+    public ResponseEntity delete(@PathVariable("interestId") UUID interestId) {
+        log.info("[관심사] 관심사 삭제 요청 id = {}", interestId);
+        interestService.delete(interestId);
+        log.info("[관심사] 관심사 삭제 응답 완료");
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/{interestId}")
+    public ResponseEntity update(@PathVariable("interestId") UUID interestId,
+                                 @Valid @RequestBody InterestUpdateRequest interestUpdateRequest) {
+        log.info("[관심사] 관심사 수정 요청 id = {}", interestId);
+        InterestDto response = interestService.update(interestId,interestUpdateRequest);
+        log.info("[관심사] 관심사 수정 응답  완료 id = {}", response.id());
+        return ResponseEntity.ok(response);
     }
 }

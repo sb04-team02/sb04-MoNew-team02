@@ -1,4 +1,10 @@
 package com.sprint.team2.monew.domain.notification.event;
 
-public class CommentLikedEvent {
-}
+
+import java.util.UUID;
+
+
+public record CommentLikedEvent (
+        UUID commentId,
+        UUID receiverId
+) { }
