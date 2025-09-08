@@ -89,7 +89,7 @@ jobs:
         with:
           task-definition: task-def.json
           container-name: ${{ secrets.ECS_CONTAINER_NAME }}
-          image: ${{ secrets.ECR_REPOSITORY_URI }}:${{ needs.build-and-push.outputs.image_tag }}
+          image: ${{ secrets.ECR_REPOSITORY_URI }}:${{ needs.build-and-push-to-ecr.outputs.image_tag }}
 
       # 새 태스크 정의 등록 + ECS 서비스 업데이트
       - name: 새 태스트 정의 등록
