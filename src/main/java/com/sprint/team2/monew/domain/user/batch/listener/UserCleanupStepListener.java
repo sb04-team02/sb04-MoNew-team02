@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 public class UserCleanupStepListener implements StepExecutionListener {
 
     private final MeterRegistry registry;
-    private final Map<String, Double> failureCountMap = new HashMap<>();
+    private final Map<String, Long> failureCountMap = new HashMap<>();
 
     public UserCleanupStepListener(MeterRegistry registry) {
         this.registry = registry;
 
         // 초기 상태 0으로 설정하고 Gauge 등록
         for (String reason : new String[]{"USER_NOT_FOUND", "DB_ERROR", "UNKNOWN"}) {
-            failureCountMap.put(reason, 0.0);
+            failureCountMap.put(reason, 0L);
 
             Gauge.builder("batch.user_cleanup.failure", failureCountMap, map -> map.get(reason))
                     .description("사용자 삭제 배치 처리 사유별 실패 횟수")
@@ -37,17 +37,23 @@ public class UserCleanupStepListener implements StepExecutionListener {
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         // 초기화
-        failureCountMap.replaceAll((k, v) -> 0.0);
+        failureCountMap.replaceAll((k, v) -> 0L);
 
         if (stepExecution.getExitStatus().equals(ExitStatus.FAILED)) {
-            // 이번 Step 실패 횟수 계산
             Map<String, Long> reasonCount = stepExecution.getFailureExceptions().stream()
                     .map(this::mapExceptionToReason)
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-            // Map에 반영
-            reasonCount.forEach((reason, count) -> failureCountMap.put(reason, count.doubleValue()));
+            // Map에 반영 (정의되지 않은 key는 UNKNOWN으로 합산)
+            reasonCount.forEach((reason, count) -> {
+                if (failureCountMap.containsKey(reason)) {
+                    failureCountMap.put(reason, count);
+                } else {
+                    failureCountMap.merge("UNKNOWN", count, Long::sum);
+                }
+            });
         }
+
         return stepExecution.getExitStatus();
     }
 
