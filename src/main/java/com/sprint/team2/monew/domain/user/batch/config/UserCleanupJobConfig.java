@@ -1,6 +1,7 @@
 package com.sprint.team2.monew.domain.user.batch.config;
 
 import com.sprint.team2.monew.domain.user.batch.listener.UserCleanupJobListener;
+import com.sprint.team2.monew.domain.user.batch.listener.UserCleanupStepListener;
 import com.sprint.team2.monew.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -22,6 +23,7 @@ public class UserCleanupJobConfig {
     private final PlatformTransactionManager transactionManager;
     private final UserService userService;
     private final UserCleanupJobListener jobListener;
+    private final UserCleanupStepListener stepListener;
 
     @Bean
     public Job userCleanupJob() {
@@ -42,6 +44,7 @@ public class UserCleanupJobConfig {
 
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
+                .listener(stepListener)
                 .build();
     }
 }
