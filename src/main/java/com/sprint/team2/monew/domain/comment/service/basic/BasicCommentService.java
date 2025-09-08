@@ -12,6 +12,7 @@ import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
+import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -35,6 +36,7 @@ public class BasicCommentService implements CommentService {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final CommentMapper commentMapper;
+    private final ReactionRepository reactionRepository;
 
     @Override
     @Transactional
@@ -89,8 +91,6 @@ public class BasicCommentService implements CommentService {
             throw new CommentForbiddenException();
         }
 
-        //업데이트 시 좋아요 유지되는 구문은 좋아요 도메인 작성 후 생성
-
         // 검증: null/blank 금지 (공백만 있는 경우도 거부)
         if (request.content() == null || request.content().isBlank()) {
             log.error("댓글 수정 실패: 빈 댓글 (commentId={}, requesterUserId={})",
@@ -98,10 +98,16 @@ public class BasicCommentService implements CommentService {
             throw CommentContentRequiredException.commentContentRequiredForUpdate(commentId);
         }
 
+        //좋아요 유지 구문
+        boolean likedByMe = false;
+        if (requesterUserId != null) {
+            likedByMe = reactionRepository.existsByUserIdAndCommentId(requesterUserId, commentId);
+        }
+
         comment.update(request.content());
         log.debug("댓글 수정 반영: commentId={}, length={}", commentId, request.content().length());
 
-        CommentDto dto = commentMapper.toDto(comment, false);
+        CommentDto dto = commentMapper.toDto(comment, likedByMe);
         log.info("댓글 수정 성공: commentId={}", commentId);
         return dto;
     }

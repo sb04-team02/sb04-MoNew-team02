@@ -6,6 +6,7 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.like.dto.CommentLikeDto;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.like.exception.ReactionAlreadyExistsException;
+import com.sprint.team2.monew.domain.like.exception.ReactionNotFoundException;
 import com.sprint.team2.monew.domain.like.mapper.ReactionMapper;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.like.service.ReactionService;
@@ -18,12 +19,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class BasicReactionService implements ReactionService {
 
     private final ReactionRepository reactionRepository;
@@ -32,7 +34,6 @@ public class BasicReactionService implements ReactionService {
     private final ReactionMapper reactionMapper;
 
     @Override
-    @Transactional
     public CommentLikeDto likeComment(UUID commentId, UUID requesterUserId) {
         log.info("댓글 좋아요 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
         User user = userRepository.findById(requesterUserId)
@@ -77,7 +78,37 @@ public class BasicReactionService implements ReactionService {
         }
     }
 
+    @Override
     public void unlikeComment(UUID commentId, UUID requesterUserId) {
+        log.info("댓글 좋아요 취소 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
 
+        User user = userRepository.findById(requesterUserId)
+                .orElseThrow(() -> {
+                    log.error("좋아요 취소 실패 : 사용자가 존재하지 않음. requesterUserId={}", requesterUserId);
+                    return new UserNotFoundException();
+                });
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.error("좋아요 취소 실패 : 댓글이 존재하지 않음 commentId={}", commentId);
+                    return ContentNotFoundException.contentNotFoundException(commentId);
+                });
+
+        boolean exists = reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+        if (!exists) {
+            log.error("좋아요 취소 실패: 기존 Reaction 없음 userId={}, commentId={}", user.getId(), comment.getId());
+            throw ReactionNotFoundException.forUnlike(comment.getId(), user.getId());
+        }
+
+        int deleted = reactionRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+        if (deleted > 0) {
+            int affected = commentRepository.decrementLikeCount(comment.getId());
+            if (affected == 0) {
+                log.warn("decrementLikeCount 미적용(이미 0이었을 가능성): commentId={}", comment.getId());
+            }
+            log.info("댓글 좋아요 취소 성공: userId={}, commentId={}", user.getId(), comment.getId());
+        } else {
+            log.info("좋아요 취소: 기존 Reaction 없음 -> 멱등 처리 userId={}, commentId={}", user.getId(), comment.getId());
+        }
     }
 }

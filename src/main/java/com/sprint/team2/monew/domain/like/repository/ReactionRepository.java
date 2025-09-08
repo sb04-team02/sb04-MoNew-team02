@@ -11,4 +11,9 @@ public interface ReactionRepository extends JpaRepository<Reaction, UUID> {
     //중복 체크를 위한 구문
     boolean existsByUserIdAndCommentId(UUID userId, UUID commentId);
 
+    Optional<Reaction> findByUserIdAndCommentId(UUID userId, UUID commentId);
+
+    @Modifying
+    int deleteByUserIdAndCommentId(UUID userId, UUID commentId);
+
 }
