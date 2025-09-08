@@ -27,8 +27,7 @@ public class UserActivityController {
     UserActivityResponseDto userActivityResponseDto = userActivityService.getUserActivity(userId);
     log.info("[활동 내역] 활동 내역 정보 응답 - userId={}", userActivityResponseDto.id());
 
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(userActivityResponseDto);
+    return ResponseEntity.ok(userActivityResponseDto);
   }
 
 }

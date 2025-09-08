@@ -21,8 +21,13 @@ public class BasicUserActivityService implements UserActivityService {
   public final UserActivityMapper userActivityMapper;
 
   public UserActivityResponseDto getUserActivity(UUID userId) {
+
+    log.info("[활동 내역] 조회 시작 - userId={}", userId);
+
     UserActivity userActivity = userActivityRepository.findById(userId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
+
+    log.info("[활동 내역] 조회 완료 - userId={}", userId);
 
     return userActivityMapper.toUserActivityResponseDto(userActivity);
   }
