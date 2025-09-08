@@ -92,7 +92,7 @@ public class BasicUserService implements UserService {
                     return UserNotFoundException.withId(userId);
                 });
 
-        log.debug("[사용자] 정보 수정 전 - nickname={}", user.getNickname());
+        log.debug("[사용자] 정보 수정 전 - id={}, nickname={}", userId, user.getNickname());
         user.update(request.nickname());
         UserDto userDto = userMapper.toDto(user);
         log.info("[사용자] 정보 수정 성공 - id={}, nickname={}", userDto.id(), userDto.nickname());
