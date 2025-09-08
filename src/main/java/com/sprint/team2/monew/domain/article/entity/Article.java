@@ -27,8 +27,7 @@ public class Article extends DeletableEntity {
     @Column(name = "publish_date", nullable = false)
     private LocalDateTime publishDate;
 
-    @Lob
-    @Column(name = "summary", nullable = false)
+    @Column(name = "summary", nullable = false, columnDefinition = "TEXT")
     private String summary;
 
     @Builder.Default
