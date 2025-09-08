@@ -13,6 +13,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  # dev 환경: 로컬로 연결하기 (mongodb 설치해야함)
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/monew
 
 logging:
   level:
