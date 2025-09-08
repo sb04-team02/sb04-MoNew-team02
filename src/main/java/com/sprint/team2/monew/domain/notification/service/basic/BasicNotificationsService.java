@@ -62,7 +62,7 @@ public class BasicNotificationsService implements NotificationService {
         User user = userRepository.findById(receiverId)
                 .orElseThrow(() -> {
                     log.warn("[알림] 알림 발신 실패 - 사용자가 존재하지 않음 사용자 ID={}", receiverId);
-                    return new UserNotFoundException();
+                    return UserNotFoundException.withId(receiverId);
                 });
 
         String content = String.format("[%s]와 관련된 기사가 1건 등록되었습니다.", interest.getName());
@@ -91,15 +91,15 @@ public class BasicNotificationsService implements NotificationService {
                     return new EntityNotFoundException("커스텀 예외로 대체 예정");
         });
 
-        User receiverUSer = userRepository.findById(receiverId)
+        User receiverUser = userRepository.findById(receiverId)
                 .orElseThrow(() -> {
                     log.warn("[알림] 알림 이밴트 발행 실패 - 대상자 ID={}에 해당하는 사용자를 찾을 수 없음", receiverId);
-                    return new UserNotFoundException();
+                    return UserNotFoundException.withId(receiverId);
                 });
-        String content = String.format("[%s]님이 나의 댓글을 좋아합니다.", receiverUSer.getNickname());
+        String content = String.format("[%s]님이 나의 댓글을 좋아합니다.", receiverUser.getNickname());
 
         Notification notification = Notification.builder()
-                .user(receiverUSer)
+                .user(receiverUser)
                 .resourceId(comment.getId())
                 .resourceType(ResourceType.COMMENT)
                 .content(content)
