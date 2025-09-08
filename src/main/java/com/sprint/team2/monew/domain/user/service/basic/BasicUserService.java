@@ -12,8 +12,10 @@ import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.user.service.UserService;
+import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,9 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    // User Activity 이벤트
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional
@@ -47,6 +52,15 @@ public class BasicUserService implements UserService {
         User savedUser = userRepository.save(userMapper.toEntity(request));
         UserDto result = userMapper.toDto(savedUser);
         log.info("[사용자] 생성 완료 - userId={}", result.id());
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new UserCreatedEvent(
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getNickname(),
+            savedUser.getCreatedAt()
+        ));
+
         return result;
     }
 
@@ -93,6 +107,7 @@ public class BasicUserService implements UserService {
                     return UserNotFoundException.withId(userId);
                 });
 
+        log.debug("[사용자] 정보 수정 전 - id={}, nickname={}", userId, user.getNickname());
         user.update(request.nickname());
         UserDto userDto = userMapper.toDto(user);
         log.info("[사용자] 정보 수정 성공 - id={}, nickname={}", userDto.id(), userDto.nickname());
@@ -117,6 +132,7 @@ public class BasicUserService implements UserService {
                 });
 
         user.setDeletedAt(LocalDateTime.now());
+        log.debug("[사용자] 논리적 삭제 수행 - id={}, deletedAt={}", userId, user.getDeletedAt());
         log.info("[사용자] 논리적 삭제 성공 - id={}", userId);
     }
 
