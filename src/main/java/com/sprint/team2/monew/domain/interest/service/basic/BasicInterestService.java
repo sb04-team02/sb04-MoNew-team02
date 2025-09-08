@@ -71,17 +71,28 @@ public class BasicInterestService implements InterestService {
         log.info("[구독] 구독 취소 완료");
     }
 
+    @Override
+    @Transactional
+    public void delete(UUID interestId) {
+        log.info("[관심사] 관심사 삭제 호출");
+        Interest interest = validateInterest(interestId);
+        subscriptionRepository.deleteByInterest(interest);
+        log.debug("[구독] 관심사 삭제에 따라 구독 삭제");
+        interestRepository.delete(interest);
+        log.info("[관심사] 관심사 삭제 완료");
+    }
+
     private User validateUser(UUID userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
             log.error("[관심사] 유저를 찾을 수 없음, id = {}", userId);
-            throw UserNotFoundException.withId(userId);
+            return UserNotFoundException.withId(userId);
         });
     }
 
     private Interest validateInterest(UUID interestId) {
         return interestRepository.findById(interestId).orElseThrow(() -> {
             log.error("[관심사] 관심사를 찾을 수 없음, id = {}", interestId);
-            throw InterestNotFoundException.notFound(interestId);
+            return InterestNotFoundException.notFound(interestId);
         });
     }
 
@@ -101,6 +112,9 @@ public class BasicInterestService implements InterestService {
 
     private Subscription validateSubscription(UUID interestId, UUID userId) {
         return subscriptionRepository.findByUser_IdAndInterest_Id(userId, interestId)
-                .orElseThrow(() -> SubscriptionNotFoundException.notFound(interestId, userId));
+                .orElseThrow(() -> {
+                    log.error("[구독] 해당 유저는 해당 관심사를 구독중이 아님. userId= {}, interestId = {}", userId, interestId);
+                    return SubscriptionNotFoundException.notFound(interestId, userId);
+                });
     }
 }
