@@ -23,9 +23,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -38,6 +44,7 @@ public class BasicNotificationsService implements NotificationService {
     private final InterestRepository interestRepository;
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
+    private final NotificationMapper notificationMapper;
 
     @EventListener
     public void notifyInterestArticleRegistered(InterestArticleRegisteredEvent event) {
@@ -114,8 +121,46 @@ public class BasicNotificationsService implements NotificationService {
 
     public void confirmAllNotifications(UUID userId) {}
 
-    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
-        return null;
+    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
+        log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);
+        log.info("[알림] 요청 파라미터 - nextAfter={}, pageSize={}, pageNumber={}",
+                nextAfter, pageable.getPageSize(), pageable.getPageNumber());
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("[알림] 알림 조회 실패 - 사용자가 존재하지 않음 / 사용자 ID={}", userId);
+                    return UserNotFoundException.withId(userId);
+                });
+        //Pageable 설정
+        Pageable pageableRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
+        Slice<Notification> slice = notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
+
+        List<Notification> notifications = slice.getContent();
+
+        log.info("[알림] 알림 조회 결과 - 건수={}, hasNext={}", notifications.size(), slice.hasNext());
+
+        List<NotificationDto> content = notifications.stream()
+                .map(notificationMapper::toNotificationDto)
+                .toList();
+
+        String nextCursor = null;
+        if (!notifications.isEmpty()) {
+            nextCursor = notifications.get(notifications.size() - 1).getCreatedAt().toString();
+        }
+
+        Long totalElements = notificationRepository.countByUserId((userId));
+
+        log.info("[알림] 응답 생성 완료 - contentSize={}, totalElements={}, hasNext={}",
+                content.size(), totalElements, slice.hasNext());
+
+        return new CursorPageResponseNotificationDto(
+                content,
+                nextCursor,
+                nextAfter,
+                pageable.getPageSize(),
+                totalElements,
+                slice.hasNext()
+        );
     }
 
     public void deleteConfirmedNotifications() {}

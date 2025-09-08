@@ -5,10 +5,7 @@ import com.sprint.team2.monew.domain.base.DeletableEntity;
 import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.List;
 @Table(name = "comments")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment extends DeletableEntity {
