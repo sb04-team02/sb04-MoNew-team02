@@ -16,10 +16,4 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    @PostMapping
-    public ResponseEntity<Void> saveArticle(@RequestHeader UUID interestId) {
-        articleService.saveByInterest(interestId);
-
-        return ResponseEntity.ok().build();
-    }
 }
