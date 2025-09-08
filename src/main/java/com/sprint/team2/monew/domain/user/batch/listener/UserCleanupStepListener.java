@@ -28,7 +28,7 @@ public class UserCleanupStepListener implements StepExecutionListener {
             failureCountMap.put(reason, 0.0);
 
             Gauge.builder("batch.user_cleanup.failure", failureCountMap, map -> map.get(reason))
-                    .description("User cleanup step failure count")
+                    .description("사용자 삭제 배치 처리 사유별 실패 횟수")
                     .tag("reason", reason)
                     .register(registry);
         }
@@ -36,7 +36,7 @@ public class UserCleanupStepListener implements StepExecutionListener {
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        // 모든 reason 초기화
+        // 초기화
         failureCountMap.replaceAll((k, v) -> 0.0);
 
         if (stepExecution.getExitStatus().equals(ExitStatus.FAILED)) {
@@ -48,7 +48,6 @@ public class UserCleanupStepListener implements StepExecutionListener {
             // Map에 반영
             reasonCount.forEach((reason, count) -> failureCountMap.put(reason, count.doubleValue()));
         }
-
         return stepExecution.getExitStatus();
     }
 
