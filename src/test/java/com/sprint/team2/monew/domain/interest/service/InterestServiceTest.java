@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.interest.service;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
@@ -260,5 +261,26 @@ public class InterestServiceTest {
         // When & then
         Exception exception = assertThrows(InterestNotFoundException.class, () -> interestService.delete(interestId));
         assertEquals("관심사를 찾을 수 없습니다.", exception.getMessage());
+    }
+
+    @DisplayName("주어지는 관심사 ID의 키워드 정보를 주어지는 키워드 정보로 수정한다.")
+    @Test
+    void updateInterestShouldSucceedWhenValidInterestIdAndKeywords() {
+        // given
+        UUID interestId = UUID.randomUUID();
+        InterestUpdateRequest interestUpdateRequest = new InterestUpdateRequest(List.of("updateKeyword1","updateKeyword2","updateKeyword3"));
+        Interest interest = new Interest("name", List.of("keyword1","keyword2"),1);
+        InterestDto interestDto = new InterestDto(interestId,"name",List.of("updateKeyword1","updateKeyword2","updateKeyword3"),0L,false);
+        given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(interest));
+        given(interestRepository.save(any(Interest.class))).willReturn(interest);
+        given(interestMapper.toDto(interest)).willReturn(interestDto);
+
+        // when
+        InterestDto responseDto = interestService.update(interestId, interestUpdateRequest);
+
+        // then
+        assertEquals(interestId, responseDto.id());
+        assertEquals("name",responseDto.name());
+        assertEquals(List.of("updateKeyword1","updateKeyword2","updateKeyword3"),responseDto.keywords());
     }
 }

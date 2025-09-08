@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.interest.controller;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import jakarta.validation.Valid;
@@ -52,6 +53,14 @@ public class InterestController {
         interestService.delete(interestId);
         log.info("[관심사] 관심사 삭제 응답 완료");
         return ResponseEntity.noContent().build();
+    }
 
+    @PatchMapping(value = "/{interestId}")
+    public ResponseEntity update(@PathVariable("interestId") UUID interestId,
+                                 @Valid @RequestBody InterestUpdateRequest interestUpdateRequest) {
+        log.info("[관심사] 관심사 수정 요청 id = {}", interestId);
+        InterestDto response = interestService.update(interestId,interestUpdateRequest);
+        log.info("[관심사] 관심사 수정 응답  완료 id = {}", response.id());
+        return ResponseEntity.ok(response);
     }
 }
