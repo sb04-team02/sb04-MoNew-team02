@@ -5,8 +5,6 @@ import com.sprint.team2.monew.domain.interest.controller.InterestController;
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
-import com.sprint.team2.monew.domain.interest.entity.Interest;
-import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.global.error.GlobalExceptionHandler;
@@ -23,7 +21,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
@@ -101,7 +98,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .header("MoNew-Request-User-ID",userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -118,7 +115,7 @@ public class InterestControllerTest {
 
         // when & then
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -137,7 +134,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-User-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -158,7 +155,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-Fail-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -177,10 +174,21 @@ public class InterestControllerTest {
         doNothing().when(interestService).delete(interestId);
 
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}",interestId)
+                delete("/api/interests/{interestId}",interestId)
                         .accept(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(status().isNoContent());
+    }
+
+    @DisplayName("관심사ID 형식이 올바르지 않으면 오류를 발생시킨다.")
+    @Test
+    void deleteInterestFailWhenInvalidInterestId() throws Exception {
+        long interestId = 1123L;
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/interests/{interestId}",interestId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isInternalServerError());
     }
 
     @DisplayName("관심사 ID와 검증된 키워드가 주어지면 해당 관심사의 키워드 수정이 성공적으로 이루어진다.")
@@ -195,7 +203,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/interests/{interest-id}",interestId)
+                patch("/api/interests/{interestId}",interestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content)
                         .accept(MediaType.APPLICATION_JSON)
@@ -219,7 +227,7 @@ public class InterestControllerTest {
 
         // when & then
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/interests/{interest-id}",interestId)
+                patch("/api/interests/{interestId}",interestId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)
                 .accept(MediaType.APPLICATION_JSON)
