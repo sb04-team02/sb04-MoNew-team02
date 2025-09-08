@@ -40,4 +40,4 @@ out/
 !.gitignore
 !.dockerignore
 .env
-*.env
+*.env.DS_Store
