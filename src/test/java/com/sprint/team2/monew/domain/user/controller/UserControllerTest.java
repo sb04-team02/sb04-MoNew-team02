@@ -3,6 +3,7 @@ package com.sprint.team2.monew.domain.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserRegisterRequest;
+import com.sprint.team2.monew.domain.user.dto.request.UserUpdateRequest;
 import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import com.sprint.team2.monew.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,7 @@ class UserControllerTest {
     // 등록 테스트
     @Test
     @DisplayName("사용자 등록 성공 테스트")
-    void createUser_Success() throws Exception {
+    void createUserSuccess() throws Exception {
         // 기본 객체 생성
         UUID userId = UUID.randomUUID();
         String email = "test@test.com";
@@ -79,13 +80,13 @@ class UserControllerTest {
         MvcResult result = resultActions.andReturn();
         String json = result.getResponse().getContentAsString();
         UserDto resultDto = objectMapper.readValue(json, UserDto.class);
-        assertThat(userDto).isEqualTo(resultDto);
+        assertThat(resultDto).isEqualTo(userDto);
         resultActions.andExpect(status().isCreated());
     }
 
     @Test
     @DisplayName("사용자 등록 실패 테스트 - 유효하지 않은 요청")
-    void createUser_Failure_InvalidRequest() throws Exception {
+    void createUserFailureInvalidRequest() throws Exception {
         // 요청 생성
         UserRegisterRequest request = new UserRegisterRequest(
                 "invalid-email",  // 이메일 형식 위반
@@ -102,63 +103,131 @@ class UserControllerTest {
     }
 
     // 로그인 테스트
-        @Test
-        @DisplayName("로그인 성공 테스트")
-        void loginUser_Success() throws Exception {
-            // 기본 객체 생성
-            UUID userId = UUID.randomUUID();
-            String email = "test@test.com";
-            String nickname = "테스트";
-            String password = "test1234";
-            LocalDateTime createdAt = LocalDateTime.now();
+    @Test
+    @DisplayName("로그인 성공 테스트")
+    void loginUserSuccess() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        String email = "test@test.com";
+        String nickname = "테스트";
+        String password = "test1234";
+        LocalDateTime createdAt = LocalDateTime.now();
 
-            // 요청 생성
-            UserLoginRequest request = new UserLoginRequest(email, password);
+        // 요청 생성
+        UserLoginRequest request = new UserLoginRequest(email, password);
 
-            // 본문 객체 생성
-            String content = objectMapper.writeValueAsString(request);
+        // 본문 객체 생성
+        String content = objectMapper.writeValueAsString(request);
 
-            // Dto 생성
-            UserDto userDto = new UserDto(
-                    userId,
-                    email,
-                    nickname,
-                    createdAt
-            );
+        // Dto 생성
+        UserDto userDto = new UserDto(
+                userId,
+                email,
+                nickname,
+                createdAt
+        );
 
-            // given
-            given(userService.login(request)).willReturn(userDto);
+        // given
+        given(userService.login(request)).willReturn(userDto);
 
-            // when
-            ResultActions resultActions = mockMvc.perform(
-                    multipart("/api/users/login")
-                            .content(content)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON_VALUE)
-            );
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/users/login")
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+        );
 
-            // then
-            MvcResult result = resultActions.andReturn();
-            String json = result.getResponse().getContentAsString();
-            UserDto resultDto = objectMapper.readValue(json, UserDto.class);
-            assertThat(userDto).isEqualTo(resultDto);
-            resultActions.andExpect(status().isOk());
-        }
+        // then
+        MvcResult result = resultActions.andReturn();
+        String json = result.getResponse().getContentAsString();
+        UserDto resultDto = objectMapper.readValue(json, UserDto.class);
+        assertThat(resultDto).isEqualTo(userDto);
+        resultActions.andExpect(status().isOk());
+    }
 
-        @Test
-        @DisplayName("로그인 실패 테스트 - 유효하지 않은 요청")
-        void loginUser_Failure_InvalidRequest() throws Exception {
-            // 요청 생성
-            UserLoginRequest request = new UserLoginRequest(
-                    "invalid-email", // 이메일 형식 위반
-                    "testtesttesttesttesttest" // 최대 길이 위반 (20자 이하)
-            );
-            String content = objectMapper.writeValueAsString(request);
+    @Test
+    @DisplayName("로그인 실패 테스트 - 유효하지 않은 요청")
+    void loginUserFailureInvalidRequest() throws Exception {
+        // 요청 생성
+        UserLoginRequest request = new UserLoginRequest(
+                "invalid-email", // 이메일 형식 위반
+                "testtesttesttesttesttest" // 최대 길이 위반 (20자 이하)
+        );
+        String content = objectMapper.writeValueAsString(request);
 
-            // when & then
-            mockMvc.perform(multipart("/api/users/login")
-                            .content(content)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest());
-        }
+        // when & then
+        mockMvc.perform(multipart("/api/users/login")
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("업데이트 성공 테스트")
+    void updateUserSuccess() throws Exception {
+        // 기본 객체 생성
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+        String email = "test@test.com";
+        String nickname = "테스트";
+        LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
+
+        // 요청 생성
+        UserUpdateRequest request = new UserUpdateRequest("newNickname");
+
+        // 본문 객체 생성
+        String content = objectMapper.writeValueAsString(request);
+
+        // Dto
+        UserDto userDto = new UserDto(
+                userId,
+                email,
+                "newNickname",
+                createdAt
+        );
+
+        // given
+        given(userService.update(userId, request, loginUserId)).willReturn(userDto);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/users/{userId}", userId)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(httpRequest -> {
+                            httpRequest.setMethod("PATCH");
+                            return httpRequest;
+                        })
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .header("Monew-Request-User-ID", loginUserId.toString())
+        );
+
+        // then
+        MvcResult result = resultActions.andReturn();
+        String json = result.getResponse().getContentAsString();
+        UserDto resultDto = objectMapper.readValue(json, UserDto.class);
+        assertThat(resultDto).isEqualTo(userDto);
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("업데이트 실패 테스트 - 유효하지 않은 요청")
+    void updateUserFailureInvalidRequest() throws Exception {
+        // 요청 생성
+        UUID userId = UUID.randomUUID();
+        UserUpdateRequest request = new UserUpdateRequest("testtesttesttesttesttest");
+        String content = objectMapper.writeValueAsString(request);
+
+        // when & then
+        mockMvc.perform(multipart("/api/users/{userId}", userId)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(httpRequest -> {
+                            httpRequest.setMethod("PATCH");
+                            return httpRequest;
+                        }))
+                .andExpect(status().isBadRequest());
+    }
+
 }
