@@ -22,13 +22,14 @@ public class Article extends DeletableEntity {
     @Column(name = "source_url", unique = true, nullable = false, length = 255)
     private String sourceUrl;
 
-    @Column(name = "title", nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 150)
     private String title;
 
     @Column(name = "publish_date", nullable = false)
     private LocalDateTime publishDate;
 
-    @Column(name = "summary", nullable = false, length = 100)
+    @Lob
+    @Column(name = "summary", nullable = false)
     private String summary;
 
     @Builder.Default
