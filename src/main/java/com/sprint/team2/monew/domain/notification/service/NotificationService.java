@@ -12,7 +12,7 @@ public interface NotificationService {
 
     void notifyInterestArticleRegistered(InterestArticleRegisteredEvent event);
 
-//    NotificationDto notifyCommentLiked(CommentLikedEvent event);
+    void notifyCommentLiked(CommentLikedEvent event);
 
     void confirmNotification(UUID notificationId);
 

@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.interest.service.basic;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestAlreadyExistsSimilarityNameException;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
@@ -80,6 +81,19 @@ public class BasicInterestService implements InterestService {
         log.debug("[구독] 관심사 삭제에 따라 구독 삭제");
         interestRepository.delete(interest);
         log.info("[관심사] 관심사 삭제 완료");
+    }
+
+    @Override
+    @Transactional
+    public InterestDto update(UUID interestId, InterestUpdateRequest interestUpdateRequest) {
+        log.info("[관심사] 관심사 수정 호출 id = {}", interestId);
+        Interest interest = validateInterest(interestId);
+        log.debug("[관심사] 수정 전 키워드 keywords = {}",interest.getKeywords());
+        interest.setKeywords(interestUpdateRequest.keywords());
+        log.debug("[관심사] 수정 후 키워드 keywords = {}",interest.getKeywords());
+        interestRepository.save(interest);
+        log.info("[관심사] 관심사 수정 완료 id = {}", interestId);
+        return interestMapper.toDto(interest);
     }
 
     private User validateUser(UUID userId) {
