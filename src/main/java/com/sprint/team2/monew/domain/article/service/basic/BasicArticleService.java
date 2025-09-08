@@ -7,7 +7,10 @@ import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
+import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
+import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.user.dto.response.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,24 +34,13 @@ public class BasicArticleService implements ArticleService {
     @Transactional
     public void saveByInterest(UUID interestId) {
         Interest interest = interestRepository.findById(interestId)
-                .orElseThrow(() -> new IllegalArgumentException("Interest not found"));
+                .orElseThrow(() -> InterestNotFoundException.notFound(interestId));
         for (String keyword : interest.getKeywords()) {
             List<ArticleDto> articles = naverApiCollector.collect(keyword);
 
             for (ArticleDto dto : articles) {
                 if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
-                    String summary = dto.summary();
-                    String title = dto.title();
-                    if (dto.title().length() > 50) {
-                        title = title.substring(0, 45) + "...";
-                    }
-                    articleEntity.setTitle(title);
-                    if (dto.summary().length() > 100) {
-                        summary = summary.substring(0, 95) + "...";
-                    }
-                    articleEntity.setSummary(summary);
-                    articleEntity.setInterest(interest);
                     articleRepository.save(articleEntity);
                 }
                 log.info("[Article] keyword({})로 뉴스 수집 성공", keyword);
