@@ -119,7 +119,21 @@ public class BasicNotificationsService implements NotificationService {
 
     public void confirmNotification(UUID notificationId) {}
 
-    public void confirmAllNotifications(UUID userId) {}
+    public void confirmAllNotifications(UUID userId) {
+        log.info("[알림] 알림 확인 여부 전건 수정 시작 / 사용자 ID={}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("[알림] 알림 전건 수정 실패 - 사용자가 존재하지 않음 / 사용자 ID={}", userId);
+                    return UserNotFoundException.withId(userId);
+                });
+
+        List<Notification> notifications = notificationRepository.findAllByUser_Id(userId);
+        notifications.forEach(notification -> notification.setConfirmed(true));
+
+        notificationRepository.saveAll(notifications);
+        log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", notifications.size());
+    }
 
     public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
         log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);

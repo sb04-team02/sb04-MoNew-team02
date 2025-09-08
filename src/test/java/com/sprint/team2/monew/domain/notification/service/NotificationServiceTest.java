@@ -178,7 +178,7 @@ public class NotificationServiceTest {
     class FindNotification {
 
         @Test
-        @DisplayName("사용자가 확인하지 않은 알림 목록을 조회함")
+        @DisplayName("요청이 유효할 경우 사용자가 확인하지 않은 알림 목록을 조회함")
         void shouldReturnUnreadNotificationsWithPagination() {
             //given
             User user = TestUserFactory.createUser();
@@ -187,7 +187,7 @@ public class NotificationServiceTest {
 
             Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
-            Notification n2 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
+            Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -219,6 +219,71 @@ public class NotificationServiceTest {
 
             // then
             assertThat(result.content()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("update()")
+    class UpdateNotification {
+
+        @Test
+        @DisplayName("요청이 유효할 경우 사용자의 모든 알림을 '확인'상태로 일괄 수정함")
+        void shouldUpdateAllNotificationsAsConfirmed() {
+            // given
+            User user = TestUserFactory.createUser();
+            UUID userId = UUID.randomUUID();
+
+            Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
+            Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
+            List<Notification> notifications = List.of(n1, n2);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(notificationRepository.findAllByUser_Id(userId)).willReturn(notifications);
+
+            // when
+            notificationService.confirmAllNotifications(userId);
+
+            //then
+            assertThat(n1.isConfirmed()).isTrue();
+            assertThat(n2.isConfirmed()).isTrue();
+        }
+
+        @Test
+        @DisplayName("알림 수정 요청 중 사용자가 존재하지 않는 경우 예외 발생")
+        void shouldThrowWhenUserDoesNotExist() {
+            // given
+            UUID nonExistentUserId = UUID.randomUUID();
+            given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThrows(UserNotFoundException.class, () -> {
+                notificationService.confirmAllNotifications(nonExistentUserId);
+            });
+        }
+
+        @Test
+        @DisplayName("요청이 유효할 경우 사용자의 알림을 '확인' 상태로 단건 수정함")
+        void shouldUpdateNotificationAsConfirmed() {
+            // given
+            User user = TestUserFactory.createUser();
+            UUID userId = UUID.randomUUID();
+
+            Notification notification = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(notificationRepository.findAllByUser_Id(userId)).willReturn(List.of(notification));
+
+            //when
+            notificationService.confirmNotification(userId);
+
+            //then
+            assertThat(notification.isConfirmed()).isTrue();
+        }
+
+        @Test
+        @DisplayName("알림 수정 요청 중 알림이 존재하지 않을 경우 예외 발생")
+        void shouldThrowWhenNotificationDoesNotExist() {
+            
         }
     }
 }
