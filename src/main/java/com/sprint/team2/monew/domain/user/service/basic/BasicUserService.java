@@ -144,11 +144,14 @@ public class BasicUserService implements UserService {
     @Transactional
     public long deletePhysicallyByBatch() {
         LocalDateTime threshold = LocalDateTime.now().minusDays(1);
+        log.info("[사용자] 물리적 삭제 배치 처리 시작 - now={}, threshold={}", LocalDateTime.now(), threshold);
+        
         List<User> users = userRepository.findAllByDeletedAtBefore(threshold);
         long count = users.size();
+        log.debug("[사용자] 물리적 삭제 배치 처리 대상 유저 수 - userCount={}", count);
 
         userRepository.deleteAll(users);
-
+        log.info("[사용자] 물리적 삭제 배치 처리 성공");
         return count; // 삭제된 건수 리턴
     }
 }
