@@ -12,6 +12,7 @@ import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.basic.BasicCommentService;
+import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -35,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BasicCommentServiceTest {
@@ -48,6 +48,10 @@ public class BasicCommentServiceTest {
     private ArticleRepository articleRepository;
     @Mock
     private CommentMapper commentMapper;
+
+    @Mock
+    private ReactionRepository reactionRepository;
+
     @Mock
     private CurrentUserProvider currentUserProvider;
 
@@ -210,13 +214,20 @@ public class BasicCommentServiceTest {
     @DisplayName("댓글 수정 성공")
     void updateCommentSuccess() {
         // given
-        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        assertThat(comment.getUser().getId()).isEqualTo(ownerId);
+
+        given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
+                .willReturn(Optional.of(comment));
+        given(reactionRepository.existsByUserIdAndCommentId(ownerId, commentId))
+                .willReturn(false);
 
         CommentDto expected = new CommentDto(
                 commentId, getId(article), ownerId, owner.getNickname(),
                 "수정된 내용", 0L, false, LocalDateTime.now()
         );
-        given(commentMapper.toDto(any(Comment.class), eq(false))).willReturn(expected);
+        given(commentMapper.toDto(any(Comment.class), eq(false)))
+                .willReturn(expected);
+
         CommentUpdateRequest req = new CommentUpdateRequest("수정된 내용");
 
         // when
@@ -225,51 +236,81 @@ public class BasicCommentServiceTest {
         // then
         assertThat(result.content()).isEqualTo("수정된 내용");
         assertThat(comment.getContent()).isEqualTo("수정된 내용");
-        verify(commentRepository).findById(commentId);
-        verify(commentMapper).toDto(any(Comment.class), eq(false));
-        verifyNoInteractions(userRepository, articleRepository);
+
+        then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
+        then(reactionRepository).should().existsByUserIdAndCommentId(ownerId, commentId);
+        then(commentMapper).should().toDto(any(Comment.class), eq(false));
+
+        then(userRepository).shouldHaveNoInteractions();
+        then(articleRepository).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("댓글이 존재하지 않아 수정 실패")
     void updateCommentShouldFailWhenCommentNotFound() {
         // given
-        given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+        given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
+                .willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, ownerId, new CommentUpdateRequest("수정")))
                 .isInstanceOf(ContentNotFoundException.class)
                 .hasMessageContaining("댓글을 찾을 수 없습니다.");
+
+        // verify
+        then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoInteractions();
+        then(commentMapper).shouldHaveNoInteractions();
+        then(userRepository).shouldHaveNoInteractions();
+        then(articleRepository).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("권한 없음 - 본인 댓글 아님")
     void updateCommentShouldFailForNonOwner() {
         // given
-        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        comment.setDeletedAt(null);
+        given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
+                .willReturn(Optional.of(comment));
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, otherUserId, new CommentUpdateRequest("수정")))
                 .isInstanceOf(CommentForbiddenException.class)
                 .hasMessageContaining("본인의 댓글만");
+
+        // verify: 좋아요/매퍼는 호출되지 않음
+        then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoInteractions();
+        then(commentMapper).shouldHaveNoInteractions();
+        then(userRepository).shouldHaveNoInteractions();
+        then(articleRepository).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("빈 내용으로 댓글 수정 실패")
     void updateCommentShouldFailWhenContentIsBlank() {
         // given
-        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        comment.setDeletedAt(null);
+        given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
+                .willReturn(Optional.of(comment));
 
         // when & then
         assertThatThrownBy(() ->
                 commentService.updateComment(commentId, ownerId, new CommentUpdateRequest("   ")))
                 .isInstanceOf(CommentContentRequiredException.class)
                 .hasMessageContaining("댓글 내용을 입력해주세요.");
-        verify(commentRepository).findById(commentId);
-        verifyNoMoreInteractions(commentRepository);
-        verifyNoInteractions(commentMapper);
+
+        // verify: 내용 검증에서 예외 → 좋아요/매퍼 호출 안됨
+        then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoInteractions();
+        then(commentMapper).shouldHaveNoInteractions();
+        then(userRepository).shouldHaveNoInteractions();
+        then(articleRepository).shouldHaveNoInteractions();
     }
 
     @Test
