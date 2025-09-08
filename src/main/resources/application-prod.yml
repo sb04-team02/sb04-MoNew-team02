@@ -12,6 +12,10 @@ spring:
 #        format_sql: false
       hibernate:
         ddl-auto: validate
+  # prod 환경: 클라우드로 연결하기
+  data:
+    mongodb:
+      uri: mongodb+srv://team2:team2123@monew.4sizz77.mongodb.net/
 
   sql:
     init:
