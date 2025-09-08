@@ -67,4 +67,26 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(updatedUserDto);
     }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteLogically(@PathVariable("userId") UUID userId,
+                                                @RequestHeader("Monew-Request-User-ID") UUID loginUserId) {
+        log.info("[사용자] 논리적 삭제 요청 수신 - id={}", userId);
+        userService.deleteLogically(userId, loginUserId);
+        log.info("[사용자] 논리적 삭제 요청 응답 - id={} 삭제 완료", userId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/{userId}/hard")
+    public ResponseEntity<Void> deletePhysicallyByForce(@PathVariable("userId") UUID userId,
+                                                        @RequestHeader("Monew-Request-User-ID") UUID loginUserId) {
+        log.info("[사용자] 물리적 삭제 요청 수신 - id={}", userId);
+        userService.deletePhysicallyByForce(userId, loginUserId);
+        log.info("[사용자] 물리적 삭제 요청 응답 - id={} 삭제 완료", userId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

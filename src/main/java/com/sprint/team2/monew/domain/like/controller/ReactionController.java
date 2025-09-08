@@ -28,7 +28,7 @@ public class ReactionController {
         log.info("댓글 좋아요 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
         CommentLikeDto commentLikeDto = reactionService.likeComment(commentId, requesterUserId);
         log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", commentLikeDto.id(), commentLikeDto.commentId(), commentLikeDto.likedBy());
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentLikeDto);
+        return ResponseEntity.status(HttpStatus.OK).body(commentLikeDto);
     }
 
     /**

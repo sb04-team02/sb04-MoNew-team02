@@ -11,14 +11,11 @@ import java.util.UUID;
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update Comment c set c.likeCount = c.likeCount + 1 where c.id = :id")
-    int incrementLikeCount(@Param("id") UUID commentId);
-
-    @Modifying
-    @Query("""
-           update Comment c 
-              set c.likeCount = case when c.likeCount > 0 then c.likeCount - 1 else 0 end
-            where c.id = :id
-           """)
-    int decrementLikeCount(@Param("id") UUID commentId);
+    @Query( value = """
+        update comments
+            set like_count = like_count + 1
+        where id = :id
+        returning like_count
+    """, nativeQuery = true)
+    long incrementLikeCountReturning(@Param("id") UUID commentId);
 }

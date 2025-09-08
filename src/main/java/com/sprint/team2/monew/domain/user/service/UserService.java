@@ -14,4 +14,8 @@ public interface UserService {
     UserDto login(UserLoginRequest request);
 
     UserDto update(UUID userId, UserUpdateRequest request, UUID loginUserId);
+
+    void deleteLogically(UUID userId, UUID loginUserId);
+
+    void deletePhysicallyByForce(UUID userId, UUID loginUserId);
 }

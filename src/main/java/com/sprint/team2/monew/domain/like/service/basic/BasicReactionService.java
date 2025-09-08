@@ -62,9 +62,12 @@ public class BasicReactionService implements ReactionService {
             reactionRepository.saveAndFlush(reaction);
 
             // ★ 원자적 +1 (동시성 안전)
-            commentRepository.incrementLikeCount(comment.getId());
+            long newLikeCount = commentRepository.incrementLikeCountReturning(comment.getId());
+            Comment freshComment = commentRepository.findById(comment.getId())
+                    .orElseThrow(() -> ContentNotFoundException.contentNotFoundException(commentId));
+            reaction.setComment(freshComment);
 
-            CommentLikeDto dto = reactionMapper.toDto(reaction);
+            CommentLikeDto dto = reactionMapper.toDto(reaction, newLikeCount);
             log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", dto.id(), dto.commentId(), dto.likedBy());
             return dto;
         } catch (DataIntegrityViolationException e) {
