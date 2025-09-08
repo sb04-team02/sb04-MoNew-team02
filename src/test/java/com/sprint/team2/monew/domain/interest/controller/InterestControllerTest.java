@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.interest.controller.InterestController;
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
+import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
+import com.sprint.team2.monew.domain.interest.entity.Interest;
+import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.global.error.GlobalExceptionHandler;
@@ -20,12 +23,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -180,4 +183,47 @@ public class InterestControllerTest {
         resultActions.andExpect(status().isNoContent());
     }
 
+    @DisplayName("관심사 ID와 검증된 키워드가 주어지면 해당 관심사의 키워드 수정이 성공적으로 이루어진다.")
+    @Test
+    void updateInterestKeywordShouldSucceedWhenValidateInterestIdAndKeywords() throws Exception {
+        // 본문생성
+        UUID interestId = UUID.randomUUID();
+        InterestUpdateRequest interestUpdateRequest = new InterestUpdateRequest(List.of("updateKeyword1","updateKeyword2","updateKeyword3"));
+        String content = om.writeValueAsString(interestUpdateRequest);
+        InterestDto interestDto = new InterestDto(interestId,"name",List.of("updateKeyword1","updateKeyword2","updateKeyword3"),0L,false);
+        given(interestService.update(interestId,interestUpdateRequest)).willReturn(interestDto);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/interests/{interest-id}",interestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("name"))
+                .andExpect(jsonPath("$.keywords.size()").value(3))
+                .andExpect(jsonPath("$.id").value(interestId.toString()));
+    }
+
+    @DisplayName("수정된 키워드가 하나도 존재하지 않으면 검증의 통과하지 못한다." +
+            "키워드가 존재하지 않으면 수정할 수 없다.")
+    @Test
+    void updateInterestKeywordsShouldFailWithEmptyKeywords() throws Exception {
+        // given
+        UUID interestId = UUID.randomUUID();
+        InterestUpdateRequest interestUpdateRequest = new InterestUpdateRequest(List.of());
+        String content = om.writeValueAsString(interestUpdateRequest);
+
+        // when & then
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/interests/{interest-id}",interestId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isBadRequest());
+    }
 }
