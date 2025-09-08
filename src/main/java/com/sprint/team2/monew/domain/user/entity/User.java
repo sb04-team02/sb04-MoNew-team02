@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -27,6 +29,7 @@ public class User extends DeletableEntity {
     public void update(String newNickname) {
         if (!StringUtils.isBlank(newNickname) && !newNickname.equals(this.nickname)) {
             this.nickname = newNickname;
+            this.setUpdatedAt(LocalDateTime.now());
         }
     }
 }
