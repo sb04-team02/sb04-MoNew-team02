@@ -1,7 +1,9 @@
 package com.sprint.team2.monew.domain.user.batch.listener;
 
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.stereotype.Component;
@@ -31,12 +33,13 @@ public class UserCleanupJobListener implements JobExecutionListener {
         sample.stop(registry.timer("batch.user_cleanup.duration"));
         running.set(0);
 
-        if (jobExecution.getStatus().isUnsuccessful()) {
-            registry.counter("batch.user_cleanup.failure").increment();
-        } else {
+        Counter deletedTotal = registry.counter("batch.user_cleanup.deleted_total");
+        Counter success = registry.counter("batch.user_cleanup.success");
+
+        if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             long deletedCount = jobExecution.getExecutionContext().getLong("deletedCount", 0L);
-            registry.counter("batch.user_cleanup.deleted_total").increment(deletedCount);
-            registry.counter("batch.user_cleanup.success").increment();
+            deletedTotal.increment(deletedCount);
+            success.increment();
         }
     }
 }
