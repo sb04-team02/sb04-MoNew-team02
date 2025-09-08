@@ -66,9 +66,10 @@ public class UserActivityListener {
         .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
     List<SubscriptionDto> subscriptionDtos = userActivity.getSubscriptions();
 
-    if (!subscriptionDtos.contains(subscriptionDto)) {
-      subscriptionDtos.add(0, subscriptionDto);
-    }
+//    if (!subscriptionDtos.contains(subscriptionDto)) {
+//      subscriptionDtos.add(0, subscriptionDto);
+//    }
+    subscriptionDtos.add(0, subscriptionDto);
 
     if (subscriptionDtos.size() > 10) {
       subscriptionDtos.remove(subscriptionDtos.size() - 1); // removing oldest item
@@ -91,7 +92,6 @@ public class UserActivityListener {
     UserActivity userActivity = userActivityRepository.findById(userId)
         // replace with custom error <<<<<<<<<<<<<<<<
         .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + userId));
-    List<SubscriptionDto> subscriptionDtos = userActivity.getSubscriptions();
 
     userActivity.getSubscriptions()
         .removeIf(s -> s.interestId().equals(event.getInterestId()));
@@ -163,9 +163,11 @@ public class UserActivityListener {
         .orElseThrow(() -> new IllegalStateException("User activity not found for user: " + commentUserId));
     List<CommentActivityLikeDto> commentActivityLikeDtos = userActivity.getCommentLikes();
 
-    if (!commentActivityLikeDtos.contains(commentActivityLikeDto)) {
-      commentActivityLikeDtos.add(0, commentActivityLikeDto);
-    }
+//    if (!commentActivityLikeDtos.contains(commentActivityLikeDto)) {
+//      commentActivityLikeDtos.add(0, commentActivityLikeDto);
+//    }
+
+    commentActivityLikeDtos.add(0, commentActivityLikeDto);
 
     if (commentActivityLikeDtos.size() > 10) {
       commentActivityLikeDtos.remove(commentActivityLikeDtos.size() - 1); // removing oldest item
