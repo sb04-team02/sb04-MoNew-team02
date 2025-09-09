@@ -100,7 +100,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .header("MoNew-Request-User-ID",userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -117,7 +117,7 @@ public class InterestControllerTest {
 
         // when & then
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interest-id}/subscriptions",interestId)
+                multipart("/api/interests/{interestId}/subscriptions",interestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -136,7 +136,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-User-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -157,7 +157,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interest-id}/subscriptions",interestId)
+                delete("/api/interests/{interestId}/subscriptions",interestId)
                         .header("Monew-Request-Fail-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
