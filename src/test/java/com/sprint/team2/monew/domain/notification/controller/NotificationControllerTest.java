@@ -5,6 +5,7 @@ import com.sprint.team2.monew.domain.notification.dto.response.CursorPageRespons
 import com.sprint.team2.monew.domain.notification.dto.response.NotificationDto;
 import com.sprint.team2.monew.domain.notification.entity.Notification;
 import com.sprint.team2.monew.domain.notification.entity.ResourceType;
+import com.sprint.team2.monew.domain.notification.exception.NotificationNotFoundException;
 import com.sprint.team2.monew.domain.notification.factory.TestNotificationFactory;
 import com.sprint.team2.monew.domain.notification.service.NotificationService;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
@@ -25,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.after;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -133,13 +133,33 @@ public class NotificationControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/notifications/{notificationID}" + notificationId)
+                patch("/api/notifications/{notificationID}", notificationId)
                         .header("Monew-Request-User-ID",userId)
                         .accept(MediaType.APPLICATION_JSON)
         );
 
         // then
         resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("알림 확인 상태 단건 수정 실패 - 존재하지 않는 알림 ID")
+    void confirmNotificationFailWhenInvalidNotificationIdFormat() throws Exception {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID nonExistentNotificationId = UUID.randomUUID();
+
+        willThrow(NotificationNotFoundException.withId(nonExistentNotificationId))
+        .given(notificationService).confirmNotification(userId, nonExistentNotificationId);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/notifications/{notificationID}", nonExistentNotificationId.toString())
+                        .header("Monew-Request-User-ID",userId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        //then
+        resultActions.andExpect(status().isNotFound());
     }
 
 
