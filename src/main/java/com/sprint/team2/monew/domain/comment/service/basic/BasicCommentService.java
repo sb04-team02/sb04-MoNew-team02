@@ -139,4 +139,31 @@ public class BasicCommentService implements CommentService {
 
         log.info("댓글 논리 삭제 성공: commentId={}, requesterUserId={}", commentId, requesterUserId);
     }
+
+    @Override
+    @Transactional
+    public void hardDeleteComment(UUID commentId, UUID requesterUserId) {
+        log.info("댓글 물리 삭제 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
+
+        //존재 확인 (삭제 상태와 무관하게)
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(ContentNotFoundException::new);
+
+        //권한 체크: 작성자 본인만
+        if (comment.getUser() == null || !comment.getUser().getId().equals(requesterUserId)) {
+            log.error("댓글 물리 삭제 실패: 권한 없음 commentId={}, ownerId={}, requesterUserId={}",
+                    commentId,
+                    comment.getUser() == null ? null : comment.getUser().getId(),
+                    requesterUserId);
+            throw new CommentForbiddenException();
+        }
+
+        //연관 데이터 정리
+        reactionRepository.deleteByCommentId(commentId);
+        log.info("댓글 연관 좋아요 삭제 완료: commentId={}", commentId);
+
+        //댓글 자체 물리 삭제
+        commentRepository.delete(comment);
+        log.info("댓글 물리 삭제 완료: commentId={}", commentId);
+    }
 }

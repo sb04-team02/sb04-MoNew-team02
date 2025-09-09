@@ -308,7 +308,7 @@ public class BasicCommentServiceTest {
         then(articleRepository).shouldHaveNoInteractions();
     }
 
-    // ===== DeleteComment =====
+    // ===== SoftDeleteComment =====
 
     @Test
     @DisplayName("논리 삭제 성공")
@@ -354,6 +354,57 @@ public class BasicCommentServiceTest {
                 .isInstanceOf(ContentNotFoundException.class);
 
         then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+    }
+
+    // ===== HardDeleteComment =====
+    @Test
+    @DisplayName("물리 삭제 성공")
+    void hardDeleteCommentSuccess() {
+        //given
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        willDoNothing().given(reactionRepository).deleteByCommentId(commentId);
+        willDoNothing().given(commentRepository).delete(comment);
+        //when + then
+        assertThatCode(() -> commentService.hardDeleteComment(commentId, ownerId))
+                .doesNotThrowAnyException();
+
+        then(commentRepository).should().findById(commentId);
+        then(reactionRepository).should().deleteByCommentId(commentId);
+        then(commentRepository).should().delete(comment);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("물리 삭제 실패-삭제 권한 없음")
+    void hardDeleteCommentForbidden() {
+        // given
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+        // when & then
+        assertThatThrownBy(() -> commentService.hardDeleteComment(commentId, otherUserId))
+                .isInstanceOf(CommentForbiddenException.class);
+
+        then(commentRepository).should().findById(commentId);
+        then(reactionRepository).should(never()).deleteByCommentId(any());
+        then(commentRepository).should(never()).delete(any());
+        then(commentRepository).shouldHaveNoMoreInteractions();
+        then(reactionRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("물리 삭제 실패-댓글이 존재하지 않음")
+    void hardDeleteCommentNotFound() {
+        // given
+        given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> commentService.hardDeleteComment(commentId, ownerId))
+                .isInstanceOf(ContentNotFoundException.class);
+
+        then(commentRepository).should().findById(commentId);
+        then(reactionRepository).shouldHaveNoInteractions();
         then(commentRepository).shouldHaveNoMoreInteractions();
     }
 
