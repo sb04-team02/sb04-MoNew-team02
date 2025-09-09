@@ -167,6 +167,8 @@ public class BasicNotificationsService implements NotificationService {
         log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", slice.getContent().size());
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
         log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);
 

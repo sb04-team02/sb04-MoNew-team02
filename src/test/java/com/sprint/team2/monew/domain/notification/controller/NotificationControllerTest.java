@@ -162,5 +162,37 @@ public class NotificationControllerTest {
         resultActions.andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("알림 확인 상태 일괄 수정 성공")
+    void confirmNotifications() throws Exception {
+        //given
+        UUID userId = UUID.randomUUID();
+        LocalDateTime after = LocalDateTime.now().minusDays(1);
+        int size = 10;
 
+        willDoNothing().given(notificationService).confirmAllNotifications(userId, after, size);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/notifications")
+                        .header("Monew-Request-User-ID",userId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("잘못된 형식의 요청이 들어올 경우 알림 확인 상태 수정 실패")
+    void confirmNotificationFailWhenInvalidRequestUserIdFormat() throws Exception {
+        //given
+        String invalidUserId = "invalid-uuid-format";
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/notifications")
+                        .header("Monew-Request-User-ID",invalidUserId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isBadRequest());
+    }
 }
