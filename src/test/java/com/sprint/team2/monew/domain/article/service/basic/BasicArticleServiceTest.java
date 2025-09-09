@@ -27,8 +27,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class BasicArticleServiceTest {
     @Mock
-    private ArticleRepository articleRepository;
-    @Mock
     private ArticleRepositoryCustom articleRepositoryCustom;
     @Mock
     private ArticleMapper articleMapper;
@@ -41,7 +39,8 @@ class BasicArticleServiceTest {
 
     @Test
     @DisplayName("뉴스 기사 정렬: 정상적으로 정렬된 DTO 리시트 반환 및 페이징 정보 반환")
-    void readArticleSortSuccess() { // given
+    void readArticleSortSuccess() {
+        // given
         UUID userId = UUID.randomUUID();
         Article article = new Article();
         article.setPublishDate(LocalDateTime.now().minusDays(1));
