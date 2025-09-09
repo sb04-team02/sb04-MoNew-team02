@@ -13,6 +13,7 @@ import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -35,6 +36,7 @@ public class BasicCommentService implements CommentService {
     private final ArticleRepository articleRepository;
     private final CommentMapper commentMapper;
     private final ReactionRepository reactionRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional
@@ -147,7 +149,10 @@ public class BasicCommentService implements CommentService {
 
         //존재 확인 (삭제 상태와 무관하게)
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(ContentNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.error("댓글 삭제 실패: 댓글 없음 또는 이미 삭제됨 commentId={}", commentId);
+                    return new ContentNotFoundException();
+                });
 
         //권한 체크: 작성자 본인만
         if (comment.getUser() == null || !comment.getUser().getId().equals(requesterUserId)) {
@@ -160,7 +165,9 @@ public class BasicCommentService implements CommentService {
 
         //연관 데이터 정리
         reactionRepository.deleteByCommentId(commentId);
-        log.info("댓글 연관 좋아요 삭제 완료: commentId={}", commentId);
+        notificationRepository.deleteByCommentId(commentId);
+        log.info("댓글 연관 좋아요, 알림 삭제 완료: commentId={}", commentId);
+
 
         //댓글 자체 물리 삭제
         commentRepository.delete(comment);
