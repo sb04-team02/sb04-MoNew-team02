@@ -49,17 +49,17 @@ public class BasicInterestService implements InterestService {
             return CursorPageResponseInterestDto.from(Page.empty(),null,null);
         }
         InterestQueryDto lastDto = pageQuery.getContent().get(pageQuery.getContent().size() - 1);
-        String newCursor = null;
+        String lastItemCursor = null;
         if ("name".equalsIgnoreCase(pageRequestDto.orderBy())){
-            newCursor = lastDto.name();
+            lastItemCursor = lastDto.name();
         } else {
-            newCursor = String.valueOf(lastDto.subscriberCount());
+            lastItemCursor = String.valueOf(lastDto.subscriberCount());
         }
-        LocalDateTime newAfter = lastDto.createdAt();
+        LocalDateTime lastItemAfter = lastDto.createdAt();
         Page<InterestDto> page = pageQuery.map(interestMapper::toDto);
-        CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,newAfter,newCursor);
+        CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,lastItemAfter,lastItemCursor);
         log.info("[관심사] 목록 조회 완료 userId = {}, 검색어 = {}, 결과수 = {}",userId, pageRequestDto.keyword(),response.content().size());
-        log.debug("[관심사] 목록 조회 완료 cursor = {}, after = {}", newCursor, newAfter);
+        log.debug("[관심사] 목록 조회 완료 cursor = {}, after = {}", lastItemCursor, lastItemAfter);
         return response;
     }
 
