@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.team2.monew.domain.user.exception.UserNotFoundException.withId;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -85,7 +87,7 @@ public class BasicReactionService implements ReactionService {
         User user = userRepository.findById(requesterUserId)
                 .orElseThrow(() -> {
                     log.error("좋아요 취소 실패 : 사용자가 존재하지 않음. requesterUserId={}", requesterUserId);
-                    return new UserNotFoundException();
+                    return UserNotFoundException.withId(requesterUserId);
                 });
 
         Comment comment = commentRepository.findById(commentId)

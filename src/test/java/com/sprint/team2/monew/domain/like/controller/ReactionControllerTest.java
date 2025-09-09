@@ -56,7 +56,7 @@ public class ReactionControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Monew-Request-User-ID", requesterId.toString())
                 )
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(dto.id().toString()))
                 .andExpect(jsonPath("$.commentId").value(commentId.toString()))
