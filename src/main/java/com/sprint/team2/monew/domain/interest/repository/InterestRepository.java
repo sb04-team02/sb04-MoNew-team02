@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
-public interface InterestRepository extends JpaRepository<Interest, UUID> {
+public interface InterestRepository extends JpaRepository<Interest, UUID> , InterestRepositoryCustom {
     @Query(nativeQuery = true,
             value = "SELECT EXISTS(" +
                     "SELECT 1 " +
