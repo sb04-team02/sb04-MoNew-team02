@@ -79,19 +79,12 @@ public class BasicArticleService implements ArticleService {
         if (!articles.isEmpty()) {
             Article last = articles.get(articles.size() - 1);
             switch (orderBy) {
-                case "commentCount" -> {
-                    nextCursor = String.valueOf(last.getCommentCount());
-                    nextAfter = last.getCreatedAt();
-                }
-                case "viewCount" -> {
-                    nextCursor = String.valueOf(last.getViewCount());
-                    nextAfter = last.getCreatedAt();
-                }
-                default -> {
-                    nextCursor = last.getPublishDate().toString();
-                    nextAfter = last.getCreatedAt();
-                }
+                case "commentCount" -> nextCursor = String.valueOf(last.getCommentCount());
+                case "viewCount" -> nextCursor = String.valueOf(last.getViewCount());
+                default -> nextCursor = last.getPublishDate().toString();
             }
+
+            nextAfter = last.getCreatedAt();
         }
 
         QArticle article = QArticle.article;
