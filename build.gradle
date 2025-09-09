@@ -57,6 +57,12 @@ dependencies {
 
     // mongodb
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // Spring Batch
+    implementation 'org.springframework.batch:spring-batch-core'
+
+    // metric
+    implementation 'io.micrometer:micrometer-core'
 }
 
 tasks.named('test') {
