@@ -13,6 +13,7 @@ import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.basic.BasicCommentService;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -45,10 +46,11 @@ public class BasicCommentServiceTest {
     @Mock
     private ArticleRepository articleRepository;
     @Mock
-    private CommentMapper commentMapper;
-
-    @Mock
     private ReactionRepository reactionRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
+    @Mock
+    private CommentMapper commentMapper;
 
     @InjectMocks
     private BasicCommentService commentService;
@@ -371,6 +373,7 @@ public class BasicCommentServiceTest {
 
         then(commentRepository).should().findById(commentId);
         then(reactionRepository).should().deleteByCommentId(commentId);
+        then(notificationRepository).should().deleteByCommentId(commentId);
         then(commentRepository).should().delete(comment);
         then(commentRepository).shouldHaveNoMoreInteractions();
         then(reactionRepository).shouldHaveNoMoreInteractions();
@@ -388,6 +391,7 @@ public class BasicCommentServiceTest {
 
         then(commentRepository).should().findById(commentId);
         then(reactionRepository).should(never()).deleteByCommentId(any());
+        then(notificationRepository).should(never()).deleteByCommentId(any());
         then(commentRepository).should(never()).delete(any());
         then(commentRepository).shouldHaveNoMoreInteractions();
         then(reactionRepository).shouldHaveNoMoreInteractions();
@@ -405,6 +409,7 @@ public class BasicCommentServiceTest {
 
         then(commentRepository).should().findById(commentId);
         then(reactionRepository).shouldHaveNoInteractions();
+        then(notificationRepository).shouldHaveNoInteractions();
         then(commentRepository).shouldHaveNoMoreInteractions();
     }
 
