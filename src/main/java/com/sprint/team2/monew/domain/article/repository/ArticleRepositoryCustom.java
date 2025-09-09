@@ -49,25 +49,49 @@ public class ArticleRepositoryCustom {
             builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
         }
 
-        if (cursor != null && after != null) {
+        if (cursor != null) {
             switch (orderBy) {
-                case "commentCount" -> builder.and(
-                        direction.equalsIgnoreCase("ASC") ?
-                                article.commentCount.gt(Integer.parseInt(cursor)) :
-                                article.commentCount.lt(Integer.parseInt(cursor))
-                );
-                case "viewCount" -> builder.and(
-                        direction.equalsIgnoreCase("ASC") ?
-                                article.viewCount.gt(Integer.parseInt(cursor)) :
-                                article.viewCount.lt(Integer.parseInt(cursor))
-                );
-                default -> { // publishDate 기준
+                case "commentCount" -> {
+                    long cursorValue = Long.parseLong(cursor);
+                    if (after != null) {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.commentCount.gt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.gt(after))) :
+                                article.commentCount.lt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.lt(after))));
+                    } else {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.commentCount.gt(cursorValue) :
+                                article.commentCount.lt(cursorValue));
+                    }
+                }
+
+                case "viewCount" -> {
+                    long cursorValue = Long.parseLong(cursor);
+                    if (after != null) {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.viewCount.gt(cursorValue)
+                                        .or(article.viewCount.eq(cursorValue).and(article.createdAt.gt(after))) :
+                                article.viewCount.lt(cursorValue)
+                                        .or(article.viewCount.eq(cursorValue).and(article.createdAt.lt(after))));
+                    } else {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.viewCount.gt(cursorValue) :
+                                article.viewCount.lt(cursorValue));
+                    }
+                }
+
+                default -> {
                     LocalDateTime cursorDate = LocalDateTime.parse(cursor);
-                    builder.and(
-                            direction.equalsIgnoreCase("ASC") ?
-                                    article.publishDate.gt(cursorDate) :
-                                    article.publishDate.lt(cursorDate)
-                    );
+                    if (after != null) {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.publishDate.gt(cursorDate)
+                                        .or(article.publishDate.eq(cursorDate).and(article.createdAt.gt(after))) :
+                                article.publishDate.lt(cursorDate)
+                                        .or(article.publishDate.eq(cursorDate).and(article.createdAt.lt(after))));
+                    } else {
+                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                                article.publishDate.gt(cursorDate) :
+                                article.publishDate.lt(cursorDate));
+                    }
                 }
             }
         }
@@ -82,7 +106,7 @@ public class ArticleRepositoryCustom {
         return jpaQueryFactory
                 .selectFrom(article)
                 .where(builder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifier, article.createdAt.asc())
                 .limit(limit + 1)
                 .fetch();
     }
