@@ -1,23 +1,25 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
+import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.entity.QArticle;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
+import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,9 +31,11 @@ public class BasicArticleService implements ArticleService {
 
     private final ArticleMapper articleMapper;
     private final ArticleRepository articleRepository;
+    private final ArticleRepositoryCustom articleRepositoryCustom;
     private final NaverApiCollector naverApiCollector;
 
     private final InterestRepository interestRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -53,16 +57,68 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ArticleDto> read(UUID userId, String orderBy, String direction, int limit) {
+    public CursorPageResponseArticleDto read(UUID userId, String orderBy, String direction, int limit,
+                                             String keyword,
+                                             UUID interestId, List<String> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
+                                             String cursor, LocalDateTime after) {
 
-        Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(orderBy).ascending() : Sort.by(orderBy).descending();
+        List<Article> articles = articleRepositoryCustom.searchArticles(
+                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
+                orderBy, direction,
+                cursor, after, limit
+        );
 
-        Pageable pageable = PageRequest.of(0, limit, sort);
+        boolean hasNext = articles.size() > limit;
+        if (hasNext) {
+            articles = articles.subList(0, limit);
+        }
 
-        Page<Article> articles = articleRepository.findAll(pageable);
+        String nextCursor = null;
+        LocalDateTime nextAfter = null;
 
-        return articles.stream()
-                .map(articleMapper::toArticleDto)
-                .toList();
+        if (!articles.isEmpty()) {
+            Article last = articles.get(articles.size() - 1);
+            switch (orderBy) {
+                case "commentCount" -> {
+                    nextCursor = String.valueOf(last.getCommentCount());
+                    nextAfter = last.getCreatedAt();
+                }
+                case "viewCount" -> {
+                    nextCursor = String.valueOf(last.getViewCount());
+                    nextAfter = last.getCreatedAt();
+                }
+                default -> {
+                    nextCursor = last.getPublishDate().toString();
+                    nextAfter = last.getPublishDate();
+                }
+            }
+        }
+
+        QArticle article = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(article.title.containsIgnoreCase(keyword)
+                    .or(article.summary.containsIgnoreCase(keyword)));
+        }
+        if (interestId != null) builder.and(article.interest.id.eq(interestId));
+        if (sourceIn != null && !sourceIn.isEmpty()) builder.and(article.source.in(sourceIn));
+        if (publishedDateFrom != null && publishedDateTo != null)
+            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
+
+        long totalElements = jpaQueryFactory
+                .select(article.count())
+                .from(article)
+                .where(builder)
+                .fetchOne();
+
+        return new CursorPageResponseArticleDto(
+                articles.stream().map(articleMapper::toArticleDto).toList(),
+                nextCursor,
+                nextAfter,
+                articles.size(),
+                totalElements,
+                hasNext
+        );
     }
 }
