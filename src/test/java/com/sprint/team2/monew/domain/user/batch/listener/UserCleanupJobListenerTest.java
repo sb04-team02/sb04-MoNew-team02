@@ -1,11 +1,12 @@
 package com.sprint.team2.monew.domain.user.batch.listener;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,11 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class UserCleanupJobListenerTest {
 
-    @Autowired
     private MeterRegistry registry;
 
-    @Autowired
     private UserCleanupJobListener listener;
+
+    @BeforeEach
+    void setUp() {
+        // 매 테스트마다 새로운 레지스트리 생성
+        registry = new SimpleMeterRegistry();
+        listener = new UserCleanupJobListener(registry);
+    }
 
     @Test
     @DisplayName("beforeJob running 설정 테스트")

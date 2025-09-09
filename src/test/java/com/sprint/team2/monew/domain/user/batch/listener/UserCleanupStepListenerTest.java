@@ -2,12 +2,13 @@ package com.sprint.team2.monew.domain.user.batch.listener;
 
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -18,11 +19,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class UserCleanupStepListenerTest {
 
-    @Autowired
     private MeterRegistry registry;
 
-    @Autowired
     private UserCleanupStepListener listener;
+
+    @BeforeEach
+    void setUp() {
+        // 매 테스트마다 새로운 레지스트리 생성
+        registry = new SimpleMeterRegistry();
+        listener = new UserCleanupStepListener(registry);
+    }
 
     @Test
     @DisplayName("Step 성공 시 메트릭 상태 테스트")

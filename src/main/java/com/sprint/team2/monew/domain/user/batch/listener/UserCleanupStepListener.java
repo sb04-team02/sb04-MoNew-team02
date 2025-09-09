@@ -28,7 +28,7 @@ public class UserCleanupStepListener implements StepExecutionListener {
             failureCountMap.put(reason, 0L);
 
             Gauge.builder("batch.user_cleanup.failure", failureCountMap, map -> map.get(reason))
-                    .description("사용자 삭제 배치 처리 사유별 실패 횟수")
+                    .description("사용자 삭제 배치 처리 실패 태그 별 확인 (USER_NOT_FOUND, DB_ERROR, UNKNOWN)")
                     .tag("reason", reason)
                     .register(registry);
         }
