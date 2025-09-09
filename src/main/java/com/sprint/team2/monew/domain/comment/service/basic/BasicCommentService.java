@@ -19,10 +19,8 @@ import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -78,9 +76,10 @@ public class BasicCommentService implements CommentService {
     @Transactional
     public CommentDto updateComment(UUID commentId, UUID requesterUserId, CommentUpdateRequest request) {
         log.info("댓글 수정 시작: commentId={}, requesterUserId={}", commentId, requesterUserId);
-        Comment comment = commentRepository.findById(commentId)
+
+        Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
                 .orElseThrow(() -> {
-                    log.error("댓글을 찾을 수 없습니다: commentId={}", commentId);
+                    log.error("댓글을 찾을 수 없거나 이미 삭제되었습니다: commentId={}", commentId);
                     return new ContentNotFoundException();
                 });
 
@@ -110,5 +109,34 @@ public class BasicCommentService implements CommentService {
         CommentDto dto = commentMapper.toDto(comment, likedByMe);
         log.info("댓글 수정 성공: commentId={}", commentId);
         return dto;
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteComment(UUID commentId, UUID requesterUserId) {
+        log.info("댓글 논리 삭제 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
+
+        //활성 댓글만 조회
+        Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
+                .orElseThrow(() -> {
+                    log.error("댓글 삭제 실패: 댓글 없음 또는 이미 삭제됨 commentId={}", commentId);
+                    return new ContentNotFoundException();
+                });
+
+        //권한 체크 : 작성한 본인만 삭제 가능
+        if (comment.getUser() == null || !comment.getUser().getId().equals(requesterUserId)) {
+            log.error("댓글 삭제 실패: 권한 없음 commentId={}, ownerId={}, requesterUserId={}", commentId,
+                    comment.getUser() == null ? null : comment.getUser().getId(),
+                    requesterUserId);
+            throw new CommentForbiddenException();
+        }
+
+        //원자적 soft delete
+        int softed = commentRepository.softDeleteById(commentId);
+        if (softed == 0) {
+            throw new ContentNotFoundException();
+        }
+
+        log.info("댓글 논리 삭제 성공: commentId={}, requesterUserId={}", commentId, requesterUserId);
     }
 }
