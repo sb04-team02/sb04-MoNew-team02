@@ -58,11 +58,13 @@ public class CommentController {
      * DELETE /api/comments/{commentId}
      */
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> softDeleteComment(@PathVariable UUID commentId) {
-        log.info("댓글 논리 삭제 요청 수신: commentId={}", commentId);
-        commentService.softDeleteComment(commentId);
+    public ResponseEntity<Void> softDeleteComment(
+            @PathVariable UUID commentId,
+            @RequestHeader(name = "Monew-Request-User-ID") UUID requesterUserId) {
+        log.info("댓글 논리 삭제 요청 수신: commentId={}, requesterUserId={}", commentId, requesterUserId);
+        commentService.softDeleteComment(commentId, requesterUserId);
 
-        log.info("댓글 논리 삭제 완료: commentId={}", commentId);
+        log.info("댓글 논리 삭제 완료: commentId={}, requesterUserId={}", commentId, requesterUserId);
         return ResponseEntity.noContent().build();
     }
 }

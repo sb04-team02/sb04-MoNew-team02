@@ -16,7 +16,6 @@ import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.domain.user.service.CurrentUserProvider;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -51,9 +49,6 @@ public class BasicCommentServiceTest {
 
     @Mock
     private ReactionRepository reactionRepository;
-
-    @Mock
-    private CurrentUserProvider currentUserProvider;
 
     @InjectMocks
     private BasicCommentService commentService;
@@ -313,19 +308,20 @@ public class BasicCommentServiceTest {
         then(articleRepository).shouldHaveNoInteractions();
     }
 
+    // ===== DeleteComment =====
+
     @Test
     @DisplayName("논리 삭제 성공")
     void softDeleteCommentSuccess() {
         // given
-        given(currentUserProvider.getCurrentUserId())
-                .willReturn(ownerId);
         given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
                 .willReturn(Optional.of(comment));
         given(commentRepository.softDeleteById(commentId))
                 .willReturn(1);
 
         // when & then
-        assertDoesNotThrow(() -> commentService.softDeleteComment(commentId));
+        assertThatCode(() -> commentService.softDeleteComment(commentId, ownerId))
+                .doesNotThrowAnyException();
 
         then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
         then(commentRepository).should().softDeleteById(commentId);
@@ -335,12 +331,12 @@ public class BasicCommentServiceTest {
     @Test
     @DisplayName("댓글 논리삭제-실패권한없음")
     void softDeleteCommentShouldFailWhenUserForbidden() {
-        // ---------- Given ----------
-        given(currentUserProvider.getCurrentUserId()).willReturn(otherUserId); // 작성자 아님
-        given(commentRepository.findByIdAndDeletedAtIsNull(commentId)).willReturn(Optional.of(comment));
+        //given
+        given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
+                .willReturn(Optional.of(comment));
 
-        // ---------- When & Then ----------
-        assertThatThrownBy(() -> commentService.softDeleteComment(commentId))
+        //when + then
+        assertThatThrownBy(() -> commentService.softDeleteComment(commentId, otherUserId))
                 .isInstanceOf(CommentForbiddenException.class);
 
         then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
@@ -350,12 +346,11 @@ public class BasicCommentServiceTest {
     @Test
     @DisplayName("댓글 논리삭제 실패-댓글없음 혹은 이미삭제됨")
     void softDeleteCommentShouldFailWhenCommentNotFound() {
-        // ---------- Given ----------
-        given(currentUserProvider.getCurrentUserId()).willReturn(ownerId);
+        //given
         given(commentRepository.findByIdAndDeletedAtIsNull(commentId)).willReturn(Optional.empty());
 
-        // ---------- When & Then ----------
-        assertThatThrownBy(() -> commentService.softDeleteComment(commentId))
+        //when + then
+        assertThatThrownBy(() -> commentService.softDeleteComment(commentId, ownerId))
                 .isInstanceOf(ContentNotFoundException.class);
 
         then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);

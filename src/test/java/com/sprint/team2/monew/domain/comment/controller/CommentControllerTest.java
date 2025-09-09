@@ -163,13 +163,15 @@ public class CommentControllerTest {
     void softDeleteCommentSuccess() throws Exception {
         //given
         UUID commentId = UUID.randomUUID();
-        willDoNothing().given(commentService).softDeleteComment(commentId);
+        UUID requesterUserId = UUID.randomUUID();
+        willDoNothing().given(commentService).softDeleteComment(commentId, requesterUserId);
 
         //when + then
-        mockMvc.perform(delete("/api/comments/{commentId}", commentId))
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                        .header("Monew-Request-User-ID", requesterUserId.toString()))
                 .andExpect(status().isNoContent());
 
-        then(commentService).should().softDeleteComment(commentId);
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
         then(commentService).shouldHaveNoMoreInteractions();
 
     }
@@ -179,14 +181,16 @@ public class CommentControllerTest {
     void softDeleteCommentFailWhenCommentNotFound() throws Exception {
         //given
         UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
         willThrow(new ContentNotFoundException()).given(commentService)
-                .softDeleteComment(commentId);
+                .softDeleteComment(commentId, requesterUserId);
 
         //when + then
-        mockMvc.perform(delete("/api/comments/{commentId}", commentId))
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                .header("Monew-Request-User-ID", requesterUserId.toString()))
                 .andExpect(status().isNotFound());
 
-        then(commentService).should().softDeleteComment(commentId);
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
         then(commentService).shouldHaveNoMoreInteractions();
     }
 
@@ -195,13 +199,15 @@ public class CommentControllerTest {
     void softDeleteCommentFailWhenInternalServerError() throws Exception{
         //given
         UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
         willThrow(new RuntimeException("unexpected"))
-                .given(commentService).softDeleteComment(commentId);
+                .given(commentService).softDeleteComment(commentId, requesterUserId);
         //when + then
-        mockMvc.perform(delete("/api/comments/{commentId}", commentId))
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                .header("Monew-Request-User-ID", requesterUserId.toString()))
                 .andExpect(status().isInternalServerError());
 
-        then(commentService).should().softDeleteComment(commentId);
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
         then(commentService).shouldHaveNoMoreInteractions();
     }
 }

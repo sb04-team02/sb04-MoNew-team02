@@ -16,13 +16,9 @@ import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.domain.user.service.CurrentUserProvider;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +35,6 @@ public class BasicCommentService implements CommentService {
     private final ArticleRepository articleRepository;
     private final CommentMapper commentMapper;
     private final ReactionRepository reactionRepository;
-    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
@@ -118,8 +113,7 @@ public class BasicCommentService implements CommentService {
 
     @Override
     @Transactional
-    public void softDeleteComment(UUID commentId) {
-        UUID requesterUserId = currentUserProvider.getCurrentUserId();
+    public void softDeleteComment(UUID commentId, UUID requesterUserId) {
         log.info("댓글 논리 삭제 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
 
         //활성 댓글만 조회
