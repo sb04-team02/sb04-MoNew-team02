@@ -184,15 +184,18 @@ public class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("잘못된 형식의 요청이 들어올 경우 알림 확인 상태 수정 실패")
-    void confirmNotificationFailWhenInvalidRequestUserIdFormat() throws Exception {
-        //given
-        String invalidUserId = "invalid-uuid-format";
+    @DisplayName("알림 확인 상태 일괄 수정 실패 - 존재하지 않는 사용자")
+    void confirmNotificationFailWhenUserNotFound () throws Exception {
+        // given
+        UUID nonExistentUserId = UUID.randomUUID();
+        willThrow(UserNotFoundException.withId(nonExistentUserId))
+                .given(notificationService).confirmAllNotifications(nonExistentUserId);
+
+        // when & then
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/notifications")
-                        .header("Monew-Request-User-ID",invalidUserId)
-                        .accept(MediaType.APPLICATION_JSON)
-        );
-        resultActions.andExpect(status().isBadRequest());
+                        .header("Monew-Request-User-ID",nonExistentUserId)
+                        .accept(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(status().isNotFound());
     }
 }

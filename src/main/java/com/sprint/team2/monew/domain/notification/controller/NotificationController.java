@@ -43,7 +43,7 @@ public class NotificationController {
             ) {
         log.info("[알림] 알림 확인 상태 단건 수정 요청 / 요청자 ID={}, 알림 ID={}",userId, notificationId);
         notificationService.confirmNotification(userId,notificationId);
-        log.info("[알림] 알림 확인 상태 단건 수정 응답 / 요청자 ID={}, 알림 ID={}\",userId, notificationId");
+        log.info("[알림] 알림 확인 상태 단건 수정 응답 / 요청자 ID={}, 알림 ID={}",userId, notificationId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -53,6 +53,7 @@ public class NotificationController {
     ) {
         log.info("[알림] 알림 확인 상태 일괄 수정 요청 / 요청자 ID={}",userId);
         notificationService.confirmAllNotifications(userId);
-
+        log.info("[알림] 알림 확인 상태 일괄 수정 응답 / 요청자 ID={}",userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
