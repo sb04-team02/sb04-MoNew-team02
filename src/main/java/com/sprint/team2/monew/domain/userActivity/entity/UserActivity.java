@@ -1,20 +1,26 @@
 package com.sprint.team2.monew.domain.userActivity.entity;
 
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
-import com.sprint.team2.monew.domain.base.BaseEntity;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Document
-public class UserActivity extends BaseEntity {
+public class UserActivity {
 
   @Id
   private UUID id; // user id
@@ -32,5 +38,4 @@ public class UserActivity extends BaseEntity {
     this.email = email;
     this.nickname = nickname;
   }
-
 }
