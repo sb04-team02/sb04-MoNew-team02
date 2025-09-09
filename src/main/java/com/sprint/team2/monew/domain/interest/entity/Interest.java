@@ -22,8 +22,6 @@ public class Interest extends UpdatableEntity {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
     @Size(min = 1, max = 10)
-//    @ElementCollection
-//    @CollectionTable(name = "interest_keywords", joinColumns = @JoinColumn(name = "interest_id"))
     @Column(name = "keywords", columnDefinition = "VARCHAR(20)[]")
     private List<String> keywords;
     @Column(name="subscription_count")
