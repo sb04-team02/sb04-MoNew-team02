@@ -32,6 +32,7 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
 
     public Page<InterestQueryDto> findAllPage(CursorPageRequestInterestDto request, UUID userId) {
         OrderSpecifier[] orderSpecifiers = createOrderSpecifier(request.orderBy(), request.direction());
+
         JPAQuery query = jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -49,17 +50,12 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
                 .where(partialMatch(request.keyword()))
                 .orderBy(orderSpecifiers)
                 .limit(request.limit());
+
         if (StringUtils.hasText(request.cursor())) {
             query.where(createCursorAfter(request.orderBy(), request.direction(), request.cursor(), request.after()));
         }
         List<InterestQueryDto> content = query.fetch();
 
-        JPAQuery totalQuery = jpaQueryFactory.select(interest.count())
-                .from(interest)
-                .where(partialMatch(request.keyword()));
-        if (StringUtils.hasText(request.cursor())) {
-            totalQuery.where(createCursorAfter(request.orderBy(), request.direction(), request.cursor(), request.after()));
-        }
         Long totalElements = jpaQueryFactory.select(interest.count())
                 .from(interest)
                 .where(partialMatch(request.keyword()))
