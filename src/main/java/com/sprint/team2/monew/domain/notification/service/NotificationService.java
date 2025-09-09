@@ -15,9 +15,9 @@ public interface NotificationService {
 
     void notifyCommentLiked(CommentLikedEvent event);
 
-    void confirmNotification(UUID notificationId);
+    void confirmNotification( UUID userId, UUID notificationId);
 
-    void confirmAllNotifications(UUID userId);
+    void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable);
 
     CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable);
 

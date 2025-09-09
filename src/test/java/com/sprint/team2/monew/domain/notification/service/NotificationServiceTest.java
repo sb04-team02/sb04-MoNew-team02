@@ -11,6 +11,7 @@ import com.sprint.team2.monew.domain.notification.entity.Notification;
 import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 import com.sprint.team2.monew.domain.notification.event.CommentLikedEvent;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
+import com.sprint.team2.monew.domain.notification.exception.NotificationNotFoundException;
 import com.sprint.team2.monew.domain.notification.factory.*;
 import com.sprint.team2.monew.domain.notification.mapper.NotificationMapper;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
@@ -191,14 +192,14 @@ public class NotificationServiceTest {
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(slice);
 
             // when
             var result = notificationService.getAllNotifications(userId,now, pageable);
 
             // then
-            verify(notificationRepository).findAllByUserIdOrderByCreatedAtDesc(userId, now, pageable);
+            verify(notificationRepository).findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable);
         }
 
         @Test
@@ -211,7 +212,7 @@ public class NotificationServiceTest {
             LocalDateTime now = LocalDateTime.now();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when
@@ -231,21 +232,25 @@ public class NotificationServiceTest {
         void shouldUpdateAllNotificationsAsConfirmed() {
             // given
             User user = TestUserFactory.createUser();
-            UUID userId = UUID.randomUUID();
+            UUID userId = user.getId();
+            LocalDateTime now = LocalDateTime.now();
 
+            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
-
+            Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUser_Id(userId)).willReturn(notifications);
+            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
+                    .willReturn(slice);
 
             // when
-            notificationService.confirmAllNotifications(userId);
+            notificationService.confirmAllNotifications(userId, now, pageable);
 
             //then
             assertThat(n1.isConfirmed()).isTrue();
             assertThat(n2.isConfirmed()).isTrue();
+            verify(notificationRepository).saveAll(slice.getContent());
         }
 
         @Test
@@ -253,11 +258,13 @@ public class NotificationServiceTest {
         void shouldThrowWhenUserDoesNotExist() {
             // given
             UUID nonExistentUserId = UUID.randomUUID();
+            LocalDateTime now = LocalDateTime.now();
+            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
             given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
 
             // when & then
             assertThrows(UserNotFoundException.class, () -> {
-                notificationService.confirmAllNotifications(nonExistentUserId);
+                notificationService.confirmAllNotifications(nonExistentUserId, now, pageable);
             });
         }
 
@@ -266,15 +273,15 @@ public class NotificationServiceTest {
         void shouldUpdateNotificationAsConfirmed() {
             // given
             User user = TestUserFactory.createUser();
-            UUID userId = UUID.randomUUID();
-
             Notification notification = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
+            UUID userId = user.getId();
+            UUID notificationId = notification.getId();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUser_Id(userId)).willReturn(List.of(notification));
+            given(notificationRepository.findById(notificationId)).willReturn(Optional.of(notification));
 
             //when
-            notificationService.confirmNotification(userId);
+            notificationService.confirmNotification(userId, notificationId);
 
             //then
             assertThat(notification.isConfirmed()).isTrue();
@@ -283,7 +290,17 @@ public class NotificationServiceTest {
         @Test
         @DisplayName("알림 수정 요청 중 알림이 존재하지 않을 경우 예외 발생")
         void shouldThrowWhenNotificationDoesNotExist() {
-            
+            // given
+            User user = TestUserFactory.createUser();
+            UUID userId = user.getId();
+            UUID notificationId = UUID.randomUUID();
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(notificationRepository.findById(notificationId)).willReturn(Optional.empty());
+
+            assertThrows(NotificationNotFoundException.class, () -> {
+                notificationService.confirmNotification(userId,notificationId );
+            });
         }
     }
 }

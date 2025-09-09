@@ -8,10 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-    Slice<Notification> findAllByUserIdOrderByCreatedAtDesc(
+    Slice<Notification> findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(
             UUID userId,
             LocalDateTime nextAfter,
             Pageable pageable);
@@ -22,7 +23,9 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     Long countByUserId(UUID userId);
 
-    List<Notification> findAllByUser_Id(UUID userId);
+    List<Notification> findAllByUserId(UUID userId);
+
+    Optional<Notification> findByUserId(UUID userId);
 
 //    List<Notification> findAllByUserId (UUID userId);
 
