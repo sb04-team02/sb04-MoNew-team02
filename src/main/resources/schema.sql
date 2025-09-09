@@ -53,21 +53,23 @@ CREATE TABLE comments
     updated_at TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ,
     content    TEXT        NOT NULL,
-    like_count BIGINT,
+    like_count BIGINT      NOT NULL DEFAULT 0,
     article_id uuid,
     user_id    uuid,
     FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT comments_like_count_nonnegative CHECK ( like_count >= 0 )
 );
 
 CREATE TABLE likes
 (
     id         uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    user_id    uuid,
-    comment_id uuid,
+    user_id    uuid        NOT NULL,
+    comment_id uuid        NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE
+    FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE,
+    CONSTRAINT uk_likes_user_comment UNIQUE (user_id, comment_id)
 );
 
 CREATE TABLE notifications

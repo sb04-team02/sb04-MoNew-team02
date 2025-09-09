@@ -30,6 +30,7 @@ public class Comment extends DeletableEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Builder.Default
     @Column(name = "like_count", nullable = false)
     private long likeCount = 0L;
 
