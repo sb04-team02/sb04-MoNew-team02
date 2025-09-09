@@ -2,7 +2,7 @@ package com.sprint.team2.monew.domain.user.batch.listener;
 
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -21,27 +21,26 @@ class UserCleanupStepListenerTest {
     @Autowired
     private MeterRegistry registry;
 
+    @Autowired
     private UserCleanupStepListener listener;
 
-    @BeforeEach
-    void setUp() {
-        listener = new UserCleanupStepListener(registry);
-    }
-
     @Test
-    void 스텝성공시_모든Gauge가0이다() {
+    @DisplayName("Step 성공 시 메트릭 상태 테스트")
+    void stepSuccessTest() {
         StepExecution stepExecution = new StepExecution("testStep", new JobExecution(1L));
         stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
         listener.afterStep(stepExecution);
 
+        // Step이 성공 시 failure는 0
         assertThat(getFailureGauge("USER_NOT_FOUND")).isZero();
         assertThat(getFailureGauge("DB_ERROR")).isZero();
         assertThat(getFailureGauge("UNKNOWN")).isZero();
     }
 
     @Test
-    void UserNotFoundException발생시_USER_NOT_FOUND가1이다() {
+    @DisplayName("UserNotFound 예외 발생 시 메트릭 상태 테스트")
+    void stepFailureUserNotFound() {
         UUID userId = UUID.randomUUID();
         StepExecution stepExecution = new StepExecution("testStep", new JobExecution(1L));
         stepExecution.setExitStatus(ExitStatus.FAILED);
@@ -49,28 +48,33 @@ class UserCleanupStepListenerTest {
 
         listener.afterStep(stepExecution);
 
+        // UserNotFound 예외 발생 시 USER_NOT_FOUND 태그의 값은 1
         assertThat(getFailureGauge("USER_NOT_FOUND")).isEqualTo(1);
     }
 
     @Test
-    void DataAccessException발생시_DB_ERROR가1이다() {
+    @DisplayName("데이터베이스 예외 발생 시 메트릭 상태 테스트")
+    void stepFailureDbError() {
         StepExecution stepExecution = new StepExecution("testStep", new JobExecution(1L));
         stepExecution.setExitStatus(ExitStatus.FAILED);
         stepExecution.addFailureException(new DataAccessResourceFailureException("db down"));
 
         listener.afterStep(stepExecution);
 
+        // DataAccessException 발생 시 DB_ERROR 태그의 값은 1
         assertThat(getFailureGauge("DB_ERROR")).isEqualTo(1);
     }
 
     @Test
-    void 알수없는예외발생시_UNKNOWN이1이다() {
+    @DisplayName("알 수 없는 예외 발생 시 메트릭 상태 테스트")
+    void stepFailureUnknown() {
         StepExecution stepExecution = new StepExecution("testStep", new JobExecution(1L));
         stepExecution.setExitStatus(ExitStatus.FAILED);
         stepExecution.addFailureException(new RuntimeException("??"));
 
         listener.afterStep(stepExecution);
 
+        // 그 밖의 예외 발생 시 UNKNOWN 태그의 값은 1
         assertThat(getFailureGauge("UNKNOWN")).isEqualTo(1);
     }
 

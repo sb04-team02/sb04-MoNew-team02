@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.user.batch.config;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -18,13 +19,15 @@ class UserCleanupJobConfigTest {
     private Step userCleanupStep;
 
     @Test
-    void 잡이_빈으로등록되어야한다() {
+    @DisplayName("Job Spring Bean 등록 테스트")
+    void jobBeanCreationTest() {
         assertThat(userCleanupJob).isNotNull();
         assertThat(userCleanupJob.getName()).isEqualTo("userCleanupJob");
     }
 
     @Test
-    void 스텝이_빈으로등록되어야한다() {
+    @DisplayName("Step Spring Bean 등록 테스트")
+    void stepBeanCreationTest() {
         assertThat(userCleanupStep).isNotNull();
         assertThat(userCleanupStep.getName()).isEqualTo("userCleanupStep");
     }
