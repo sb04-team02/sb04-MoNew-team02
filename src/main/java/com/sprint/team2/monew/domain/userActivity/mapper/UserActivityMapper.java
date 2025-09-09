@@ -18,6 +18,9 @@ public interface UserActivityMapper {
   // from userActivity to UserActivityResponseDto
   UserActivityResponseDto toUserActivityResponseDto(UserActivity userActivity);
 
+  // for testing
+  UserActivity toUserActivity(UserActivityResponseDto userActivityResponseDto);
+
   ArticleViewDto toArticleViewDto(ArticleViewEvent event);
 
   SubscriptionDto toSubscriptionDto(SubscriptionUpdatedEvent event);

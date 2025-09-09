@@ -31,4 +31,11 @@ public class BasicUserActivityService implements UserActivityService {
     return userActivityMapper.toUserActivityResponseDto(userActivity);
   }
 
+  // ============ test =============
+  public UserActivityResponseDto createUserActivity(UserActivityResponseDto userActivityResponseDto) {
+    UserActivity savedUserActivity = userActivityRepository.save(userActivityMapper.toUserActivity(userActivityResponseDto));
+
+    return userActivityMapper.toUserActivityResponseDto(savedUserActivity);
+  }
+
 }
