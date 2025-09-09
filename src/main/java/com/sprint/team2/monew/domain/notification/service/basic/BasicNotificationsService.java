@@ -36,6 +36,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicNotificationsService implements NotificationService {
 
@@ -47,7 +48,6 @@ public class BasicNotificationsService implements NotificationService {
     private final NotificationMapper notificationMapper;
 
     @Override
-    @Transactional
     @EventListener
     public void notifyInterestArticleRegistered(InterestArticleRegisteredEvent event) {
         log.info("[알림] 관심사 키워드 기반 기사 등록 알림 생성 시작");
@@ -88,7 +88,6 @@ public class BasicNotificationsService implements NotificationService {
     }
 
     @Override
-    @Transactional
     @EventListener
     public void notifyCommentLiked(CommentLikedEvent event) {
         log.info("[알림] 댓글에 좋아요 눌림 알림 생성 시작");
@@ -122,7 +121,6 @@ public class BasicNotificationsService implements NotificationService {
     }
 
     @Override
-    @Transactional
     public void confirmNotification(UUID userId, UUID notificationId) {
         log.info("[알림] 알림 확인 여부 단건 수정 시작 / 사용자 ID={}", userId);
 
@@ -148,7 +146,6 @@ public class BasicNotificationsService implements NotificationService {
     }
 
     @Override
-    @Transactional
     public void confirmAllNotifications(UUID userId) {
         log.info("[알림] 알림 확인 여부 전건 수정 시작 / 사용자 ID={}", userId);
 
@@ -206,5 +203,6 @@ public class BasicNotificationsService implements NotificationService {
         );
     }
 
+    @Override
     public void deleteConfirmedNotifications() {}
 }

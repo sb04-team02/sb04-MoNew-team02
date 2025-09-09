@@ -5,6 +5,7 @@ import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
+import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,10 +23,9 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CommentController.class)
@@ -38,6 +38,8 @@ public class CommentControllerTest {
 
     @MockitoBean
     CommentService commentService;
+
+    // ===== registerComment =====
 
     @Test
     @DisplayName("댓글 작성 성공 - 201")
@@ -97,6 +99,8 @@ public class CommentControllerTest {
         verifyNoInteractions(commentService);
     }
 
+    // ===== updateComment =====
+    
     @Test
     @DisplayName("댓글 수정 성공 - 200")
     void updateCommentSuccess() throws Exception {
@@ -156,5 +160,115 @@ public class CommentControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message", containsString("댓글 내용을 입력해주세요")))
                 .andExpect(jsonPath("$.details.commentId").value(commentId.toString()));
+    }
+
+    // ===== SoftDeleteComment =====
+
+    @Test
+    @DisplayName("댓글 논리삭제 성공-204")
+    void softDeleteCommentSuccess() throws Exception {
+        //given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willDoNothing().given(commentService).softDeleteComment(commentId, requesterUserId);
+
+        //when + then
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                        .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isNoContent());
+
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패-404")
+    void softDeleteCommentFailWhenCommentNotFound() throws Exception {
+        //given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willThrow(new ContentNotFoundException()).given(commentService)
+                .softDeleteComment(commentId, requesterUserId);
+
+        //when + then
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isNotFound());
+
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패-500")
+    void softDeleteCommentFailWhenInternalServerError() throws Exception{
+        //given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willThrow(new RuntimeException("unexpected"))
+                .given(commentService).softDeleteComment(commentId, requesterUserId);
+        //when + then
+        mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+                .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isInternalServerError());
+
+        then(commentService).should().softDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    // ===== HardDeleteComment =====
+    
+    @Test
+    @DisplayName("댓글 물리삭제 성공-204 No Content")
+    void hardDeleteCommentSuccess() throws Exception{
+        //given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willDoNothing().given(commentService).hardDeleteComment(commentId, requesterUserId);
+        
+        //when +then
+        mockMvc.perform(delete("/api/comments/{commentId}/hard", commentId)
+                        .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isNoContent());
+
+        then(commentService).should().hardDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("댓글 물리 삭제 실패 댓글 정보 없음-404 Not Found")
+    void hardDeleteCommentNotFound() throws Exception {
+        // given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willThrow(new ContentNotFoundException())
+                .given(commentService).hardDeleteComment(commentId, requesterUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/comments/{commentId}/hard", commentId)
+                        .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isNotFound());
+
+        then(commentService).should().hardDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("댓글 물리 삭제 실패 서버 내부 오류-500 Internal Server Error")
+    void hardDeleteCommentISE() throws Exception {
+        // given
+        UUID commentId = UUID.randomUUID();
+        UUID requesterUserId = UUID.randomUUID();
+        willThrow(new RuntimeException("unexpected"))
+                .given(commentService).hardDeleteComment(commentId, requesterUserId);
+
+        // when & then
+        mockMvc.perform(delete("/api/comments/{commentId}/hard", commentId)
+                        .header("Monew-Request-User-ID", requesterUserId.toString()))
+                .andExpect(status().isInternalServerError());
+
+        then(commentService).should().hardDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
     }
 }

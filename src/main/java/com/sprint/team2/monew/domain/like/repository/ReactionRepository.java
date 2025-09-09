@@ -16,4 +16,5 @@ public interface ReactionRepository extends JpaRepository<Reaction, UUID> {
     @Modifying
     int deleteByUserIdAndCommentId(UUID userId, UUID commentId);
 
+    void deleteByCommentId(UUID commentId);
 }
