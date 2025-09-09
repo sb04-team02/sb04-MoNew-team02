@@ -7,6 +7,9 @@ import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.QArticle;
+import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
+import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
+import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
@@ -43,14 +46,25 @@ public class BasicArticleService implements ArticleService {
         Interest interest = interestRepository.findById(interestId)
                 .orElseThrow(() -> InterestNotFoundException.notFound(interestId));
         for (String keyword : interest.getKeywords()) {
-            List<ArticleDto> articles = naverApiCollector.collect(keyword);
+            List<ArticleDto> articles;
+            try {
+                articles = naverApiCollector.collect(keyword);
+            } catch (RuntimeException e) {
+                log.error("[Article] keyword({}) 수집 실패", keyword, e);
+                throw ArticleCollectFailedException.withKeyword(keyword);
+            }
 
             for (ArticleDto dto : articles) {
                 if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
-                    articleRepository.save(articleEntity);
+                    try {
+                        articleRepository.save(articleEntity);
+                    } catch (Exception e) {
+                        log.error("[Article] 뉴스 기사 저장 실패", e);
+                        throw ArticleSaveFailedException.articleSaveFailed();
+                    }
                 }
-                log.info("[Article] keyword({})로 뉴스 수집 성공", keyword);
+                log.info("[Article] keyword({})로 뉴스 수집 및 저장 성공", keyword);
             }
         }
     }
@@ -61,6 +75,16 @@ public class BasicArticleService implements ArticleService {
                                              String keyword,
                                              UUID interestId, List<String> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                              String cursor, LocalDateTime after) {
+
+        if (limit <= 0) {
+            log.error("[Article] 커서 페이지 크기는 0보다 커야 함, limit = {}", limit);
+            throw InvalidParameterException.invalidParameter();
+        }
+
+        if (!List.of("publishDate", "commentCount", "viewCount").contains(orderBy)) {
+            log.error("[Article] 정렬 속성에는 publishDate, commentCount, viewCount만 가능, 정렬 속성 = {}", orderBy);
+            throw InvalidParameterException.invalidParameter();
+        }
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
                 keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
