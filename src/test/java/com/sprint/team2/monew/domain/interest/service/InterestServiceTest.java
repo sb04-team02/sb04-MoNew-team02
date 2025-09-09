@@ -1,8 +1,11 @@
 package com.sprint.team2.monew.domain.interest.service;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
+import com.sprint.team2.monew.domain.interest.dto.request.CursorPageRequestInterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
+import com.sprint.team2.monew.domain.interest.dto.response.CursorPageResponseInterestDto;
+import com.sprint.team2.monew.domain.interest.dto.response.InterestQueryDto;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestErrorCode;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
@@ -25,6 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -282,5 +287,28 @@ public class InterestServiceTest {
         assertEquals(interestId, responseDto.id());
         assertEquals("name",responseDto.name());
         assertEquals(List.of("updateKeyword1","updateKeyword2","updateKeyword3"),responseDto.keywords());
+    }
+
+    @DisplayName("페이지네이션 정보가 주어지면 해당 정보를 토대로 커서 기반 페이지네이션을 구현하여 반환한다.")
+    @Test
+    void readAllInterestShouldSucceedWithCursorPagination() {
+        // given
+        UUID userId = UUID.randomUUID();
+        String keyword = "스포츠";
+        String orderBy = "name";
+        String direction = "ASC";
+        int limit = 50;
+        CursorPageRequestInterestDto request = new CursorPageRequestInterestDto(keyword,orderBy,direction,null,null,limit);
+        InterestQueryDto interestQueryDto = new InterestQueryDto(UUID.randomUUID(), "name", List.of("1","2"),1,false,LocalDateTime.now());
+        InterestDto dto = new InterestDto(interestQueryDto.id(),interestQueryDto.name(),interestQueryDto.keywords(),interestQueryDto.subscriberCount(),interestQueryDto.subscribedByMe());
+        given(interestRepository.findAllPage(request,userId)).willReturn(new PageImpl<>(List.of(interestQueryDto), PageRequest.of(0,request.limit()),1));
+        given(interestMapper.toDto(any(InterestQueryDto.class))).willReturn(dto);
+        // when
+        CursorPageResponseInterestDto response = interestService.readAll(request,userId);
+
+        // then
+        assertNotNull(response.content());
+        assertEquals(dto,response.content().get(0));
+        assertFalse(response.hasNext());
     }
 }

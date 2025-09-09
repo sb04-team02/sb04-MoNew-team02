@@ -3,8 +3,10 @@ package com.sprint.team2.monew.domain.interest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.interest.controller.InterestController;
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
+import com.sprint.team2.monew.domain.interest.dto.request.CursorPageRequestInterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
+import com.sprint.team2.monew.domain.interest.dto.response.CursorPageResponseInterestDto;
 import com.sprint.team2.monew.domain.interest.service.InterestService;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.global.error.GlobalExceptionHandler;
@@ -98,7 +100,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interestId}/subscriptions",interestId)
+                multipart("/api/interests/{interest-id}/subscriptions",interestId)
                         .header("MoNew-Request-User-ID",userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -115,7 +117,7 @@ public class InterestControllerTest {
 
         // when & then
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/interests/{interestId}/subscriptions",interestId)
+                multipart("/api/interests/{interest-id}/subscriptions",interestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -134,7 +136,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interestId}/subscriptions",interestId)
+                delete("/api/interests/{interest-id}/subscriptions",interestId)
                         .header("Monew-Request-User-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -155,7 +157,7 @@ public class InterestControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/interests/{interestId}/subscriptions",interestId)
+                delete("/api/interests/{interest-id}/subscriptions",interestId)
                         .header("Monew-Request-Fail-ID",userId)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -233,5 +235,76 @@ public class InterestControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("커서 기반 페이지네이션을 구현하여 관심사 목록을 조회한다.")
+    @Test
+    void readAllInterestShouldSucceedWithCursorPagination() throws Exception{
+        // 본문 생성
+        String keyword = "스포츠";
+        String orderBy = "name";
+        String direction = "ASC";
+        int limit = 50;
+        UUID userId = UUID.randomUUID();
+        CursorPageRequestInterestDto requestDto = new CursorPageRequestInterestDto(keyword, orderBy, direction, null, null, limit);
+        // given
+        CursorPageResponseInterestDto<InterestDto> response = new CursorPageResponseInterestDto<InterestDto>(List.of(new InterestDto(UUID.randomUUID(),"name",List.of("1","2"),1L,false)),"축구",LocalDateTime.now(),50,150L,true);
+        given(interestService.readAll(requestDto,userId)).willReturn(response);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/interests")
+                        .header("Monew-Request-User-Id",userId)
+                        .param("keyword",keyword)
+                        .param("orderBy",orderBy)
+                        .param("direction",direction)
+                        .param("limit", String.valueOf(50))
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isNotEmpty());
+
+    }
+
+    @DisplayName("orderBy, direction, limit은 필수로 포함되어야 하며, 포함하지 않을 경우 요청에 실패한다.")
+    @Test
+    void readAllInterestShouldFailWhenInvalidParam() throws Exception{
+        // given
+        UUID userId = UUID.randomUUID();
+
+        // when & then
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/interests")
+                        .header("Monew-Request-User-Id",userId)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("정렬 기준은 name,subscriberCount만 올 수 있으며 그 외에는 올 수 없다." +
+            "그 외에 값이 들어올 경우 요청에 실패한다.")
+    @Test
+    void readAllInterestShouldFailWhenUndefinedValueInOrderBy() throws Exception{
+        // given
+        UUID userId = UUID.randomUUID();
+        String keyword = "keyword";
+        String orderBy = "createdAt";
+        String direction = "ASC";
+        int limit = 50;
+
+        // when & then
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/interests")
+                        .header("Monew-Request-User-Id",userId)
+                        .param("keyword",keyword)
+                        .param("orderBy",orderBy)
+                        .param("direction",direction)
+                        .param("limit",String.valueOf(limit))
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isInternalServerError());
     }
 }

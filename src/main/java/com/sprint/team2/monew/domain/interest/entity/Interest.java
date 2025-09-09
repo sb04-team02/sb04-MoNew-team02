@@ -2,12 +2,11 @@ package com.sprint.team2.monew.domain.interest.entity;
 
 import com.sprint.team2.monew.domain.base.UpdatableEntity;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Type;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +22,9 @@ public class Interest extends UpdatableEntity {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
     @Size(min = 1, max = 10)
-    @Column(nullable = false, name = "keywords")
+//    @ElementCollection
+//    @CollectionTable(name = "interest_keywords", joinColumns = @JoinColumn(name = "interest_id"))
+    @Column(name = "keywords", columnDefinition = "VARCHAR(20)[]")
     private List<String> keywords;
     @Column(name="subscription_count")
     private long subscriberCount;

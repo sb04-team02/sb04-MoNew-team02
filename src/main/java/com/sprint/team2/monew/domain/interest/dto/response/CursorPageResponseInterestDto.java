@@ -1,6 +1,7 @@
 package com.sprint.team2.monew.domain.interest.dto.response;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
