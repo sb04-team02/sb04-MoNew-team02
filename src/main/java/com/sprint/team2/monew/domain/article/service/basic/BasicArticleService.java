@@ -89,7 +89,7 @@ public class BasicArticleService implements ArticleService {
                 }
                 default -> {
                     nextCursor = last.getPublishDate().toString();
-                    nextAfter = last.getPublishDate();
+                    nextAfter = last.getCreatedAt();
                 }
             }
         }
