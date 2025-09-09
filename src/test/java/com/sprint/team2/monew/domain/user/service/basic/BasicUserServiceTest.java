@@ -11,12 +11,14 @@ import com.sprint.team2.monew.domain.user.exception.LoginFailedException;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +40,9 @@ class BasicUserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    ApplicationEventPublisher publisher;
 
     @InjectMocks
     private BasicUserService userService;
@@ -69,6 +75,9 @@ class BasicUserServiceTest {
         );
         given(userMapper.toEntity(request)).willReturn(user);
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
+
+        // 이벤트 퍼블리셔
+        willDoNothing().given(publisher).publishEvent(any(UserCreatedEvent.class));
 
         // when
         UserDto result = userService.create(request);
