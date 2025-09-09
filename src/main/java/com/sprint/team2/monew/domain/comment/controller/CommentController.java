@@ -67,4 +67,19 @@ public class CommentController {
         log.info("댓글 논리 삭제 완료: commentId={}, requesterUserId={}", commentId, requesterUserId);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 댓글 물리 삭제
+     * DELETE /api/comments/{commentId}/hard
+     */
+    @DeleteMapping("/{commentId}/hard")
+    public ResponseEntity<Void> hardDeleteComment(
+            @PathVariable UUID commentId,
+            @RequestHeader(name = "Monew-Request-User-ID") UUID requesterUserId) {
+        log.info("댓글 물리 삭제 요청 수신: commentId={}, requesterUserId={}", commentId, requesterUserId);
+        commentService.hardDeleteComment(commentId, requesterUserId);
+
+        log.info("댓글 물리 삭제 완료: commentId={}, requesterUserId={}", commentId, requesterUserId);
+        return ResponseEntity.noContent().build();
+    }
 }

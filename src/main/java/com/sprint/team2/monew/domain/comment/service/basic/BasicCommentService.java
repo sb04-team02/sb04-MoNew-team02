@@ -13,6 +13,7 @@ import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -35,6 +36,7 @@ public class BasicCommentService implements CommentService {
     private final ArticleRepository articleRepository;
     private final CommentMapper commentMapper;
     private final ReactionRepository reactionRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional
@@ -138,5 +140,37 @@ public class BasicCommentService implements CommentService {
         }
 
         log.info("댓글 논리 삭제 성공: commentId={}, requesterUserId={}", commentId, requesterUserId);
+    }
+
+    @Override
+    @Transactional
+    public void hardDeleteComment(UUID commentId, UUID requesterUserId) {
+        log.info("댓글 물리 삭제 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);
+
+        //존재 확인 (삭제 상태와 무관하게)
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.error("댓글 삭제 실패: 댓글 없음 또는 이미 삭제됨 commentId={}", commentId);
+                    return new ContentNotFoundException();
+                });
+
+        //권한 체크: 작성자 본인만
+        if (comment.getUser() == null || !comment.getUser().getId().equals(requesterUserId)) {
+            log.error("댓글 물리 삭제 실패: 권한 없음 commentId={}, ownerId={}, requesterUserId={}",
+                    commentId,
+                    comment.getUser() == null ? null : comment.getUser().getId(),
+                    requesterUserId);
+            throw new CommentForbiddenException();
+        }
+
+        //연관 데이터 정리
+        reactionRepository.deleteByCommentId(commentId);
+        notificationRepository.deleteByCommentId(commentId);
+        log.info("댓글 연관 좋아요, 알림 삭제 완료: commentId={}", commentId);
+
+
+        //댓글 자체 물리 삭제
+        commentRepository.delete(comment);
+        log.info("댓글 물리 삭제 완료: commentId={}", commentId);
     }
 }

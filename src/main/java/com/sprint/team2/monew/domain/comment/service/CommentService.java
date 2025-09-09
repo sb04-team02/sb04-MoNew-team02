@@ -11,4 +11,5 @@ public interface CommentService {
     CommentDto registerComment(CommentRegisterRequest request);
     CommentDto updateComment(UUID commentId, UUID requesterUserId, CommentUpdateRequest request);
     void softDeleteComment(UUID commentId, UUID requesterUserId);
+    void hardDeleteComment(UUID commentId, UUID requesterUserId);
 }
