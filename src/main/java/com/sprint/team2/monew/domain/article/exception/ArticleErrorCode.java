@@ -11,6 +11,9 @@ public enum ArticleErrorCode implements ErrorCode {
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "뉴스 기사 정보가 없습니다."),
     NAVER_API_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Naver API 호출 실패"),
     EMPTY_RESPONSE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Naver API가 빈 응답 반환"),
+    ARTICLE_COLLECT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "뉴스 기사 수집 살패"),
+    ARTICLE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "뉴스 기사 저장 실패"),
+    INVALIED_PARAMETER(HttpStatus.NO_CONTENT.value(), "잘못된 파라미터"),
     ;
 
     private final int status;
