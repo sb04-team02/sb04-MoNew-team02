@@ -30,24 +30,9 @@ public class ArticleRepositoryCustom {
             int limit
     ) {
         QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (keyword != null && !keyword.isBlank()) {
-            builder.and(article.title.containsIgnoreCase(keyword)
-                    .or(article.summary.containsIgnoreCase(keyword)));
-        }
-
-        if (interestId != null) {
-            builder.and(article.interest.id.eq(interestId));
-        }
-
-        if (sourceIn != null && !sourceIn.isEmpty()) {
-            builder.and(article.source.in(sourceIn));
-        }
-
-        if (publishedDateFrom != null && publishedDateTo != null) {
-            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
-        }
+        BooleanBuilder builder = build(
+                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
+        );
 
         if (cursor != null) {
             switch (orderBy) {
@@ -119,17 +104,9 @@ public class ArticleRepositoryCustom {
             LocalDateTime publishedDateTo
     ) {
         QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (keyword != null && !keyword.isBlank()) {
-            builder.and(article.title.containsIgnoreCase(keyword)
-                    .or(article.summary.containsIgnoreCase(keyword)));
-        }
-        if (interestId != null) builder.and(article.interest.id.eq(interestId));
-        if (sourceIn != null && !sourceIn.isEmpty()) builder.and(article.source.in(sourceIn));
-        if (publishedDateFrom != null && publishedDateTo != null) {
-            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
-        }
+        BooleanBuilder builder = build(
+                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
+        );
 
         Long total = jpaQueryFactory
                 .select(article.count())
@@ -138,5 +115,33 @@ public class ArticleRepositoryCustom {
                 .fetchOne();
 
         return total != null ? total : 0L;
+    }
+
+    // 공통 메서드
+    private BooleanBuilder build(
+            String keyword,
+            UUID interestId,
+            List<String> sourceIn,
+            LocalDateTime publishedDateFrom,
+            LocalDateTime publishedDateTo
+    ) {
+        QArticle article = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(article.title.containsIgnoreCase(keyword)
+                    .or(article.summary.containsIgnoreCase(keyword)));
+        }
+        if (interestId != null) {
+            builder.and(article.interest.id.eq(interestId));
+        }
+        if (sourceIn != null && !sourceIn.isEmpty()) {
+            builder.and(article.source.in(sourceIn));
+        }
+        if (publishedDateFrom != null && publishedDateTo != null) {
+            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
+        }
+
+        return builder;
     }
 }
