@@ -29,5 +29,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
 //    List<Notification> findAllByUserId (UUID userId);
 
-
+    void deleteByCommentId(UUID commentId);
 }

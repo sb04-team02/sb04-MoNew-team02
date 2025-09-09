@@ -185,8 +185,9 @@ public class NotificationServiceTest {
             User user = TestUserFactory.createUser();
             UUID userId = UUID.randomUUID();
             LocalDateTime now = LocalDateTime.now();
+            int size = 10;
 
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
@@ -196,7 +197,7 @@ public class NotificationServiceTest {
                     .willReturn(slice);
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, pageable);
+            var result = notificationService.getAllNotifications(userId,now, size);
 
             // then
             verify(notificationRepository).findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable);
@@ -208,7 +209,8 @@ public class NotificationServiceTest {
             // given
             User user = TestUserFactory.createUser();
             UUID userId = UUID.randomUUID();
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            int size = 10;
+            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
             LocalDateTime now = LocalDateTime.now();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -216,7 +218,7 @@ public class NotificationServiceTest {
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, pageable);
+            var result = notificationService.getAllNotifications(userId,now, size);
 
             // then
             assertThat(result.content()).isEmpty();
@@ -234,8 +236,9 @@ public class NotificationServiceTest {
             User user = TestUserFactory.createUser();
             UUID userId = user.getId();
             LocalDateTime now = LocalDateTime.now();
+            int size = 10;
 
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
@@ -245,7 +248,7 @@ public class NotificationServiceTest {
                     .willReturn(slice);
 
             // when
-            notificationService.confirmAllNotifications(userId, now, pageable);
+            notificationService.confirmAllNotifications(userId, now, size);
 
             //then
             assertThat(n1.isConfirmed()).isTrue();
@@ -259,12 +262,13 @@ public class NotificationServiceTest {
             // given
             UUID nonExistentUserId = UUID.randomUUID();
             LocalDateTime now = LocalDateTime.now();
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            int size = 10;
+            Pageable pageable = PageRequest.of(0, size  , Sort.by("createdAt").descending());
             given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
 
             // when & then
             assertThrows(UserNotFoundException.class, () -> {
-                notificationService.confirmAllNotifications(nonExistentUserId, now, pageable);
+                notificationService.confirmAllNotifications(nonExistentUserId, now, size);
             });
         }
 

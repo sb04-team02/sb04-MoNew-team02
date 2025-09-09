@@ -149,7 +149,7 @@ public class BasicNotificationsService implements NotificationService {
 
     @Override
     @Transactional
-    public void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
+    public void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
         log.info("[알림] 알림 확인 여부 전건 수정 시작 / 사용자 ID={}", userId);
 
         User user = userRepository.findById(userId)
@@ -158,7 +158,7 @@ public class BasicNotificationsService implements NotificationService {
                     return UserNotFoundException.withId(userId);
                 });
 
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(),Sort.by("createdAt").descending());
+        Pageable pageRequest = PageRequest.of(0,size,Sort.by("createdAt").descending());
         Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(
                 userId, nextAfter, pageRequest);
         slice.forEach(notification -> notification.setConfirmed(true));
@@ -167,10 +167,8 @@ public class BasicNotificationsService implements NotificationService {
         log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", slice.getContent().size());
     }
 
-    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
+    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
         log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);
-        log.info("[알림] 요청 파라미터 - nextAfter={}, pageSize={}, pageNumber={}",
-                nextAfter, pageable.getPageSize(), pageable.getPageNumber());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -178,7 +176,7 @@ public class BasicNotificationsService implements NotificationService {
                     return UserNotFoundException.withId(userId);
                 });
         //Pageable 설정
-        Pageable pageableRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
+        Pageable pageableRequest = PageRequest.of(0, size, Sort.by("createdAt").descending());
         Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
 
         List<Notification> notifications = slice.getContent();
@@ -203,7 +201,7 @@ public class BasicNotificationsService implements NotificationService {
                 content,
                 nextCursor,
                 nextAfter,
-                pageable.getPageSize(),
+                size,
                 totalElements,
                 slice.hasNext()
         );
