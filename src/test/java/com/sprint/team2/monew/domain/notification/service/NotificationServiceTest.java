@@ -197,7 +197,7 @@ public class NotificationServiceTest {
                     .willReturn(slice);
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, size);
+            notificationService.getAllNotifications(userId,now, size);
 
             // then
             verify(notificationRepository).findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable);
@@ -235,25 +235,22 @@ public class NotificationServiceTest {
             // given
             User user = TestUserFactory.createUser();
             UUID userId = user.getId();
-            LocalDateTime now = LocalDateTime.now();
-            int size = 10;
 
-            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
+
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
-            Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
-                    .willReturn(slice);
+            given(notificationRepository.findAllByUserIdAndConfirmedIsFalse(userId))
+                    .willReturn(notifications);
 
             // when
-            notificationService.confirmAllNotifications(userId, now, size);
+            notificationService.confirmAllNotifications(userId);
 
             //then
             assertThat(n1.isConfirmed()).isTrue();
             assertThat(n2.isConfirmed()).isTrue();
-            verify(notificationRepository).saveAll(slice.getContent());
+            verify(notificationRepository).saveAll(notifications);
         }
 
         @Test
@@ -268,7 +265,7 @@ public class NotificationServiceTest {
 
             // when & then
             assertThrows(UserNotFoundException.class, () -> {
-                notificationService.confirmAllNotifications(nonExistentUserId, now, size);
+                notificationService.confirmAllNotifications(nonExistentUserId);
             });
         }
 

@@ -170,7 +170,7 @@ public class NotificationControllerTest {
         LocalDateTime after = LocalDateTime.now().minusDays(1);
         int size = 10;
 
-        willDoNothing().given(notificationService).confirmAllNotifications(userId, after, size);
+        willDoNothing().given(notificationService).confirmAllNotifications(userId);
 
         //when
         ResultActions resultActions = mockMvc.perform(

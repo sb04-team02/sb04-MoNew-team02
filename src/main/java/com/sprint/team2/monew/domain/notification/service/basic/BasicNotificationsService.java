@@ -149,7 +149,7 @@ public class BasicNotificationsService implements NotificationService {
 
     @Override
     @Transactional
-    public void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
+    public void confirmAllNotifications(UUID userId) {
         log.info("[알림] 알림 확인 여부 전건 수정 시작 / 사용자 ID={}", userId);
 
         User user = userRepository.findById(userId)
@@ -157,14 +157,11 @@ public class BasicNotificationsService implements NotificationService {
                     log.warn("[알림] 알림 전건 수정 실패 - 사용자가 존재하지 않음 / 사용자 ID={}", userId);
                     return UserNotFoundException.withId(userId);
                 });
+        List<Notification> notifications = notificationRepository.findAllByUserIdAndConfirmedIsFalse(userId);
+        notifications.forEach(notification -> notification.setConfirmed(true));
 
-        Pageable pageRequest = PageRequest.of(0,size,Sort.by("createdAt").descending());
-        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(
-                userId, nextAfter, pageRequest);
-        slice.forEach(notification -> notification.setConfirmed(true));
-
-        notificationRepository.saveAll(slice.getContent());
-        log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", slice.getContent().size());
+        notificationRepository.saveAll(notifications);
+        log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", notifications.size());
     }
 
     @Override
