@@ -87,25 +87,9 @@ public class BasicArticleService implements ArticleService {
             nextAfter = last.getCreatedAt();
         }
 
-        QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (keyword != null && !keyword.isBlank()) {
-            builder.and(article.title.containsIgnoreCase(keyword)
-                    .or(article.summary.containsIgnoreCase(keyword)));
-        }
-        if (interestId != null) builder.and(article.interest.id.eq(interestId));
-        if (sourceIn != null && !sourceIn.isEmpty()) builder.and(article.source.in(sourceIn));
-        if (publishedDateFrom != null && publishedDateTo != null)
-            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
-
-        Long totalElementsResult = jpaQueryFactory
-                .select(article.count())
-                .from(article)
-                .where(builder)
-                .fetchOne();
-
-        long totalElements = (totalElementsResult != null) ? totalElementsResult : 0L;
+        long totalElements = articleRepositoryCustom.countArticles(
+                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
+        );
 
         return new CursorPageResponseArticleDto(
                 articles.stream().map(articleMapper::toArticleDto).toList(),

@@ -110,4 +110,33 @@ public class ArticleRepositoryCustom {
                 .limit(limit + 1)
                 .fetch();
     }
+
+    public long countArticles(
+            String keyword,
+            UUID interestId,
+            List<String> sourceIn,
+            LocalDateTime publishedDateFrom,
+            LocalDateTime publishedDateTo
+    ) {
+        QArticle article = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(article.title.containsIgnoreCase(keyword)
+                    .or(article.summary.containsIgnoreCase(keyword)));
+        }
+        if (interestId != null) builder.and(article.interest.id.eq(interestId));
+        if (sourceIn != null && !sourceIn.isEmpty()) builder.and(article.source.in(sourceIn));
+        if (publishedDateFrom != null && publishedDateTo != null) {
+            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
+        }
+
+        Long total = jpaQueryFactory
+                .select(article.count())
+                .from(article)
+                .where(builder)
+                .fetchOne();
+
+        return total != null ? total : 0L;
+    }
 }
