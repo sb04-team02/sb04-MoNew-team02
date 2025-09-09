@@ -106,11 +106,13 @@ public class BasicArticleService implements ArticleService {
         if (publishedDateFrom != null && publishedDateTo != null)
             builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
 
-        long totalElements = jpaQueryFactory
+        Long totalElementsResult = jpaQueryFactory
                 .select(article.count())
                 .from(article)
                 .where(builder)
                 .fetchOne();
+
+        long totalElements = (totalElementsResult != null) ? totalElementsResult : 0L;
 
         return new CursorPageResponseArticleDto(
                 articles.stream().map(articleMapper::toArticleDto).toList(),
