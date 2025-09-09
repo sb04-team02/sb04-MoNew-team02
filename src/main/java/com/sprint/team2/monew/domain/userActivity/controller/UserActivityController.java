@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +30,16 @@ public class UserActivityController {
     log.info("[활동 내역] 활동 내역 정보 응답 - userId={}", userActivityResponseDto.id());
 
     return ResponseEntity.ok(userActivityResponseDto);
+  }
+
+  // ======================= test =======================
+  @PostMapping
+  public ResponseEntity<UserActivityResponseDto> create(@RequestBody UserActivityResponseDto userActivityResponseDto) {
+    log.info("[활동 내역] 활동 내역 정보 생성 요청 수신");
+    UserActivityResponseDto response = userActivityService.createUserActivity(userActivityResponseDto);
+    log.info("[활동 내역] 활동 내역 정보 생성 응답 ");
+
+    return ResponseEntity.ok(response);
   }
 
 }

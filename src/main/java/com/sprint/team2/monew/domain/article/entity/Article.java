@@ -1,7 +1,6 @@
 package com.sprint.team2.monew.domain.article.entity;
 
 import com.sprint.team2.monew.domain.base.DeletableEntity;
-import com.sprint.team2.monew.domain.base.UpdatableEntity;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Article extends DeletableEntity {
     @Column(name = "source", nullable = false, length = 30)
     private String source;
@@ -22,13 +21,13 @@ public class Article extends DeletableEntity {
     @Column(name = "source_url", unique = true, nullable = false, length = 255)
     private String sourceUrl;
 
-    @Column(name = "title", nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 150)
     private String title;
 
     @Column(name = "publish_date", nullable = false)
     private LocalDateTime publishDate;
 
-    @Column(name = "summary", nullable = false, length = 100)
+    @Column(name = "summary", nullable = false, columnDefinition = "TEXT")
     private String summary;
 
     @Builder.Default
