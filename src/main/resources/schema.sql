@@ -16,7 +16,7 @@ CREATE TABLE interests
     updated_at         TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
     name               VARCHAR(50) NOT NULL,
     subscription_count BIGINT,
-    keywords           VARCHAR(20)[]
+    keywords           JSON
 );
 
 CREATE TABLE subscriptions

@@ -10,11 +10,13 @@ import com.sprint.team2.monew.domain.like.exception.ReactionNotFoundException;
 import com.sprint.team2.monew.domain.like.mapper.ReactionMapper;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
 import com.sprint.team2.monew.domain.like.service.ReactionService;
+import com.sprint.team2.monew.domain.notification.event.CommentLikedEvent;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,9 @@ public class BasicReactionService implements ReactionService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ReactionMapper reactionMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public CommentLikeDto likeComment(UUID commentId, UUID requesterUserId) {
@@ -63,6 +68,12 @@ public class BasicReactionService implements ReactionService {
 
             //유니크 위반을 즉시 드러내기 위해 flush
             reactionRepository.saveAndFlush(reaction);
+
+            // 좋아요 생성 시 알림 이벤트 발행
+            applicationEventPublisher.publishEvent(new CommentLikedEvent(
+                    commentId,
+                    user.getId()
+            ));
 
             // ★ 원자적 +1 (동시성 안전)
             long newLikeCount = commentRepository.incrementLikeCountReturning(comment.getId());

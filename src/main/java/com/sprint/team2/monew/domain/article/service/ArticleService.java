@@ -1,6 +1,9 @@
 package com.sprint.team2.monew.domain.article.service;
 
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
+import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +13,8 @@ public interface ArticleService {
 
     void saveByInterest(UUID interestId);
 
-    CursorPageResponseArticleDto read(UUID userId, String orderBy, String direction, int limit,
+    CursorPageResponseArticleDto read(UUID userId, ArticleOrderBy orderBy, ArticleDirection direction, int limit,
                                       String keyword,
-                                      UUID interestId, List<String> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
+                                      UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                       String cursor, LocalDateTime after);
 }

@@ -3,10 +3,8 @@ package com.sprint.team2.monew.domain.notification.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.notification.dto.response.CursorPageResponseNotificationDto;
 import com.sprint.team2.monew.domain.notification.dto.response.NotificationDto;
-import com.sprint.team2.monew.domain.notification.entity.Notification;
 import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 import com.sprint.team2.monew.domain.notification.exception.NotificationNotFoundException;
-import com.sprint.team2.monew.domain.notification.factory.TestNotificationFactory;
 import com.sprint.team2.monew.domain.notification.service.NotificationService;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.after;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
