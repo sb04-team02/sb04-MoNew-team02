@@ -2,9 +2,11 @@ package com.sprint.team2.monew.domain.article.batch.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.service.ArticleBackupService;
 import jakarta.persistence.EntityManagerFactory;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -13,10 +15,10 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -55,18 +57,28 @@ public class BackupBatchConfig {
         .processor(newsBackupProcessor)
         .writer(newsBackupWriter)
         .build();
-
   }
 
   // ===================== Components in Step: ItemReader, ItemProcessor, ItemWriter =====================
 
   // Reader - Reads Article objects from the database for a specific date
   @Bean
-  public JpaPagingItemReader<Article> newsBackupReader(EntityManagerFactory entityManagerFactory) {
+  public JpaPagingItemReader<Article> newsBackupReader(
+      EntityManagerFactory entityManagerFactory,
+      @Value("#{jobParameters['backupDate']}") String backupDateStr
+  ) {
+    LocalDate backupDate = LocalDate.parse(backupDateStr);
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("startDate", backupDate.atStartOfDay());
+    parameters.put("endDate", backupDate.plusDays(1).atStartOfDay());
+
     return new JpaPagingItemReaderBuilder<Article>()
         .name("articleJpaPagingItemReader")
         .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT a FROM Article a")
+        .queryString("SELECT a FROM Article a "
+            + "WHERE a.createdAt >= :startDate AND a.createdAt < :endDate")
+        .parameterValues(parameters)
         .pageSize(chunkSize)
         .build();
   }
