@@ -2,8 +2,7 @@ package com.sprint.team2.monew.domain.article.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.entity.QArticle;
+import com.sprint.team2.monew.domain.article.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,11 +19,11 @@ public class ArticleRepositoryCustom {
     public List<Article> searchArticles(
             String keyword,
             UUID interestId,
-            List<String> sourceIn,
+            List<ArticleSource> sourceIn,
             LocalDateTime publishedDateFrom,
             LocalDateTime publishedDateTo,
-            String orderBy,
-            String direction,
+            ArticleOrderBy orderBy,
+            ArticleDirection direction,
             String cursor,
             LocalDateTime after,
             int limit
@@ -36,29 +35,29 @@ public class ArticleRepositoryCustom {
 
         if (cursor != null) {
             switch (orderBy) {
-                case "commentCount" -> {
+                case commentCount -> {
                     long cursorValue = Long.parseLong(cursor);
                     if (after != null) {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.commentCount.gt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.gt(after))) :
                                 article.commentCount.lt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.lt(after))));
                     } else {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.commentCount.gt(cursorValue) :
                                 article.commentCount.lt(cursorValue));
                     }
                 }
 
-                case "viewCount" -> {
+                case viewCount -> {
                     long cursorValue = Long.parseLong(cursor);
                     if (after != null) {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.viewCount.gt(cursorValue)
                                         .or(article.viewCount.eq(cursorValue).and(article.createdAt.gt(after))) :
                                 article.viewCount.lt(cursorValue)
                                         .or(article.viewCount.eq(cursorValue).and(article.createdAt.lt(after))));
                     } else {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.viewCount.gt(cursorValue) :
                                 article.viewCount.lt(cursorValue));
                     }
@@ -67,13 +66,13 @@ public class ArticleRepositoryCustom {
                 default -> {
                     LocalDateTime cursorDate = LocalDateTime.parse(cursor);
                     if (after != null) {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.publishDate.gt(cursorDate)
                                         .or(article.publishDate.eq(cursorDate).and(article.createdAt.gt(after))) :
                                 article.publishDate.lt(cursorDate)
                                         .or(article.publishDate.eq(cursorDate).and(article.createdAt.lt(after))));
                     } else {
-                        builder.and(direction.equalsIgnoreCase("ASC") ?
+                        builder.and(direction == ArticleDirection.ASC ?
                                 article.publishDate.gt(cursorDate) :
                                 article.publishDate.lt(cursorDate));
                     }
@@ -82,10 +81,10 @@ public class ArticleRepositoryCustom {
         }
 
         var orderSpecifier = switch (orderBy) {
-            case "commentCount" ->
-                    direction.equalsIgnoreCase("ASC") ? article.commentCount.asc() : article.commentCount.desc();
-            case "viewCount" -> direction.equalsIgnoreCase("ASC") ? article.viewCount.asc() : article.viewCount.desc();
-            default -> direction.equalsIgnoreCase("ASC") ? article.publishDate.asc() : article.publishDate.desc();
+            case commentCount ->
+                    direction == ArticleDirection.ASC ? article.commentCount.asc() : article.commentCount.desc();
+            case viewCount -> direction == ArticleDirection.ASC ? article.viewCount.asc() : article.viewCount.desc();
+            default -> direction == ArticleDirection.ASC ? article.publishDate.asc() : article.publishDate.desc();
         };
 
         return jpaQueryFactory
@@ -99,7 +98,7 @@ public class ArticleRepositoryCustom {
     public long countArticles(
             String keyword,
             UUID interestId,
-            List<String> sourceIn,
+            List<ArticleSource> sourceIn,
             LocalDateTime publishedDateFrom,
             LocalDateTime publishedDateTo
     ) {
@@ -121,7 +120,7 @@ public class ArticleRepositoryCustom {
     private BooleanBuilder build(
             String keyword,
             UUID interestId,
-            List<String> sourceIn,
+            List<ArticleSource> sourceIn,
             LocalDateTime publishedDateFrom,
             LocalDateTime publishedDateTo
     ) {

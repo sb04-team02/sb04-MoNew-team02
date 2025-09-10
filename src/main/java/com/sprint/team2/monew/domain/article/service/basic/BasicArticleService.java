@@ -4,6 +4,9 @@ import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
+import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
@@ -53,9 +56,9 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseArticleDto read(UUID userId, String orderBy, String direction, int limit,
+    public CursorPageResponseArticleDto read(UUID userId, ArticleOrderBy orderBy, ArticleDirection direction, int limit,
                                              String keyword,
-                                             UUID interestId, List<String> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
+                                             UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                              String cursor, LocalDateTime after) {
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
@@ -75,8 +78,8 @@ public class BasicArticleService implements ArticleService {
         if (!articles.isEmpty()) {
             Article last = articles.get(articles.size() - 1);
             switch (orderBy) {
-                case "commentCount" -> nextCursor = String.valueOf(last.getCommentCount());
-                case "viewCount" -> nextCursor = String.valueOf(last.getViewCount());
+                case commentCount -> nextCursor = String.valueOf(last.getCommentCount());
+                case viewCount -> nextCursor = String.valueOf(last.getViewCount());
                 default -> nextCursor = last.getPublishDate().toString();
             }
 
