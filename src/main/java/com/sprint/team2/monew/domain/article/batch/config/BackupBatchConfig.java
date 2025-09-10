@@ -94,10 +94,16 @@ public class BackupBatchConfig {
 
   // Writer - Writes the processed data (JSON) to a file in AWS S3 (배치로 S3에 백업)
   @Bean
-  public ItemWriter<String> newsBackupWriter() {
+  @StepScope
+  public ItemWriter<String> newsBackupWriter(
+      @Value("#{jobParameters['backupDate']}") String backupDateStr
+  ) {
     return articles -> {
       String aggregatedJson = String.join("\n", articles.getItems());
-      String filename = "backup-" + UUID.randomUUID() + ".json";
+      String filename = String.format("articles-%s/chunk-%s.json",
+          backupDateStr,
+          UUID.randomUUID()
+          );
       articleBackupService.backupToS3(filename, aggregatedJson);
     };
   }
