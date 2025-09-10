@@ -193,14 +193,14 @@ public class NotificationServiceTest {
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(slice);
 
             // when
             notificationService.getAllNotifications(userId,now, size);
 
             // then
-            verify(notificationRepository).findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable);
+            verify(notificationRepository).findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable);
         }
 
         @Test
@@ -214,7 +214,7 @@ public class NotificationServiceTest {
             LocalDateTime now = LocalDateTime.now();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when

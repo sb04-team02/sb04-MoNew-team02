@@ -173,7 +173,7 @@ public class BasicNotificationsService implements NotificationService {
                 });
         //Pageable 설정
         Pageable pageableRequest = PageRequest.of(0, size, Sort.by("createdAt").descending());
-        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
+        Slice<Notification> slice = notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
 
         List<Notification> notifications = slice.getContent();
 
