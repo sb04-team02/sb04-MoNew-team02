@@ -13,6 +13,7 @@ import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.basic.BasicCommentService;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.team2.monew.domain.article.entity.ArticleSource.NAVER;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,7 +73,7 @@ public class BasicCommentServiceTest {
 
         // Article / User 는 @Builder 사용 (protected 기본 생성자 회피)
         article = Article.builder()
-                .source("nyt")
+                .source(NAVER)
                 .sourceUrl("https://example.com/" + UUID.randomUUID())
                 .title("뉴스 제목")
                 .publishDate(LocalDateTime.now())
@@ -110,7 +112,7 @@ public class BasicCommentServiceTest {
 
         User user = User.builder().email("user@example.com").password("pw").nickname("nick").build();
         Article article = Article.builder()
-                .source("naver")
+                .source(NAVER)
                 .sourceUrl("https://n/" + UUID.randomUUID())
                 .title("제목")
                 .publishDate(LocalDateTime.now())
@@ -373,7 +375,7 @@ public class BasicCommentServiceTest {
 
         then(commentRepository).should().findById(commentId);
         then(reactionRepository).should().deleteByCommentId(commentId);
-        then(notificationRepository).should().deleteByCommentId(commentId);
+        then(notificationRepository).should().deleteByResourceTypeAndResourceId(ResourceType.COMMENT, commentId);
         then(commentRepository).should().delete(comment);
         then(commentRepository).shouldHaveNoMoreInteractions();
         then(reactionRepository).shouldHaveNoMoreInteractions();
@@ -391,7 +393,7 @@ public class BasicCommentServiceTest {
 
         then(commentRepository).should().findById(commentId);
         then(reactionRepository).should(never()).deleteByCommentId(any());
-        then(notificationRepository).should(never()).deleteByCommentId(any());
+        then(notificationRepository).should(never()).deleteByResourceTypeAndResourceId(any(ResourceType.class), any(UUID.class));
         then(commentRepository).should(never()).delete(any());
         then(commentRepository).shouldHaveNoMoreInteractions();
         then(reactionRepository).shouldHaveNoMoreInteractions();

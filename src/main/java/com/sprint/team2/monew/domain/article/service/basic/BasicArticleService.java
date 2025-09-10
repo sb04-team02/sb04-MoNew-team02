@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;

@@ -17,6 +17,7 @@ import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
@@ -171,7 +172,7 @@ public class BasicCommentService implements CommentService {
 
         //연관 데이터 정리
         reactionRepository.deleteByCommentId(commentId);
-        notificationRepository.deleteByCommentId(commentId);
+        notificationRepository.deleteByResourceTypeAndResourceId(ResourceType.COMMENT, commentId);
         log.info("댓글 연관 좋아요, 알림 삭제 완료: commentId={}", commentId);
 
 
