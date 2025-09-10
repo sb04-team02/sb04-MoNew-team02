@@ -24,7 +24,6 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @GetMapping
-    // TODO: ENUM 사용
     public ResponseEntity<CursorPageResponseArticleDto> getArticles(@RequestHeader("Monew-Request-User-ID") UUID userId,
                                                                     @RequestParam(required = false) String keyword,
                                                                     @RequestParam(required = false) UUID interestId,
