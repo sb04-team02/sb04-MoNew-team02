@@ -1,6 +1,9 @@
 package com.sprint.team2.monew.domain.article.controller;
 
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
+import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +24,14 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @GetMapping
-    // TODO: ENUM 사용
     public ResponseEntity<CursorPageResponseArticleDto> getArticles(@RequestHeader("Monew-Request-User-ID") UUID userId,
                                                                     @RequestParam(required = false) String keyword,
                                                                     @RequestParam(required = false) UUID interestId,
-                                                                    @RequestParam(required = false) List<String> sourceIn,
+                                                                    @RequestParam(required = false) List<ArticleSource> sourceIn,
                                                                     @RequestParam(required = false) LocalDateTime publishedDateFrom,
                                                                     @RequestParam(required = false) LocalDateTime publishedDateTo,
-                                                                    @RequestParam(defaultValue = "publishDate") String orderBy,
-                                                                    @RequestParam(defaultValue = "ASC") String direction,
+                                                                    @RequestParam(defaultValue = "publishDate") ArticleOrderBy orderBy,
+                                                                    @RequestParam(defaultValue = "ASC") ArticleDirection direction,
                                                                     @RequestParam(required = false) String cursor,
                                                                     @RequestParam(required = false) LocalDateTime after,
                                                                     @RequestParam(defaultValue = "50") int limit) {

@@ -1,11 +1,12 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
 import org.junit.jupiter.api.DisplayName;
@@ -33,14 +34,16 @@ class BasicArticleServiceTest {
     private JPAQueryFactory jpaQueryFactory;
     @Mock
     private JPAQuery<Long> jpaQuery;
+
     @InjectMocks
     private BasicArticleService basicArticleService;
 
     @Test
-    @DisplayName("뉴스 기사 정렬: 정상적으로 정렬된 DTO 리시트 반환 및 페이징 정보 반환")
+    @DisplayName("뉴스 기사 정렬: 정상적으로 정렬된 DTO 리스트 반환 및 페이징 정보 반환")
     void readArticleSortSuccess() {
         // given
         UUID userId = UUID.randomUUID();
+
         Article article = new Article();
         article.setPublishDate(LocalDateTime.now().minusDays(1));
 
@@ -56,20 +59,20 @@ class BasicArticleServiceTest {
                 false
         );
 
-        when(articleRepositoryCustom.searchArticles(any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt()))
-                .thenReturn(List.of(article));
-        when(articleMapper.toArticleDto(article))
-                .thenReturn(articleDto);
-        when(jpaQueryFactory.select(any(Expression.class)))
-                .thenReturn(jpaQuery);
-        when(jpaQuery.from(any(com.querydsl.core.types.EntityPath.class)))
-                .thenReturn(jpaQuery);
-        when(jpaQuery.fetchOne())
-                .thenReturn(1L);
+        when(articleRepositoryCustom.searchArticles(
+                any(), any(), any(), any(), any(),
+                eq(ArticleOrderBy.publishDate), eq(ArticleDirection.ASC),
+                any(), any(), anyInt())
+        ).thenReturn(List.of(article));
+
+        when(articleMapper.toArticleDto(article)).thenReturn(articleDto);
+        when(articleRepositoryCustom.countArticles(
+                any(), any(), any(), any(), any()
+        )).thenReturn(1L);
 
         // when
         CursorPageResponseArticleDto result = basicArticleService.read(
-                userId, "publishDate", "ASC", 10,
+                userId, ArticleOrderBy.publishDate, ArticleDirection.ASC, 10,
                 null,
                 null, null, null, null,
                 null, null);
@@ -79,7 +82,11 @@ class BasicArticleServiceTest {
         assertThat(result.content().get(0)).isEqualTo(articleDto);
         assertThat(result.hasNext()).isFalse();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(articleRepositoryCustom, times(1)).searchArticles(any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+        verify(articleRepositoryCustom, times(1)).searchArticles(
+                any(), any(), any(), any(), any(),
+                eq(ArticleOrderBy.publishDate), eq(ArticleDirection.ASC),
+                any(), any(), anyInt()
+        );
         verify(articleMapper, times(1)).toArticleDto(article);
     }
 }
