@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +24,8 @@ public class Interest extends UpdatableEntity {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
     @Size(min = 1, max = 10)
-    @Column(name = "keywords", columnDefinition = "VARCHAR(20)[]")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "keywords", columnDefinition = "json")
     private List<String> keywords;
     @Column(name="subscription_count")
     private long subscriberCount;
