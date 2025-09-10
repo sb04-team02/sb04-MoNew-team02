@@ -1,6 +1,5 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
@@ -35,6 +34,7 @@ class BasicArticleServiceTest {
     private JPAQueryFactory jpaQueryFactory;
     @Mock
     private JPAQuery<Long> jpaQuery;
+
     @InjectMocks
     private BasicArticleService basicArticleService;
 

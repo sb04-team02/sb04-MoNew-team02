@@ -7,6 +7,9 @@ import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
+import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
+import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
+import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
@@ -83,7 +86,9 @@ public class BasicArticleService implements ArticleService {
             throw InvalidParameterException.invalidParameter();
         }
 
-        if (!List.of("publishDate", "commentCount", "viewCount").contains(orderBy)) {
+        if (orderBy != ArticleOrderBy.publishDate &&
+                orderBy != ArticleOrderBy.commentCount &&
+                orderBy != ArticleOrderBy.viewCount) {
             log.error("[Article] 정렬 속성에는 publishDate, commentCount, viewCount만 가능, 정렬 속성 = {}", orderBy);
             throw InvalidParameterException.invalidParameter();
         }
