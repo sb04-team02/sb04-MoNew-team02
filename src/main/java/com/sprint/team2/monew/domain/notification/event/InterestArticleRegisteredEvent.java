@@ -4,6 +4,5 @@ import java.util.UUID;
 
 public record InterestArticleRegisteredEvent (
     UUID interestId,
-    UUID articleId,
-    UUID receiverId
+    UUID articleId
  ){}
