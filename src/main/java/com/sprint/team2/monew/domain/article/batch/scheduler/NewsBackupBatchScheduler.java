@@ -21,7 +21,7 @@ public class NewsBackupBatchScheduler {
   private final Job backupNewsJob;
 
   @Scheduled(cron = "0 0 0 * * *")
-  public void runNewsCollectionJob() {
+  public void runBackupNewsSchedulerJob() {
     try {
       String backupDate = LocalDate.now().minusDays(1)
           .format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -37,5 +37,4 @@ public class NewsBackupBatchScheduler {
       log.error("[뉴스 기사] 뉴스 기사 백업 배치 실행 실패", e);
     }
   }
-
 }
