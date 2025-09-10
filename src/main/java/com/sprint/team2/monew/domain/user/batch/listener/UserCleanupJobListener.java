@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import jakarta.annotation.PostConstruct;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.stereotype.Component;
@@ -23,10 +22,7 @@ public class UserCleanupJobListener implements JobExecutionListener {
 
     public UserCleanupJobListener(MeterRegistry registry) {
         this.registry = registry;
-    }
 
-    @PostConstruct
-    public void initMetrics() {
         Gauge.builder("batch.user_cleanup.running", running, AtomicInteger::get)
                 .description("현재 사용자 삭제 배치 처리 작업 진행 여부 (0: 종료, 1: 실행중)")
                 .register(registry);

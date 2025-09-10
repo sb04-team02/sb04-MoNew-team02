@@ -9,7 +9,6 @@ import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.user.service.UserService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
@@ -33,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Slf4j
 @SpringBatchTest
 @Import(UserCleanupJobConfig.class)
 class UserCleanupJobE2ETest {

@@ -3,7 +3,6 @@ package com.sprint.team2.monew.domain.user.batch.listener;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import jakarta.annotation.PostConstruct;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -23,10 +22,7 @@ public class UserCleanupStepListener implements StepExecutionListener {
 
     public UserCleanupStepListener(MeterRegistry registry) {
         this.registry = registry;
-    }
 
-    @PostConstruct
-    public void initMetrics() {
         // 초기 상태 0으로 설정하고 Gauge 등록
         for (String reason : new String[]{"USER_NOT_FOUND", "DB_ERROR", "UNKNOWN"}) {
             failureCountMap.put(reason, 0L);
