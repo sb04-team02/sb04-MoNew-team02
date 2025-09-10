@@ -17,8 +17,11 @@ import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ public class BasicArticleService implements ArticleService {
 
     private final InterestRepository interestRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -59,6 +63,10 @@ public class BasicArticleService implements ArticleService {
                     Article articleEntity = articleMapper.toEntity(dto);
                     try {
                         articleRepository.save(articleEntity);
+                        applicationEventPublisher.publishEvent(new InterestArticleRegisteredEvent(
+                                interestId,
+                                articleEntity.getId()
+                        ));
                     } catch (Exception e) {
                         log.error("[Article] 뉴스 기사 저장 실패", e);
                         throw ArticleSaveFailedException.articleSaveFailed();
