@@ -47,13 +47,21 @@ public class BasicArticleService implements ArticleService {
             for (ArticleDto dto : articles) {
                 if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
-                    articleRepository.save(articleEntity);
-                    log.info("[Article] {}에서 keyword({}) 저장: {} - {}", dto.source(), keyword, dto.title(), dto.sourceUrl());
+                    try {
+                        articleRepository.save(articleEntity);
+                        log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
+                                dto.source(), keyword, dto.title(), dto.sourceUrl());
+                    } catch (Exception e) {
+                        log.error("[Article] {}에서 keyword({}) 저장 실패: {} - {}",
+                                dto.source(), keyword, dto.title(), dto.sourceUrl(), e);
+                        throw ArticleSaveFailedException.articleSaveFailed();
+                    }
                 } else {
-                    log.debug("[Articlle] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}", dto.source(), keyword, dto.title(), dto.sourceUrl());
+                    log.debug("[Article] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}",
+                            dto.source(), keyword, dto.title(), dto.sourceUrl());
                 }
-                log.info("[Article] keyword({})로 뉴스 수집 성공, total = {}", keyword, articles.size());
             }
+            log.info("[Article] keyword({})로 뉴스 수집 완료, total = {}", keyword, articles.size());
         }
     }
 
