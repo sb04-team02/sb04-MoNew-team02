@@ -1,8 +1,11 @@
 package com.sprint.team2.monew.domain.interest.service.basic;
 
 import com.sprint.team2.monew.domain.interest.dto.InterestDto;
+import com.sprint.team2.monew.domain.interest.dto.request.CursorPageRequestInterestDto;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestRegisterRequest;
 import com.sprint.team2.monew.domain.interest.dto.request.InterestUpdateRequest;
+import com.sprint.team2.monew.domain.interest.dto.response.CursorPageResponseInterestDto;
+import com.sprint.team2.monew.domain.interest.dto.response.InterestQueryDto;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestAlreadyExistsSimilarityNameException;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
@@ -20,9 +23,11 @@ import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -34,6 +39,29 @@ public class BasicInterestService implements InterestService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final SubscriptionMapper subscriptionMapper;
+
+    @Transactional(readOnly = true)
+    @Override
+    public CursorPageResponseInterestDto readAll(CursorPageRequestInterestDto pageRequestDto, UUID userId) {
+        log.info("[관심사] 목록 조회 실행 userId = {}", userId);
+        Page<InterestQueryDto> pageQuery = interestRepository.findAllPage(pageRequestDto, userId);
+        if (pageQuery.getContent().isEmpty()) {
+            return CursorPageResponseInterestDto.from(Page.empty(),null,null);
+        }
+        InterestQueryDto lastDto = pageQuery.getContent().get(pageQuery.getContent().size() - 1);
+        String lastItemCursor = null;
+        if ("name".equalsIgnoreCase(pageRequestDto.orderBy())){
+            lastItemCursor = lastDto.name();
+        } else {
+            lastItemCursor = String.valueOf(lastDto.subscriberCount());
+        }
+        LocalDateTime lastItemAfter = lastDto.createdAt();
+        Page<InterestDto> page = pageQuery.map(interestMapper::toDto);
+        CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,lastItemAfter,lastItemCursor);
+        log.info("[관심사] 목록 조회 완료 userId = {}, 검색어 = {}, 결과수 = {}",userId, pageRequestDto.keyword(),response.content().size());
+        log.debug("[관심사] 목록 조회 완료 cursor = {}, after = {}", lastItemCursor, lastItemAfter);
+        return response;
+    }
 
     @Transactional
     @Override
