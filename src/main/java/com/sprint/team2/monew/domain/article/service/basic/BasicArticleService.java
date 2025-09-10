@@ -48,8 +48,11 @@ public class BasicArticleService implements ArticleService {
                 if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
                     articleRepository.save(articleEntity);
+                    log.info("[Article] {}에서 keyword({}) 저장: {} - {}", dto.source(), keyword, dto.title(), dto.sourceUrl());
+                } else {
+                    log.debug("[Articlle] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}", dto.source(), keyword, dto.title(), dto.sourceUrl());
                 }
-                log.info("[Article] keyword({})로 뉴스 수집 성공", keyword);
+                log.info("[Article] keyword({})로 뉴스 수집 성공, total = {}", keyword, articles.size());
             }
         }
     }
@@ -71,6 +74,10 @@ public class BasicArticleService implements ArticleService {
         if (hasNext) {
             articles = articles.subList(0, limit);
         }
+
+        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCurosr = {}",
+                userId, keyword, interestId, articles.size(), hasNext,
+                !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
 
         String nextCursor = null;
         LocalDateTime nextAfter = null;
