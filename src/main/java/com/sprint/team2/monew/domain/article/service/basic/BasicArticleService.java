@@ -1,12 +1,9 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.entity.QArticle;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
@@ -35,7 +32,6 @@ public class BasicArticleService implements ArticleService {
     private final NaverApiCollector naverApiCollector;
 
     private final InterestRepository interestRepository;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public void saveByInterest(UUID interestId) {
