@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -63,6 +64,7 @@ public class BackupBatchConfig {
 
   // Reader - Reads Article objects from the database for a specific date
   @Bean
+  @StepScope
   public JpaPagingItemReader<Article> newsBackupReader(
       EntityManagerFactory entityManagerFactory,
       @Value("#{jobParameters['backupDate']}") String backupDateStr
