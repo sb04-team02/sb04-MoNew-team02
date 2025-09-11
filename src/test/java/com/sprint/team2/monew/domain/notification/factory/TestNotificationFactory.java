@@ -35,7 +35,7 @@ public class TestNotificationFactory {
                 .content("테스트 알림")
                 .build();
 
-        ReflectionTestUtils.setField(notification, "updatedAt", LocalDateTime.now().minusDays(8));
+        ReflectionTestUtils.setField(notification, "updatedAt", LocalDateTime.now().minusDays(7));
         return notification;
     }
 }

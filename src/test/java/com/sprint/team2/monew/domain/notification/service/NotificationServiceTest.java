@@ -320,11 +320,11 @@ public class NotificationServiceTest {
             List<Notification> notifications = List.of(noti1, noti2);
 
             LocalDateTime threshold = LocalDateTime.of(2024, 1, 1, 0, 0);
-            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(threshold))
+            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(any()))
                     .willReturn(notifications);
 
             // when
-            notificationService.deleteConfirmedNotifications();
+            notificationService.deleteAllConfirmedNotifications();
 
             //then
             assertThat(noti1.isConfirmed()).isTrue();
@@ -337,13 +337,13 @@ public class NotificationServiceTest {
         void shouldThrowWhenNotificationDoesNotExist() {
             //given
             LocalDateTime threshold = LocalDateTime.of(2024, 1, 1, 0, 0);
-            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(threshold))
+            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(any()))
                     .willReturn(List.of());
             //when
-            notificationService.deleteConfirmedNotifications();
+            notificationService.deleteAllConfirmedNotifications();
 
             //then
-            verify(notificationRepository, never()).deleteAll(anyList());
+            verify(notificationRepository, never()).deleteAll(any());
         }
     }
 }
