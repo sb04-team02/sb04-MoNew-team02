@@ -12,7 +12,9 @@ import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.user.service.UserService;
-import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -54,7 +56,7 @@ public class BasicUserService implements UserService {
         log.info("[사용자] 생성 완료 - userId={}", result.id());
 
         // ============== User Activity 이벤트 추가 ==============
-        publisher.publishEvent(new UserCreatedEvent(
+        publisher.publishEvent(new UserCreateEvent(
             savedUser.getId(),
             savedUser.getEmail(),
             savedUser.getNickname(),
@@ -111,6 +113,13 @@ public class BasicUserService implements UserService {
         user.update(request.nickname());
         UserDto userDto = userMapper.toDto(user);
         log.info("[사용자] 정보 수정 성공 - id={}, nickname={}", userDto.id(), userDto.nickname());
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new UserUpdateEvent(
+            user.getId(),
+            user.getNickname()
+        ));
+
         return userDto;
     }
 
@@ -134,6 +143,11 @@ public class BasicUserService implements UserService {
         user.setDeletedAt(LocalDateTime.now());
         log.debug("[사용자] 논리적 삭제 수행 - id={}, deletedAt={}", userId, user.getDeletedAt());
         log.info("[사용자] 논리적 삭제 성공 - id={}", userId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new UserDeleteEvent(
+            user.getId()
+        ));
     }
 
     @Override
@@ -154,6 +168,11 @@ public class BasicUserService implements UserService {
 
         userRepository.deleteById(userId);
         log.info("[사용자] 물리적 삭제 성공 - id={}", userId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new UserDeleteEvent(
+            userId
+        ));
     }
 
     @Override

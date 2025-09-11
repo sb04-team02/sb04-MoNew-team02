@@ -1,4 +1,4 @@
-package com.sprint.team2.monew.domain.userActivity.events;
+package com.sprint.team2.monew.domain.userActivity.events.articleEvent;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

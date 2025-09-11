@@ -17,9 +17,13 @@ import com.sprint.team2.monew.domain.notification.repository.NotificationReposit
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +41,9 @@ public class BasicCommentService implements CommentService {
     private final CommentMapper commentMapper;
     private final ReactionRepository reactionRepository;
     private final NotificationRepository notificationRepository;
+
+    // User Activity 이벤트
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional
@@ -71,6 +78,19 @@ public class BasicCommentService implements CommentService {
         log.info("댓글 생성 성공: commentId={}, articleId={}, userId={}",
                 saved.getId(), request.articleId(), request.userId());
         CommentDto result = commentMapper.toDto(saved, false);// 좋아요 도메인 미구현이므로 false
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new CommentAddEvent(
+            comment.getId(),
+            comment.getArticle().getId(),
+            comment.getArticle().getTitle(),
+            user.getId(),
+            user.getNickname(),
+            comment.getContent(),
+            comment.getLikeCount(),
+            comment.getCreatedAt()
+        ));
+
         return result;
     }
 
@@ -110,6 +130,19 @@ public class BasicCommentService implements CommentService {
 
         CommentDto dto = commentMapper.toDto(comment, likedByMe);
         log.info("댓글 수정 성공: commentId={}", commentId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new CommentUpdateEvent(
+            comment.getId(),
+            comment.getArticle().getId(),
+            comment.getArticle().getTitle(),
+            comment.getUser().getId(),
+            comment.getUser().getNickname(),
+            comment.getContent(),
+            comment.getLikeCount(),
+            comment.getCreatedAt()
+        ));
+
         return dto;
     }
 
@@ -140,6 +173,12 @@ public class BasicCommentService implements CommentService {
         }
 
         log.info("댓글 논리 삭제 성공: commentId={}, requesterUserId={}", commentId, requesterUserId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new CommentDeleteEvent(
+            comment.getId(),
+            requesterUserId
+        ));
     }
 
     @Override
@@ -172,5 +211,11 @@ public class BasicCommentService implements CommentService {
         //댓글 자체 물리 삭제
         commentRepository.delete(comment);
         log.info("댓글 물리 삭제 완료: commentId={}", commentId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new CommentDeleteEvent(
+            comment.getId(),
+            requesterUserId
+        ));
     }
 }

@@ -1,11 +1,11 @@
-package com.sprint.team2.monew.domain.userActivity.events;
+package com.sprint.team2.monew.domain.userActivity.events.commentEvent;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class CommentActivityLikeEvent {
+public class CommentLikeEvent {
   UUID id;
   LocalDateTime createdAt;
   UUID commentId;

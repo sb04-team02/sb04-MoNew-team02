@@ -1,4 +1,4 @@
-package com.sprint.team2.monew.domain.userActivity.events;
+package com.sprint.team2.monew.domain.userActivity.events.userEvent;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class UserCreatedEvent {
+public class UserCreateEvent {
   private final UUID id; // userid
   private final String email;
   private final String nickname;

@@ -6,10 +6,12 @@ import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import com.sprint.team2.monew.domain.userActivity.dto.response.UserActivityResponseDto;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
-import com.sprint.team2.monew.domain.userActivity.events.ArticleViewEvent;
-import com.sprint.team2.monew.domain.userActivity.events.CommentActivityEvent;
-import com.sprint.team2.monew.domain.userActivity.events.CommentActivityLikeEvent;
-import com.sprint.team2.monew.domain.userActivity.events.SubscriptionUpdatedEvent;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
@@ -23,9 +25,13 @@ public interface UserActivityMapper {
 
   ArticleViewDto toArticleViewDto(ArticleViewEvent event);
 
-  SubscriptionDto toSubscriptionDto(SubscriptionUpdatedEvent event);
+  SubscriptionDto toSubscriptionDto(SubscriptionAddEvent event);
 
-  CommentActivityDto toCommentActivityDto(CommentActivityEvent event);
+  CommentActivityDto toCommentActivityDto(CommentUpdateEvent event);
 
-  CommentActivityLikeDto toCommentActivityLikeDto(CommentActivityLikeEvent event);
+  CommentActivityDto toCommentActivityDto(CommentAddEvent event);
+
+  CommentActivityDto toCommentActivityDto(CommentDeleteEvent event);
+
+  CommentActivityLikeDto toCommentActivityLikeDto(CommentLikeEvent event);
 }

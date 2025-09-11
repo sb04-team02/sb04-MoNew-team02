@@ -5,11 +5,16 @@ import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
-import com.sprint.team2.monew.domain.userActivity.events.ArticleViewEvent;
-import com.sprint.team2.monew.domain.userActivity.events.CommentActivityEvent;
-import com.sprint.team2.monew.domain.userActivity.events.CommentActivityLikeEvent;
-import com.sprint.team2.monew.domain.userActivity.events.SubscriptionUpdatedEvent;
-import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
@@ -36,7 +41,7 @@ public class UserActivityListener {
   // ================================== 사용자 ==================================
   // 사용자 생성
   @EventListener
-  public void handleUserCreate(UserCreatedEvent event) {
+  public void handleUserCreate(UserCreateEvent event) {
     UUID id = event.getId();
     String email = event.getEmail();
     String nickname = event.getNickname();
@@ -52,15 +57,44 @@ public class UserActivityListener {
     log.info("[사용자 활동] 생성 완료 - id = {}", id);
   }
 
+  // 사용자 닉네임 수정
+  @EventListener
+  public void handleUserUpdate(UserUpdateEvent event) {
+
+    UUID userId = event.getId();
+    String nickname = event.getNickname();
+
+    log.info("[사용자 활동] 닉네임 수정 시작 - userId = {}", userId);
+    UserActivity userActivity = userActivityRepository.findById(userId)
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
+    // save to mongodb
+    userActivity.setNickname(nickname);
+    userActivityRepository.save(userActivity);
+
+    log.info("[사용자 활동] 닉네임 수정 완료 - userId = {}", userId);
+  }
+
+  // 사용자 삭제
+  @EventListener
+  public void handleUserDelete(UserDeleteEvent event) {
+
+    UUID userId = event.getUserId();
+
+    log.info("[사용자 활동] 유저 삭제 시작 - userId = {}", userId);
+    userActivityRepository.deleteById(userId);
+
+    log.info("[사용자 활동] 유저 삭제 완료 - userId = {}", userId);
+  }
+
   // ================================== 구독 ==================================
   // 구독 업데이트
   @EventListener
-  public void handleSubscriptionAdd(SubscriptionUpdatedEvent event) {
-    UUID userId = event.getId();
-    UUID interestId = event.getInterestId();
+  public void handleSubscriptionAdd(SubscriptionAddEvent event) {
+    UUID userId = event.getUserId();
+    UUID subscriptionId = event.getId();
     SubscriptionDto subscriptionDto = userActivityMapper.toSubscriptionDto(event);
 
-    log.info("[사용자 활동] 구독 추가 시작 - interestId = {}",interestId);
+    log.info("[사용자 활동] 구독 추가 시작 - subscriptionId = {}",subscriptionId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
@@ -77,16 +111,16 @@ public class UserActivityListener {
 
     userActivityRepository.save(userActivity);
 
-    log.info("[사용자 활동] 구독 추가 완료 - interestId = {}", interestId);
+    log.info("[사용자 활동] 구독 추가 완료 - subscriptionId = {}", subscriptionId);
   }
 
   // 구독 업데이트
   @EventListener
-  public void handleSubscriptionDelete(SubscriptionUpdatedEvent event) {
-    UUID userId = event.getId();
-    UUID interestId = event.getInterestId();
+  public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
+    UUID userId = event.getUserId();
+    UUID subscriptionId = event.getId();
 
-    log.info("[사용자 활동] 구독 삭제 시작 - interestId = {}",interestId);
+    log.info("[사용자 활동] 구독 삭제 시작 - subscriptionId = {}",subscriptionId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
@@ -96,15 +130,15 @@ public class UserActivityListener {
 
     userActivityRepository.save(userActivity);
 
-    log.info("[사용자 활동] 구독 삭제 완료 - interestId = {}", interestId);
+    log.info("[사용자 활동] 구독 삭제 완료 - subscriptionId = {}", subscriptionId);
   }
 
   // ================================== 댓글 (최신 10개) ==================================
   // 유저 댓글 추가
   @EventListener
-  public void handleCommentAdd(CommentActivityEvent event) {
-    UUID commentId = event.getId();
+  public void handleCommentAdd(CommentAddEvent event) {
     UUID userId = event.getUserId();
+    UUID commentId = event.getId();
     CommentActivityDto commentActivityDto = userActivityMapper.toCommentActivityDto(event);
 
     log.info("[사용자 활동] 댓글 추가 시작 - commentId = {}",commentId);
@@ -124,11 +158,39 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 추가 완료- commentId = {}", commentId);
   }
 
-  // 유저 댓글 삭제
   @EventListener
-  public void handleCommentDelete(CommentActivityEvent event) {
+  public void handleCommentUpdate(CommentUpdateEvent event) {
     UUID commentId = event.getId();
     UUID userId = event.getUserId();
+
+    log.info("[사용자 활동] 댓글 수정 시작 - commentId = {}", commentId);
+
+    UserActivity userActivity = userActivityRepository.findById(userId)
+        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
+
+    List<CommentActivityDto> comments = userActivity.getComments();
+    int indexUpdate = -1;
+    for (int i = 0; i < comments.size(); i++) {
+      if (comments.get(i).id().equals(commentId)) {
+        indexUpdate = i;
+      }
+    }
+    if (indexUpdate != -1) {
+      CommentActivityDto commentActivityDto = userActivityMapper.toCommentActivityDto(event);
+      comments.set(indexUpdate, commentActivityDto);
+    } else {
+      log.warn("[사용자 활동] 수정할 댓글 Id {}를 최근 활동 내역에서 찾지 못했습니다.", commentId);
+    }
+    userActivityRepository.save(userActivity);
+
+    log.info("[사용자 활동] 댓글 수정 완료 - commentId = {}", commentId);
+  }
+
+  // 유저 댓글 삭제
+  @EventListener
+  public void handleCommentDelete(CommentDeleteEvent event) {
+    UUID userId = event.getUserId();
+    UUID commentId = event.getCommentId();
 
     log.info("[사용자 활동] 댓글 삭제 시작 - commentId = {}", commentId);
 
@@ -147,7 +209,7 @@ public class UserActivityListener {
 
   // 유저 댓글 좋아요
   @EventListener
-  public void handleCommentLikeAdd(CommentActivityLikeEvent event) {
+  public void handleCommentLikeAdd(CommentLikeEvent event) {
     UUID commentId = event.getCommentId();
     UUID commentUserId = event.getCommentUserId();
     CommentActivityLikeDto commentActivityLikeDto = userActivityMapper.toCommentActivityLikeDto(event);
@@ -175,7 +237,7 @@ public class UserActivityListener {
 
   // 유저 댓글 좋아요 취소
   @EventListener
-  public void handleCommentLikeCancel(CommentActivityLikeEvent event) {
+  public void handleCommentLikeCancel(CommentLikeEvent event) {
     UUID commentId = event.getCommentId();
     UUID commentUserId = event.getCommentUserId();
 
