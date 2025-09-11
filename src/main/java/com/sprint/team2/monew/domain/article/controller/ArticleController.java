@@ -55,4 +55,13 @@ public class ArticleController {
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    @DeleteMapping("/{articleId}/hard")
+    public ResponseEntity<Void> deleteHardArticle(@PathVariable("articleId") UUID articleId) {
+        articleService.hardDelete(articleId);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

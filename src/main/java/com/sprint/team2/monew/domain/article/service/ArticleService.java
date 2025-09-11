@@ -19,4 +19,6 @@ public interface ArticleService {
                                       String cursor, LocalDateTime after);
 
     void softDelete(UUID articleId);
+
+    void hardDelete(UUID articleId);
 }

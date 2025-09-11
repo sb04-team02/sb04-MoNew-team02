@@ -18,6 +18,7 @@ import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class BasicArticleService implements ArticleService {
     private final NaverApiCollector naverApiCollector;
 
     private final InterestRepository interestRepository;
+
+    private final UserActivityRepositoryCustom userActivityRepositoryCustom;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -147,5 +150,19 @@ public class BasicArticleService implements ArticleService {
 
         article.setDeletedAt(LocalDateTime.now());
         log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
+    }
+
+    @Override
+    public void hardDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 물리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        userActivityRepositoryCustom.deleteByArticleId(articleId);
+
+        articleRepository.delete(article);
+        log.info("[Article] 물리 삭제 성공");
     }
 }
