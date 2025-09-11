@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.article.service.basic;
 
 import com.sprint.team2.monew.domain.article.dto.response.ArticleRestoreResultDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
 import com.sprint.team2.monew.domain.base.BaseEntity;
 import com.sprint.team2.monew.global.config.aws.S3Properties;
@@ -37,6 +38,7 @@ public class BasicArticleStorageService implements ArticleStorageService {
   private final S3Properties s3Properties;
   private final JobLauncher jobLauncher;
   private final Job restoreNewsJob;
+  private final ArticleRepository articleRepository;
 
 
   @Override
@@ -92,6 +94,9 @@ public class BasicArticleStorageService implements ArticleStorageService {
         if (articles == null) {
           articles = new ArrayList<>();
         }
+        
+        // save to db
+        articleRepository.saveAll(articles);
 
         List<UUID> articleIds = articles.stream()
             .map(BaseEntity::getId)
