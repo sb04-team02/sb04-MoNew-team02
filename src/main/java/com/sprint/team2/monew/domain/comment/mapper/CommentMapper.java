@@ -1,10 +1,8 @@
 package com.sprint.team2.monew.domain.comment.mapper;
 
-import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
-import com.sprint.team2.monew.domain.user.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
