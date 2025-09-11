@@ -126,6 +126,7 @@ public class ArticleRepositoryCustom {
     ) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(article.deletedAt.isNull());
 
         if (keyword != null && !keyword.isBlank()) {
             builder.and(article.title.containsIgnoreCase(keyword)

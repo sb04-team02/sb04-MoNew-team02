@@ -1,6 +1,6 @@
 package com.sprint.team2.monew.domain.interest.dto.request;
 
-import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -18,6 +18,7 @@ public record CursorPageRequestInterestDto(
         String cursor,
         LocalDateTime after,
         @NotNull
-        int limit
+        @Min(1)
+        Integer limit
 ) {
 }

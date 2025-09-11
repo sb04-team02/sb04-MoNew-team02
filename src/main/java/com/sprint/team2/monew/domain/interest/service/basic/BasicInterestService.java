@@ -21,8 +21,12 @@ import com.sprint.team2.monew.domain.subscription.repository.SubscriptionReposit
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,9 @@ public class BasicInterestService implements InterestService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final SubscriptionMapper subscriptionMapper;
+
+    // User Activity 이벤트
+    private final ApplicationEventPublisher publisher;
 
     @Transactional(readOnly = true)
     @Override
@@ -93,6 +100,18 @@ public class BasicInterestService implements InterestService {
         subscriptionRepository.save(subscription);
         interest.increaseSubscriber();
         log.info("[구독] 구독 등록 완료 id = {}", subscription.getId());
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionAddEvent(
+            subscription.getId(),
+            interest.getId(),
+            interest.getName(),
+            interest.getKeywords(),
+            interest.getSubscriberCount(),
+            interest.getCreatedAt(),
+            user.getId()
+        ));
+
         return subscriptionMapper.toDto(subscription);
     }
 
@@ -105,6 +124,13 @@ public class BasicInterestService implements InterestService {
         interest.decreaseSubscriber();
         subscriptionRepository.delete(subscription);
         log.info("[구독] 구독 취소 완료");
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionCancelEvent(
+            subscription.getId(),
+            interestId,
+            userId
+        ));
     }
 
     @Override
@@ -116,6 +142,11 @@ public class BasicInterestService implements InterestService {
         log.debug("[구독] 관심사 삭제에 따라 구독 삭제");
         interestRepository.delete(interest);
         log.info("[관심사] 관심사 삭제 완료");
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionDeleteEvent(
+            interestId
+        ));
     }
 
     @Override
