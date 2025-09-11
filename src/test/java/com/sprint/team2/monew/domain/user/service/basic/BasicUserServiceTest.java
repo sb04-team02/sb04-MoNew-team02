@@ -11,7 +11,7 @@ import com.sprint.team2.monew.domain.user.exception.LoginFailedException;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.mapper.UserMapper;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.domain.userActivity.events.UserCreatedEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +77,7 @@ class BasicUserServiceTest {
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         // 이벤트 퍼블리셔
-        willDoNothing().given(publisher).publishEvent(any(UserCreatedEvent.class));
+        willDoNothing().given(publisher).publishEvent(any(UserCreateEvent.class));
 
         // when
         UserDto result = userService.create(request);
