@@ -9,6 +9,7 @@ import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
+import com.sprint.team2.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
 import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
@@ -18,6 +19,7 @@ import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,8 @@ public class BasicArticleService implements ArticleService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
 
+    private final UserActivityRepositoryCustom userActivityRepositoryCustom;
+
     @Override
     public void saveByInterest(UUID interestId) {
 
@@ -60,7 +64,7 @@ public class BasicArticleService implements ArticleService {
             }
 
             for (ArticleDto dto : articles) {
-                if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
+                if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
                     try {
                         articleRepository.save(articleEntity);
@@ -116,7 +120,7 @@ public class BasicArticleService implements ArticleService {
             articles = articles.subList(0, limit);
         }
 
-        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCurosr = {}",
+        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCursor = {}",
                 userId, keyword, interestId, articles.size(), hasNext,
                 !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
 
@@ -147,4 +151,31 @@ public class BasicArticleService implements ArticleService {
                 hasNext
         );
     }
+
+    @Override
+    public void softDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 논리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        article.setDeletedAt(LocalDateTime.now());
+        log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
+    }
+
+    @Override
+    public void hardDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 물리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        userActivityRepositoryCustom.deleteByArticleId(articleId);
+
+        articleRepository.delete(article);
+        log.info("[Article] 물리 삭제 성공");
+    }
+
 }
