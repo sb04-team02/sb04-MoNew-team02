@@ -16,6 +16,7 @@ import com.sprint.team2.monew.domain.notification.factory.*;
 import com.sprint.team2.monew.domain.notification.mapper.NotificationMapper;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.notification.service.basic.BasicNotificationsService;
+import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -27,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +40,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +58,8 @@ public class NotificationServiceTest {
 
     @Mock private CommentRepository commentRepository;
 
+    @Mock private SubscriptionRepository subscriptionRepository;
+
     @InjectMocks private BasicNotificationsService notificationService;
 
     @Nested
@@ -65,34 +70,33 @@ public class NotificationServiceTest {
         @DisplayName("관심사 키워드와 매치되는 기사가 등록되면 알림 생성됨")
         void shouldCreateNotificationWhenArticleMatchesInterest() {
             //given
-            User user = TestUserFactory.createUser();
             Interest interest = TestInterestFactory.createInterest();
             Article article = TestArticleFactory.createArticle();
 
-            UUID userId = user.getId();
             UUID interestId = interest.getId();
             UUID articleId = article.getId();
 
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            User user1 = TestUserFactory.createUser();
+            User user2 = TestUserFactory.createUser();
+            ReflectionTestUtils.setField(user1, "id", UUID.randomUUID());
+            ReflectionTestUtils.setField(user2, "id", UUID.randomUUID());
+            UUID user1Id = user1.getId();
+            UUID user2Id = user2.getId();
+            List<UUID> receiverIds = List.of(user1Id, user2Id);
+
+            InterestArticleRegisteredEvent event = new InterestArticleRegisteredEvent(interestId, articleId);
+
+            given(subscriptionRepository.findUserIdsByInterestId(interestId)).willReturn(receiverIds);
+            given(userRepository.findById(user1Id)).willReturn(Optional.of(user1));
+            given(userRepository.findById(user2Id)).willReturn(Optional.of(user2));
             given(interestRepository.findById(interestId)).willReturn(Optional.of(interest));
             given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
-
-            InterestArticleRegisteredEvent event = new InterestArticleRegisteredEvent(interestId, articleId, userId);
-
-            // 알림 객체 생성
-            Notification notification = Notification.builder()
-                    .user(user)
-                    .resourceType(ResourceType.INTEREST)
-                    .resourceId(interest.getId())
-                    .confirmed(false)
-                    .content("[관심사] 와 관련된 기사가 1건 등록되었습니다.")
-                    .build();
 
             //when
             notificationService.notifyInterestArticleRegistered(event);
 
             //then
-            verify(notificationRepository).save(any(Notification.class));
+            verify(notificationRepository, times(2)).save(any(Notification.class));
         }
 
         @Test
@@ -101,14 +105,13 @@ public class NotificationServiceTest {
             // given
             Interest interest = TestInterestFactory.createInterest();
             Article article = TestArticleFactory.createArticle();
-
             UUID interestId = interest.getId();
             UUID articleId = article.getId();
             UUID nonExistentUserId = UUID.randomUUID();
 
             InterestArticleRegisteredEvent event = new InterestArticleRegisteredEvent(
-                    interestId, articleId, nonExistentUserId);
-
+                    interestId, articleId);
+            given(subscriptionRepository.findUserIdsByInterestId(interestId)).willReturn(List.of(nonExistentUserId));
             given(interestRepository.findById(interestId)).willReturn(Optional.of(interest));
             given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
             given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
@@ -185,21 +188,22 @@ public class NotificationServiceTest {
             User user = TestUserFactory.createUser();
             UUID userId = UUID.randomUUID();
             LocalDateTime now = LocalDateTime.now();
+            int size = 10;
 
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(slice);
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, pageable);
+            notificationService.getAllNotifications(userId,now, size);
 
             // then
-            verify(notificationRepository).findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable);
+            verify(notificationRepository).findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable);
         }
 
         @Test
@@ -208,15 +212,16 @@ public class NotificationServiceTest {
             // given
             User user = TestUserFactory.createUser();
             UUID userId = UUID.randomUUID();
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            int size = 10;
+            Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
             LocalDateTime now = LocalDateTime.now();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, pageable);
+            var result = notificationService.getAllNotifications(userId,now, size);
 
             // then
             assertThat(result.content()).isEmpty();
@@ -233,24 +238,22 @@ public class NotificationServiceTest {
             // given
             User user = TestUserFactory.createUser();
             UUID userId = user.getId();
-            LocalDateTime now = LocalDateTime.now();
 
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
             Notification n1 = TestNotificationFactory.createNotification(ResourceType.COMMENT, UUID.randomUUID(),"[테스트1] 님이 나의 댓글을 좋아합니다.");
             Notification n2 = TestNotificationFactory.createNotification(ResourceType.INTEREST, UUID.randomUUID(),"[테스트] 와 관련된 기사가 1건 등록되었습니다.");
             List<Notification> notifications = List.of(n1, n2);
-            Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, now, pageable))
-                    .willReturn(slice);
+            given(notificationRepository.findAllByUserIdAndConfirmedIsFalse(userId))
+                    .willReturn(notifications);
 
             // when
-            notificationService.confirmAllNotifications(userId, now, pageable);
+            notificationService.confirmAllNotifications(userId);
 
             //then
             assertThat(n1.isConfirmed()).isTrue();
             assertThat(n2.isConfirmed()).isTrue();
-            verify(notificationRepository).saveAll(slice.getContent());
+            verify(notificationRepository).saveAll(notifications);
         }
 
         @Test
@@ -259,12 +262,13 @@ public class NotificationServiceTest {
             // given
             UUID nonExistentUserId = UUID.randomUUID();
             LocalDateTime now = LocalDateTime.now();
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+            int size = 10;
+            Pageable pageable = PageRequest.of(0, size  , Sort.by("createdAt").descending());
             given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
 
             // when & then
             assertThrows(UserNotFoundException.class, () -> {
-                notificationService.confirmAllNotifications(nonExistentUserId, now, pageable);
+                notificationService.confirmAllNotifications(nonExistentUserId);
             });
         }
 

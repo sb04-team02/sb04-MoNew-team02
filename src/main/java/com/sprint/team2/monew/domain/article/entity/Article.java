@@ -15,8 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Article extends DeletableEntity {
+    @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false, length = 30)
-    private String source;
+    private ArticleSource source;
 
     @Column(name = "source_url", unique = true, nullable = false, length = 255)
     private String sourceUrl;

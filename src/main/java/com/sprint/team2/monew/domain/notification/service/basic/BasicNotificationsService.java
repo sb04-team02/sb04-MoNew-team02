@@ -16,6 +16,7 @@ import com.sprint.team2.monew.domain.notification.exception.NotificationNotFound
 import com.sprint.team2.monew.domain.notification.mapper.NotificationMapper;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.notification.service.NotificationService;
+import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
@@ -45,6 +46,7 @@ public class BasicNotificationsService implements NotificationService {
     private final InterestRepository interestRepository;
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final NotificationMapper notificationMapper;
 
     @Override
@@ -54,8 +56,7 @@ public class BasicNotificationsService implements NotificationService {
 
         UUID interestId = event.interestId();
         UUID articleId = event.articleId();
-        UUID receiverId = event.receiverId();
-
+        List<UUID> receiverIds = subscriptionRepository.findUserIdsByInterestId(interestId);
         Interest interest = interestRepository.findById(interestId)
                 .orElseThrow(() -> {
                     log.warn("[알림] 이벤트 발행 실패 - 관심사 ID={}에 해당하는 관심사를 찾을 수 없음", interestId);
@@ -68,23 +69,25 @@ public class BasicNotificationsService implements NotificationService {
                     return new EntityNotFoundException("커스텀 예외로 대체 예정");
                 });
 
-        User user = userRepository.findById(receiverId)
-                .orElseThrow(() -> {
-                    log.warn("[알림] 알림 발신 실패 - 사용자가 존재하지 않음 사용자 ID={}", receiverId);
-                    return UserNotFoundException.withId(receiverId);
-                });
+        for (UUID receiverId : receiverIds) {
+            User user = userRepository.findById(receiverId)
+                    .orElseThrow(() -> {
+                        log.warn("[알림] 알림 발신 실패 - 사용자 없음 / 사용자 ID={}", receiverId);
+                        return UserNotFoundException.withId(receiverId);
+                    });
 
-        String content = String.format("[%s]와 관련된 기사가 1건 등록되었습니다.", interest.getName());
+            String content = String.format("[%s]와 관련된 기사가 1건 등록되었습니다.", interest.getName());
 
-        Notification notification = Notification.builder()
-                .user(user)
-                .resourceId(interest.getId())
-                .resourceType(ResourceType.INTEREST)
-                .content(content)
-                .confirmed(false)
-                .build();
-        notificationRepository.save(notification);
-        log.info("[알림] 구독 키워드에 대한 기사 등록 알림 저장 완료 - 기사 ID={}, 수신자 ID={}", articleId, receiverId);
+            Notification notification = Notification.builder()
+                    .user(user)
+                    .resourceId(interest.getId())
+                    .resourceType(ResourceType.INTEREST)
+                    .content(content)
+                    .confirmed(false)
+                    .build();
+            notificationRepository.save(notification);
+            log.info("[알림] 구독 키워드에 대한 기사 등록 알림 저장 완료 - 기사 ID={}, 수신자 ID={}", articleId, receiverId);
+        }
     }
 
     @Override
@@ -146,7 +149,7 @@ public class BasicNotificationsService implements NotificationService {
     }
 
     @Override
-    public void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
+    public void confirmAllNotifications(UUID userId) {
         log.info("[알림] 알림 확인 여부 전건 수정 시작 / 사용자 ID={}", userId);
 
         User user = userRepository.findById(userId)
@@ -154,22 +157,17 @@ public class BasicNotificationsService implements NotificationService {
                     log.warn("[알림] 알림 전건 수정 실패 - 사용자가 존재하지 않음 / 사용자 ID={}", userId);
                     return UserNotFoundException.withId(userId);
                 });
+        List<Notification> notifications = notificationRepository.findAllByUserIdAndConfirmedIsFalse(userId);
+        notifications.forEach(notification -> notification.setConfirmed(true));
 
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(),Sort.by("createdAt").descending());
-        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(
-                userId, nextAfter, pageRequest);
-        slice.forEach(notification -> notification.setConfirmed(true));
-
-        notificationRepository.saveAll(slice.getContent());
-        log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", slice.getContent().size());
+        notificationRepository.saveAll(notifications);
+        log.info("[알림] 알림 확인 여부 전건 수정 완료 / 수정 건수={}", notifications.size());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable) {
+    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
         log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);
-        log.info("[알림] 요청 파라미터 - nextAfter={}, pageSize={}, pageNumber={}",
-                nextAfter, pageable.getPageSize(), pageable.getPageNumber());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -177,8 +175,8 @@ public class BasicNotificationsService implements NotificationService {
                     return UserNotFoundException.withId(userId);
                 });
         //Pageable 설정
-        Pageable pageableRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
-        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseAndOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
+        Pageable pageableRequest = PageRequest.of(0, size, Sort.by("createdAt").descending());
+        Slice<Notification> slice = notificationRepository.findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
 
         List<Notification> notifications = slice.getContent();
 
@@ -202,7 +200,7 @@ public class BasicNotificationsService implements NotificationService {
                 content,
                 nextCursor,
                 nextAfter,
-                pageable.getPageSize(),
+                size,
                 totalElements,
                 slice.hasNext()
         );

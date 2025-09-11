@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum NotificationErrorCode implements ErrorCode {
-    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Notification not found");
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Notification not found"),
+    INVALID_FORMAT(HttpStatus.BAD_REQUEST.value(), "Invalid format");
 
     private int status;
     private String message;

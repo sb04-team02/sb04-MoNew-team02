@@ -17,9 +17,9 @@ public interface NotificationService {
 
     void confirmNotification( UUID userId, UUID notificationId);
 
-    void confirmAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable);
+    void confirmAllNotifications(UUID userId);
 
-    CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, Pageable pageable);
+    CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size);
 
     void deleteConfirmedNotifications();
 }
