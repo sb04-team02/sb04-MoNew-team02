@@ -14,6 +14,9 @@ import com.sprint.team2.monew.domain.notification.event.CommentLikedEvent;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeCancelEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,9 +42,6 @@ public class BasicReactionService implements ReactionService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    // User Activity 이벤트
-    private final ApplicationEventPublisher publisher;
 
 
     @Override
@@ -87,6 +87,21 @@ public class BasicReactionService implements ReactionService {
 
             CommentLikeDto dto = reactionMapper.toDto(reaction, newLikeCount);
             log.info("댓글 좋아요 성공: reactionId={}, commentId={}, likedBy={}", dto.id(), dto.commentId(), dto.likedBy());
+
+            // User Activity 이벤트
+            applicationEventPublisher.publishEvent(new CommentLikeAddEvent(
+                reaction.getId(),
+                reaction.getCreatedAt(),
+                comment.getId(),
+                comment.getArticle().getId(),
+                comment.getArticle().getTitle(),
+                user.getId(),
+                user.getNickname(),
+                comment.getContent(),
+                comment.getLikeCount(),
+                comment.getCreatedAt()
+            ));
+
             return dto;
         } catch (DataIntegrityViolationException e) {
             // 유니크 제약(동시 더블클릭 등) 최종 방어
@@ -124,6 +139,13 @@ public class BasicReactionService implements ReactionService {
                 log.warn("decrementLikeCount 미적용(이미 0이었을 가능성): commentId={}", comment.getId());
             }
             log.info("댓글 좋아요 취소 성공: userId={}, commentId={}", user.getId(), comment.getId());
+
+            // User Activity 이벤트
+            applicationEventPublisher.publishEvent(new CommentLikeCancelEvent(
+                comment.getId(),
+                user.getId()
+            ));
+
         } else {
             log.info("좋아요 취소: 기존 Reaction 없음 -> 멱등 처리 userId={}, commentId={}", user.getId(), comment.getId());
         }

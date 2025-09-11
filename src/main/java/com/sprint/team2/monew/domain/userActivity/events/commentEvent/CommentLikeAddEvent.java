@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 public record CommentLikeAddEvent (
-  UUID id,
+  UUID id, // reaction Id (좋아요 id)
   LocalDateTime createdAt,
   UUID commentId,
   UUID articleId,

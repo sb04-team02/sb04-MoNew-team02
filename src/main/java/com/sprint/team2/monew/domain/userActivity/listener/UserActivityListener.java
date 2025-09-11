@@ -169,8 +169,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentAdd(CommentAddEvent event) {
-    UUID userId = event.userId();
     UUID commentId = event.id();
+    UUID userId = event.userId();
     CommentActivityDto commentActivityDto = userActivityMapper.toCommentActivityDto(event);
 
     log.info("[사용자 활동] 댓글 추가 시작 - commentId = {}",commentId);
@@ -209,8 +209,8 @@ public class UserActivityListener {
       }
     }
     if (indexUpdate != -1) {
-      CommentActivityDto commentActivityDto = userActivityMapper.toCommentActivityDto(event);
-      comments.set(indexUpdate, commentActivityDto);
+      CommentActivityDto newCommentActivityDto = userActivityMapper.toCommentActivityDto(event);
+      comments.set(indexUpdate, newCommentActivityDto);
     } else {
       log.warn("[사용자 활동] 수정할 댓글 Id {}를 최근 활동 내역에서 찾지 못했습니다.", commentId);
     }
@@ -249,7 +249,7 @@ public class UserActivityListener {
     UUID commentUserId = event.commentUserId();
     CommentActivityLikeDto commentActivityLikeDto = userActivityMapper.toCommentActivityLikeDto(event);
 
-    log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId = {}",commentId);
+    log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId,  = {}",commentId);
 
     UserActivity userActivity = userActivityRepository.findById(commentUserId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(commentUserId));
