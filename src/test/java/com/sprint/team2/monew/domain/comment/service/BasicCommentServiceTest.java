@@ -1,11 +1,14 @@
 package com.sprint.team2.monew.domain.comment.service;
 
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
+import com.sprint.team2.monew.domain.comment.dto.response.CursorPageResponseCommentDto;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
+import com.sprint.team2.monew.domain.comment.entity.CommentSortType;
 import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
 import com.sprint.team2.monew.domain.comment.exception.CommentForbiddenException;
 import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
@@ -23,12 +26,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,6 +60,9 @@ public class BasicCommentServiceTest {
     private NotificationRepository notificationRepository;
     @Mock
     private CommentMapper commentMapper;
+
+    @Captor
+    ArgumentCaptor<PageRequest> pageRequestCaptor;
 
     @InjectMocks
     private BasicCommentService commentService;
@@ -413,6 +423,263 @@ public class BasicCommentServiceTest {
         then(reactionRepository).shouldHaveNoInteractions();
         then(notificationRepository).shouldHaveNoInteractions();
         then(commentRepository).shouldHaveNoMoreInteractions();
+    }
+
+    // ===== ArticleComment List =====
+    @Test
+    @DisplayName("DATE 정렬(내림차순) 성공: nextCursor=마지막 createdAt, likedByMe 반영")
+    void getAllArticleCommentWithDateSortSuccess() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        UUID requesterId = UUID.randomUUID();
+        int size = 3;
+        boolean asc = false;
+
+        LocalDateTime t3 = LocalDateTime.parse("2025-09-10T10:10:00");
+
+        Comment c1 = mock(Comment.class);
+        Comment c2 = mock(Comment.class);
+        Comment c3 = mock(Comment.class);
+
+        UUID c1Id = UUID.randomUUID();
+        UUID c2Id = UUID.randomUUID();
+        UUID c3Id = UUID.randomUUID();
+
+        given(c1.getId()).willReturn(c1Id);
+        given(c2.getId()).willReturn(c2Id);
+        given(c3.getId()).willReturn(c3Id);
+
+        given(c3.getCreatedAt()).willReturn(t3);
+
+        given(articleRepository.existsById(articleId)).willReturn(true);
+
+        Slice<Comment> slice = new SliceImpl<>(
+                List.of(c1, c2, c3),
+                PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
+                true // hasNext
+        );
+        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(asc), any(PageRequest.class)))
+                .willReturn(slice);
+
+        // likedByMe: true, false, true
+        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c1Id)).willReturn(true);
+        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c2Id)).willReturn(false);
+        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c3Id)).willReturn(true);
+
+        CommentDto dto1 = mock(CommentDto.class);
+        CommentDto dto2 = mock(CommentDto.class);
+        CommentDto dto3 = mock(CommentDto.class);
+
+        given(commentMapper.toDto(c1, true)).willReturn(dto1);
+        given(commentMapper.toDto(c2, false)).willReturn(dto2);
+        given(commentMapper.toDto(c3, true)).willReturn(dto3);
+
+        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(42L);
+
+        //when
+        CursorPageResponseCommentDto result = commentService.getAllArticleComment(
+                articleId, requesterId, null, size, null, asc);
+
+        //then
+        assertThat(result).isNotNull();
+        assertThat(result.content()).containsExactly(dto1, dto2, dto3);
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.totalElements()).isEqualTo(42L);
+        assertThat(result.nextCursor()).isEqualTo(t3.toString());
+
+        then(articleRepository).should().existsById(articleId);
+        then(commentRepository).should()
+                .findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class));
+        then(reactionRepository).should(times(3))
+                .existsByUserIdAndCommentId(eq(requesterId), any(UUID.class));
+        then(commentMapper).should().toDto(c1, true);
+        then(commentMapper).should().toDto(c2, false);
+        then(commentMapper).should().toDto(c3, true);
+        then(commentRepository).should().countByArticleIdAndNotDeleted(articleId);
+        then(commentRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("LIKE_COUNT 정렬(내림차순) 성공")
+    void getAllArticleCommentWithLikeCountSortSuccess() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        UUID requesterId = UUID.randomUUID();
+        int size = 2;
+        boolean asc = false;
+
+        LocalDateTime t1 = LocalDateTime.parse("2025-09-10T09:00:00");
+        LocalDateTime t2 = LocalDateTime.parse("2025-09-10T09:01:00");
+
+        Comment a = mock(Comment.class);
+        Comment b = mock(Comment.class);
+
+        UUID aId = UUID.randomUUID();
+        UUID bId = UUID.randomUUID();
+
+        given(a.getId()).willReturn(aId);
+        given(b.getId()).willReturn(bId);
+
+        given(b.getCreatedAt()).willReturn(t2);
+
+        given(b.getLikeCount()).willReturn(10L); // 동률 → createdAt 보조 정렬
+
+        given(articleRepository.existsById(articleId)).willReturn(true);
+
+        Slice<Comment> slice = new SliceImpl<>(
+                List.of(a, b),
+                PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "likeCount")
+                        .and(Sort.by(Sort.Direction.DESC, "createdAt"))),
+                true
+        );
+        given(commentRepository.findByArticleIdWithLikeCountCursor(
+                eq(articleId), isNull(), isNull(), eq(asc), any(PageRequest.class)))
+                .willReturn(slice);
+
+        given(reactionRepository.existsByUserIdAndCommentId(requesterId, aId)).willReturn(false);
+        given(reactionRepository.existsByUserIdAndCommentId(requesterId, bId)).willReturn(true);
+
+        CommentDto dtoA = mock(CommentDto.class);
+        CommentDto dtoB = mock(CommentDto.class);
+
+        given(commentMapper.toDto(a, false)).willReturn(dtoA);
+        given(commentMapper.toDto(b, true)).willReturn(dtoB);
+
+        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(7L);
+
+        //when
+        CursorPageResponseCommentDto result = commentService.getAllArticleComment(
+                articleId, requesterId, null, size, CommentSortType.LIKE_COUNT, asc);
+
+        //then
+        assertThat(result.content()).containsExactly(dtoA, dtoB);
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.totalElements()).isEqualTo(7L);
+        assertThat(result.nextCursor()).isEqualTo("10|" + t2);
+
+        then(commentRepository).should().findByArticleIdWithLikeCountCursor(
+                eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class));
+    }
+
+    @Test
+    @DisplayName("requesterUserId가 null이면 likedByMe 조회 호출 안 함")
+    void requesterNullShouldNotQueryLikedByMe() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        int size = 2;
+
+        Comment c1 = mock(Comment.class);
+        Comment c2 = mock(Comment.class);
+
+        UUID c1Id = UUID.randomUUID();
+        UUID c2Id = UUID.randomUUID();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        given(articleRepository.existsById(articleId)).willReturn(true);
+
+        Slice<Comment> slice = new SliceImpl<>(
+                List.of(c1, c2),
+                PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
+                false
+        );
+        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+                .willReturn(slice);
+
+        CommentDto dto1 = mock(CommentDto.class);
+        CommentDto dto2 = mock(CommentDto.class);
+        given(commentMapper.toDto(eq(c1), anyBoolean())).willReturn(dto1);
+        given(commentMapper.toDto(eq(c2), anyBoolean())).willReturn(dto2);
+
+        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(2L);
+
+        //when
+        CursorPageResponseCommentDto result = commentService.getAllArticleComment(
+                articleId, null, null, size, CommentSortType.DATE, false);
+
+        //then
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.nextCursor()).isNull();
+        assertThat(result.content()).containsExactly(dto1, dto2);
+
+        then(reactionRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("잘못된 커서 포맷(DATE): IllegalArgumentException")
+    void invalidCursorDateSortThrowsIllegalArgument() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        given(articleRepository.existsById(articleId)).willReturn(true);
+        String badCursor = "NOT_A_DATE";
+
+        //when + then
+        assertThatThrownBy(() ->
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, CommentSortType.DATE, false)
+        ).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("잘못된 커서 형식");
+
+        then(commentRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("잘못된 커서 포맷(LIKE_COUNT): IllegalArgumentException")
+    void invalidCursorLikeCountSortThrowsIllegalArgument() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        given(articleRepository.existsById(articleId)).willReturn(true);
+        String badCursor = "notNumber|notDate";
+
+        //when + then
+        assertThatThrownBy(() ->
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, CommentSortType.LIKE_COUNT, false)
+        ).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("잘못된 커서 형식");
+
+        then(commentRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("기사 없음: ArticleNotFoundException")
+    void articleNotFoundThrowsException() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        given(articleRepository.existsById(articleId)).willReturn(false);
+
+        //when + then
+        assertThatThrownBy(() ->
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, 10, CommentSortType.DATE, false)
+        ).isInstanceOf(ArticleNotFoundException.class);
+
+        then(commentRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("size 보정(0 또는 100 초과 → 20) 및 Pageable 반영 확인")
+    void sizeNormalizationAndPageableVerification() {
+        //given
+        UUID articleId = UUID.randomUUID();
+        given(articleRepository.existsById(articleId)).willReturn(true);
+
+        int requestedSize = 0; // → 20으로 보정
+        Slice<Comment> emptySlice = new SliceImpl<>(
+                List.of(),
+                PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt")),
+                false
+        );
+
+        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+                .willReturn(emptySlice);
+        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(0L);
+
+        //when
+        commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, requestedSize, CommentSortType.DATE, false);
+
+        //then
+        then(commentRepository).should().findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), pageRequestCaptor.capture());
+        PageRequest pr = pageRequestCaptor.getValue();
+        assertThat(pr.getPageSize()).isEqualTo(20);
+        assertThat(pr.getSort()).isEqualTo(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     // ===== 유틸: DeletableEntity의 id 주입/조회 =====

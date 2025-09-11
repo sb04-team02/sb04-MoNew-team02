@@ -4,20 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.comment.dto.CommentDto;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentRegisterRequest;
 import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
+import com.sprint.team2.monew.domain.comment.dto.response.CursorPageResponseCommentDto;
+import com.sprint.team2.monew.domain.comment.entity.CommentSortType;
 import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
 import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
+import com.sprint.team2.monew.global.error.GlobalExceptionHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CommentController.class)
+@Import(GlobalExceptionHandler.class)
 public class CommentControllerTest {
 
     @Autowired
@@ -269,6 +273,91 @@ public class CommentControllerTest {
                 .andExpect(status().isInternalServerError());
 
         then(commentService).should().hardDeleteComment(commentId, requesterUserId);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    // ===== ArticleComment List =====
+    @Test
+    @DisplayName("댓글 목록 조회 성공(200) - orderBy=likeCount, direction=DESC")
+    void getCommentsOkLikeCountDesc() throws Exception {
+        //given
+        UUID articleId = UUID.randomUUID();
+        UUID requesterId = UUID.randomUUID();
+        String cursor = "10|2025-09-10T12:34:56";
+        int limit = 2;
+
+        CursorPageResponseCommentDto body = new CursorPageResponseCommentDto(
+                List.of(mock(CommentDto.class)),
+                cursor,
+                LocalDateTime.parse("2025-09-10T12:34:56"),
+                limit,
+                1L,
+                true
+        );
+
+        given(commentService.getAllArticleComment(
+                eq(articleId), eq(requesterId), eq(cursor), eq(limit),
+                eq(CommentSortType.LIKE_COUNT), eq(false))
+        ).willReturn(body);
+
+        //when + then
+        mockMvc.perform(get("/api/comments")
+                        .param("articleId", articleId.toString())
+                        .param("orderBy", "likeCount")
+                        .param("direction", "DESC")
+                        .param("cursor", cursor)
+                        .param("limit", String.valueOf(limit))
+                        .header("Monew-Request-User-ID", requesterId.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        then(commentService).should().getAllArticleComment(
+                articleId, requesterId, cursor, limit, CommentSortType.LIKE_COUNT, false);
+        then(commentService).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @DisplayName("잘못된 요청(400) - 필수 파라미터(articleId) 누락")
+    void getCommentsBadRequestMissingArticleId() throws Exception {
+        //given
+        UUID requesterId = UUID.randomUUID();
+
+        //when + then
+        mockMvc.perform(get("/api/comments")
+                        .param("orderBy", "date")
+                        .param("direction", "ASC")
+                        .header("Monew-Request-User-ID", requesterId.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        then(commentService).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("서버 오류(500) - 서비스 예외 전파")
+    void getCommentsInternalServerErrorServiceException() throws Exception {
+        //given
+        UUID articleId = UUID.randomUUID();
+        UUID requesterId = UUID.randomUUID();
+        int limit = 20;
+
+        given(commentService.getAllArticleComment(
+                eq(articleId), eq(requesterId), isNull(), eq(limit),
+                eq(CommentSortType.DATE), eq(true))
+        ).willThrow(new RuntimeException("unexpected"));
+
+        //when + then
+        mockMvc.perform(get("/api/comments")
+                        .param("articleId", articleId.toString())
+                        .param("orderBy", "date")
+                        .param("direction", "ASC") // ASC → asc=true
+                        .param("limit", String.valueOf(limit))
+                        .header("Monew-Request-User-ID", requesterId.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+
+        then(commentService).should().getAllArticleComment(
+                articleId, requesterId, null, limit, CommentSortType.DATE, true);
         then(commentService).shouldHaveNoMoreInteractions();
     }
 }
