@@ -55,4 +55,33 @@ class ArticleControllerTest {
 
         verify(articleService, times(1)).softDelete(invalidId);
     }
+
+    @Test
+    @DisplayName("뉴스 기사 물리 삭제 성공")
+    void hardDeleteSuccess() throws Exception {
+        // given
+        UUID articleId = UUID.randomUUID();
+        doNothing().when(articleService).hardDelete(articleId);
+
+        // when & then
+        mockMvc.perform(delete("/api/articles/{articleId}/hard", articleId))
+                .andExpect(status().isNoContent());
+
+        verify(articleService, times(1)).hardDelete(articleId);
+    }
+
+    @Test
+    @DisplayName("뉴스 기사 물리 삭제 실패 존재하지 않은 id")
+    void hardDeleteFailWhenNotFound() throws Exception {
+        // given
+        UUID invalidId = UUID.randomUUID();
+
+        doThrow(ArticleNotFoundException.withId(invalidId)).when(articleService).hardDelete(invalidId);
+
+        // when & then
+        mockMvc.perform(delete("/api/articles/{articleId}/hard", invalidId))
+                .andExpect(status().isNotFound());
+
+        verify(articleService, times(1)).hardDelete(invalidId);
+    }
 }

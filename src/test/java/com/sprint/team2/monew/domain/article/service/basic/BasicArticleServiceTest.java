@@ -9,6 +9,7 @@ import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,8 @@ class BasicArticleServiceTest {
     private ArticleRepository articleRepository;
     @Mock
     private ArticleMapper articleMapper;
+    @Mock
+    private UserActivityRepositoryCustom userActivityRepositoryCustom;
 
     @InjectMocks
     private BasicArticleService basicArticleService;
@@ -112,5 +115,31 @@ class BasicArticleServiceTest {
         // then
         assertThat(article.getDeletedAt()).isNotNull();
         verify(articleRepository, times(1)).findById(articleId);
+    }
+
+    @Test
+    @DisplayName("물리 삭제 성공")
+    void hardDeleteSuccess() {
+        // given
+        UUID articleId = UUID.randomUUID();
+        Article article = Article.builder()
+                .title("Article 1 title")
+                .summary("Article 1 summary")
+                .source(ArticleSource.NAVER)
+                .sourceUrl("https://article1.com")
+                .publishDate(LocalDateTime.now().minusDays(1))
+                .commentCount(5)
+                .viewCount(10)
+                .build();
+
+        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+
+        // when
+        basicArticleService.hardDelete(articleId);
+
+        // then
+        verify(articleRepository, times(1)).findById(articleId);
+        verify(articleRepository, times(1)).delete(article);
+        verify(userActivityRepositoryCustom, times(1)).deleteByArticleId(articleId);
     }
 }
