@@ -4,8 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,21 +34,28 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public void handleValidationExceptions(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
         Map<String, Object> details = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(fieldError -> {
             String fieldName = fieldError.getField();
-            String errorMessage = fieldError.getDefaultMessage();
-            details.put(fieldName, errorMessage);
+            Object rejectedValue = fieldError.getRejectedValue();
+            details.put(fieldName, rejectedValue);
         });
 
-        throw new DomainException(details);
+        DomainException domainException = new DomainException(details);
+        log.error("요청 유효성 커스텀 예외 발생: code={}, message={}", domainException.getErrorCode(), domainException.getMessage(), domainException);
+
+        return ResponseEntity.status(domainException.getStatus())
+                .body(new ErrorResponse(domainException));
     }
 
-    @ExceptionHandler(DomainException.class)
-    public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
-        log.error("요청 유효성 커스텀 예외 발생: code={}, message={}", e.getErrorCode(), e.getMessage(), e);
-        return ResponseEntity.status(e.getStatus())
-                .body(new ErrorResponse(e));
+    // 필수 쿼리 파라미터 누락 → 400
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException e) {
+        Map<String, Object> details = new HashMap<>();
+        details.put("param", e.getParameterName());
+        details.put("expectedType", e.getParameterType());
+        details.put("reason", e.getMessage());
+        return ResponseEntity.badRequest().body(new ErrorResponse(new DomainException(details)));
     }
 }

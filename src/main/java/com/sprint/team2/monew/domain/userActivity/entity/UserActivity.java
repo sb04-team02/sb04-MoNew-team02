@@ -27,6 +27,7 @@ public class UserActivity {
   private String email;
   private String nickname;
   private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
   private List<SubscriptionDto> subscriptions;
   private List<CommentActivityDto> comments;
