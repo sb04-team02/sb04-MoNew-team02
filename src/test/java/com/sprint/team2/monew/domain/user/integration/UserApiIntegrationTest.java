@@ -53,13 +53,6 @@ class UserApiIntegrationTest {
         String nickname = "registerTest";
         String password = "test1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-        String requestBody = objectMapper.writeValueAsString(registerRequest);
-
         // when & then
         // 사용자 생성 성공
         registerUser(email, nickname, password);
@@ -87,11 +80,10 @@ class UserApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(BaseErrorCode.INVALID_INPUT_VALUE)))
+                .andExpect(jsonPath("$.code", is(BaseErrorCode.INVALID_INPUT_VALUE.toString())))
                 .andExpect(jsonPath("$.details.email").value(invalidEmail))
                 .andExpect(jsonPath("$.details.nickname").value(invalidNickname))
                 .andExpect(jsonPath("$.details.password").value(invalidPassword));
-
     }
 
     @Test
@@ -119,8 +111,8 @@ class UserApiIntegrationTest {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(duplicateUserRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(UserErrorCode.EMAIL_ALREADY_EXISTS)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code", is(UserErrorCode.EMAIL_ALREADY_EXISTS.toString())))
                 .andExpect(jsonPath("$.details.email").value(containsString(duplicatedEmail)));
     }
 
@@ -472,7 +464,7 @@ class UserApiIntegrationTest {
 
         // 사용자 물리적 삭제 실패 - 대상자를 물리적으로 삭제할 권한이 시도자에게 없음 (ID가 다름)
         mockMvc.perform(delete("/api/users/{userId}/hard", userId)
-                .header("Monew-Request-User-ID", loginUserId))
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE))
                 .andExpect(jsonPath("$.details.userId").value(userId))
@@ -500,7 +492,7 @@ class UserApiIntegrationTest {
 
         // 사용자 물리적 삭제 실패 - 사용자 정보 없음
         mockMvc.perform(delete("/api/users/{userId}/hard", userId)
-                .header("Monew-Request-User-ID", loginUserId))
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
                 .andExpect(jsonPath("$.details.userId").value(userId));
@@ -526,11 +518,11 @@ class UserApiIntegrationTest {
                 .andReturn();
 
         String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID id = JsonPath.parse(registerResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(registerResponse).read("$.createdAt", LocalDateTime.class);
+        String id = JsonPath.parse(registerResponse).read("$.id");
+        String createdAt = JsonPath.parse(registerResponse).read("$.createdAt");
         Map<String, String> registerResultMap = new HashMap<>();
-        registerResultMap.put("id", id.toString());
-        registerResultMap.put("createdAt", createdAt.toString());
+        registerResultMap.put("id", id);
+        registerResultMap.put("createdAt", createdAt);
         return registerResultMap;
     }
 
@@ -551,11 +543,11 @@ class UserApiIntegrationTest {
                 .andReturn();
 
         String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID id = JsonPath.parse(loginResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(loginResponse).read("$.createdAt", LocalDateTime.class);
+        String id = JsonPath.parse(loginResponse).read("$.id");
+        String createdAt = JsonPath.parse(loginResponse).read("$.createdAt");
         Map<String, String> loginResultMap = new HashMap<>();
-        loginResultMap.put("id", id.toString());
-        loginResultMap.put("createdAt", createdAt.toString());
+        loginResultMap.put("id", id);
+        loginResultMap.put("createdAt", createdAt);
         return loginResultMap;
     }
 
