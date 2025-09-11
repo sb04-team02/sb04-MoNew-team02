@@ -17,7 +17,6 @@ public enum ArticleErrorCode implements ErrorCode {
 
     // 뉴스 기사 복구
     S3_ACCESS_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "S3 백업 파일 접근에 실패했습니다.");
-    ;
 
     private final int status;
     private final String message;
