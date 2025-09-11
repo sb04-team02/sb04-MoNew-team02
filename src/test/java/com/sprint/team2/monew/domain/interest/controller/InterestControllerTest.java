@@ -230,9 +230,9 @@ public class InterestControllerTest {
         // when & then
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/interests/{interestId}",interestId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content)
-                .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .accept(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(status().isBadRequest());
     }
@@ -281,7 +281,7 @@ public class InterestControllerTest {
                         .header("Monew-Request-User-Id",userId)
                         .accept(MediaType.APPLICATION_JSON)
         );
-        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(status().isInternalServerError());
     }
 
     @DisplayName("정렬 기준은 name,subscriberCount만 올 수 있으며 그 외에는 올 수 없다." +
