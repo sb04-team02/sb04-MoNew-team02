@@ -1,11 +1,13 @@
 package com.sprint.team2.monew.domain.article.entity;
 
 import com.sprint.team2.monew.domain.base.DeletableEntity;
+import com.sprint.team2.monew.domain.comment.entity.Comment;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "articles")
@@ -15,8 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Article extends DeletableEntity {
+    @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false, length = 30)
-    private String source;
+    private ArticleSource source;
 
     @Column(name = "source_url", unique = true, nullable = false, length = 255)
     private String sourceUrl;
@@ -41,4 +44,7 @@ public class Article extends DeletableEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "interest_id")
     private Interest interest;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 }

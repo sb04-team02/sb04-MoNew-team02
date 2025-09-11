@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface ArticleRepository extends JpaRepository<Article, UUID> {
 
-    boolean existsBySourceUrl(String sourceUrl);
+    boolean existsBySourceUrlAndDeletedAtIsNull(String sourceUrl);
 }

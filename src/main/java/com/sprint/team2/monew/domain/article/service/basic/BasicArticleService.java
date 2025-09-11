@@ -1,13 +1,15 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.entity.QArticle;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
+import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
+import com.sprint.team2.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
 import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
@@ -17,8 +19,8 @@ import com.sprint.team2.monew.domain.article.service.ArticleService;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,8 +43,11 @@ public class BasicArticleService implements ArticleService {
     private final NaverApiCollector naverApiCollector;
 
     private final InterestRepository interestRepository;
-    private final JPAQueryFactory jpaQueryFactory;
+  
     private final ApplicationEventPublisher applicationEventPublisher;
+
+
+    private final UserActivityRepositoryCustom userActivityRepositoryCustom;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -59,29 +64,37 @@ public class BasicArticleService implements ArticleService {
             }
 
             for (ArticleDto dto : articles) {
-                if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
+                if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
                     try {
                         articleRepository.save(articleEntity);
+                        log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
+                                dto.source(), keyword, dto.title(), dto.sourceUrl());
+
                         applicationEventPublisher.publishEvent(new InterestArticleRegisteredEvent(
                                 interestId,
                                 articleEntity.getId()
                         ));
+
                     } catch (Exception e) {
-                        log.error("[Article] 뉴스 기사 저장 실패", e);
+                        log.error("[Article] {}에서 keyword({}) 저장 실패: {} - {}",
+                                dto.source(), keyword, dto.title(), dto.sourceUrl(), e);
                         throw ArticleSaveFailedException.articleSaveFailed();
                     }
+                } else {
+                    log.debug("[Article] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}",
+                            dto.source(), keyword, dto.title(), dto.sourceUrl());
                 }
-                log.info("[Article] keyword({})로 뉴스 수집 및 저장 성공", keyword);
             }
+            log.info("[Article] keyword({})로 뉴스 수집 완료, total = {}", keyword, articles.size());
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseArticleDto read(UUID userId, String orderBy, String direction, int limit,
+    public CursorPageResponseArticleDto read(UUID userId, ArticleOrderBy orderBy, ArticleDirection direction, int limit,
                                              String keyword,
-                                             UUID interestId, List<String> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
+                                             UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                              String cursor, LocalDateTime after) {
 
         if (limit <= 0) {
@@ -89,7 +102,9 @@ public class BasicArticleService implements ArticleService {
             throw InvalidParameterException.invalidParameter();
         }
 
-        if (!List.of("publishDate", "commentCount", "viewCount").contains(orderBy)) {
+        if (orderBy != ArticleOrderBy.publishDate &&
+                orderBy != ArticleOrderBy.commentCount &&
+                orderBy != ArticleOrderBy.viewCount) {
             log.error("[Article] 정렬 속성에는 publishDate, commentCount, viewCount만 가능, 정렬 속성 = {}", orderBy);
             throw InvalidParameterException.invalidParameter();
         }
@@ -105,46 +120,27 @@ public class BasicArticleService implements ArticleService {
             articles = articles.subList(0, limit);
         }
 
+        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCursor = {}",
+                userId, keyword, interestId, articles.size(), hasNext,
+                !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
+
         String nextCursor = null;
         LocalDateTime nextAfter = null;
 
         if (!articles.isEmpty()) {
             Article last = articles.get(articles.size() - 1);
             switch (orderBy) {
-                case "commentCount" -> {
-                    nextCursor = String.valueOf(last.getCommentCount());
-                    nextAfter = last.getCreatedAt();
-                }
-                case "viewCount" -> {
-                    nextCursor = String.valueOf(last.getViewCount());
-                    nextAfter = last.getCreatedAt();
-                }
-                default -> {
-                    nextCursor = last.getPublishDate().toString();
-                    nextAfter = last.getPublishDate();
-                }
+                case commentCount -> nextCursor = String.valueOf(last.getCommentCount());
+                case viewCount -> nextCursor = String.valueOf(last.getViewCount());
+                default -> nextCursor = last.getPublishDate().toString();
             }
+
+            nextAfter = last.getCreatedAt();
         }
 
-        QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (keyword != null && !keyword.isBlank()) {
-            builder.and(article.title.containsIgnoreCase(keyword)
-                    .or(article.summary.containsIgnoreCase(keyword)));
-        }
-        if (interestId != null) builder.and(article.interest.id.eq(interestId));
-        if (sourceIn != null && !sourceIn.isEmpty()) builder.and(article.source.in(sourceIn));
-        if (publishedDateFrom != null && publishedDateTo != null)
-            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
-
-        Long totalElementsResult = jpaQueryFactory
-                .select(article.count())
-                .from(article)
-                .where(builder)
-                .fetchOne();
-
-        long totalElements = (totalElementsResult != null) ? totalElementsResult : 0L;
+        long totalElements = articleRepositoryCustom.countArticles(
+                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
+        );
 
         return new CursorPageResponseArticleDto(
                 articles.stream().map(articleMapper::toArticleDto).toList(),
@@ -155,4 +151,31 @@ public class BasicArticleService implements ArticleService {
                 hasNext
         );
     }
+
+    @Override
+    public void softDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 논리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        article.setDeletedAt(LocalDateTime.now());
+        log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
+    }
+
+    @Override
+    public void hardDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 물리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        userActivityRepositoryCustom.deleteByArticleId(articleId);
+
+        articleRepository.delete(article);
+        log.info("[Article] 물리 삭제 성공");
+    }
+
 }

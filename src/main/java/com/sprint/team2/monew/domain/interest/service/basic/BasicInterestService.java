@@ -21,9 +21,14 @@ import com.sprint.team2.monew.domain.subscription.repository.SubscriptionReposit
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,26 +45,35 @@ public class BasicInterestService implements InterestService {
     private final UserRepository userRepository;
     private final SubscriptionMapper subscriptionMapper;
 
+    // User Activity 이벤트
+    private final ApplicationEventPublisher publisher;
+
     @Transactional(readOnly = true)
     @Override
     public CursorPageResponseInterestDto readAll(CursorPageRequestInterestDto pageRequestDto, UUID userId) {
         log.info("[관심사] 목록 조회 실행 userId = {}", userId);
-        Page<InterestQueryDto> pageQuery = interestRepository.findAllPage(pageRequestDto, userId);
+        Slice<InterestQueryDto> pageQuery = interestRepository.findAllPage(pageRequestDto, userId);
+
         if (pageQuery.getContent().isEmpty()) {
             return CursorPageResponseInterestDto.from(Page.empty(),null,null);
         }
+
         InterestQueryDto lastDto = pageQuery.getContent().get(pageQuery.getContent().size() - 1);
         String lastItemCursor = null;
+
         if ("name".equalsIgnoreCase(pageRequestDto.orderBy())){
             lastItemCursor = lastDto.name();
         } else {
             lastItemCursor = String.valueOf(lastDto.subscriberCount());
         }
+
         LocalDateTime lastItemAfter = lastDto.createdAt();
-        Page<InterestDto> page = pageQuery.map(interestMapper::toDto);
-        CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,lastItemAfter,lastItemCursor);
+        Slice<InterestDto> page = pageQuery.map(interestMapper::toDto);
+        Long totalElements = interestRepository.countTotalElements(pageRequestDto.keyword());
+        CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,lastItemCursor,lastItemAfter,totalElements);
         log.info("[관심사] 목록 조회 완료 userId = {}, 검색어 = {}, 결과수 = {}",userId, pageRequestDto.keyword(),response.content().size());
         log.debug("[관심사] 목록 조회 완료 cursor = {}, after = {}", lastItemCursor, lastItemAfter);
+
         return response;
     }
 
@@ -86,6 +100,18 @@ public class BasicInterestService implements InterestService {
         subscriptionRepository.save(subscription);
         interest.increaseSubscriber();
         log.info("[구독] 구독 등록 완료 id = {}", subscription.getId());
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionAddEvent(
+            subscription.getId(),
+            interest.getId(),
+            interest.getName(),
+            interest.getKeywords(),
+            interest.getSubscriberCount(),
+            interest.getCreatedAt(),
+            user.getId()
+        ));
+
         return subscriptionMapper.toDto(subscription);
     }
 
@@ -98,6 +124,13 @@ public class BasicInterestService implements InterestService {
         interest.decreaseSubscriber();
         subscriptionRepository.delete(subscription);
         log.info("[구독] 구독 취소 완료");
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionCancelEvent(
+            subscription.getId(),
+            interestId,
+            userId
+        ));
     }
 
     @Override
@@ -109,6 +142,11 @@ public class BasicInterestService implements InterestService {
         log.debug("[구독] 관심사 삭제에 따라 구독 삭제");
         interestRepository.delete(interest);
         log.info("[관심사] 관심사 삭제 완료");
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionDeleteEvent(
+            interestId
+        ));
     }
 
     @Override

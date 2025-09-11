@@ -1,6 +1,11 @@
 package com.sprint.team2.monew.domain.article.controller;
 
+import com.sprint.team2.monew.domain.article.dto.response.ArticleRestoreResultDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
+import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
+import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
+import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +24,17 @@ import java.util.UUID;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleStorageService articleStorageService;
 
     @GetMapping
-    // TODO: ENUM 사용
     public ResponseEntity<CursorPageResponseArticleDto> getArticles(@RequestHeader("Monew-Request-User-ID") UUID userId,
                                                                     @RequestParam(required = false) String keyword,
                                                                     @RequestParam(required = false) UUID interestId,
-                                                                    @RequestParam(required = false) List<String> sourceIn,
+                                                                    @RequestParam(required = false) List<ArticleSource> sourceIn,
                                                                     @RequestParam(required = false) LocalDateTime publishedDateFrom,
                                                                     @RequestParam(required = false) LocalDateTime publishedDateTo,
-                                                                    @RequestParam(defaultValue = "publishDate") String orderBy,
-                                                                    @RequestParam(defaultValue = "ASC") String direction,
+                                                                    @RequestParam(defaultValue = "publishDate") ArticleOrderBy orderBy,
+                                                                    @RequestParam(defaultValue = "ASC") ArticleDirection direction,
                                                                     @RequestParam(required = false) String cursor,
                                                                     @RequestParam(required = false) LocalDateTime after,
                                                                     @RequestParam(defaultValue = "50") int limit) {
@@ -43,5 +48,33 @@ public class ArticleController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(result);
+    }
+
+    @GetMapping("/restore")
+    public ResponseEntity<ArticleRestoreResultDto> restoreArticles(@RequestParam("from") LocalDateTime from,
+                                                                   @RequestParam("to") LocalDateTime to
+    ) {
+
+        ArticleRestoreResultDto articleRestoreResultDto = articleStorageService.restoreArticle(from, to);
+        return ResponseEntity.ok(articleRestoreResultDto);
+    }
+
+
+    @DeleteMapping("/{articleId}")
+    public ResponseEntity<Void> deleteArticle(@PathVariable("articleId") UUID articleId) {
+        articleService.softDelete(articleId);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/{articleId}/hard")
+    public ResponseEntity<Void> deleteHardArticle(@PathVariable("articleId") UUID articleId) {
+        articleService.hardDelete(articleId);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
