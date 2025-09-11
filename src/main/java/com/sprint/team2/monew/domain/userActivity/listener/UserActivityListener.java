@@ -11,6 +11,7 @@ import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDel
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
@@ -116,11 +117,11 @@ public class UserActivityListener {
 
   // 구독 업데이트
   @EventListener
-  public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
+  public void handleSubscriptionCancel(SubscriptionCancelEvent event) {
     UUID userId = event.getUserId();
     UUID subscriptionId = event.getId();
 
-    log.info("[사용자 활동] 구독 삭제 시작 - subscriptionId = {}",subscriptionId);
+    log.info("[사용자 활동] 구독 취소 시작 - subscriptionId = {}",subscriptionId);
 
     UserActivity userActivity = userActivityRepository.findById(userId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
@@ -130,7 +131,28 @@ public class UserActivityListener {
 
     userActivityRepository.save(userActivity);
 
-    log.info("[사용자 활동] 구독 삭제 완료 - subscriptionId = {}", subscriptionId);
+    log.info("[사용자 활동] 구독 취소 완료 - subscriptionId = {}", subscriptionId);
+  }
+
+  // 관심사가 삭제되었을 때, 유저가 구독했으면 삭제
+  @EventListener
+  public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
+    UUID interestId = event.getInterestId();
+
+    log.info("[사용자 활동] 구독 삭제 시작 - interestId = {}",interestId);
+
+    List<UserActivity> userActivityList = userActivityRepository.findBySubscriptionsInterestId(interestId);
+    if (userActivityList.isEmpty()) {
+      log.info("[사용자 활동] 해당 관심사를 구독한 사용자가 없습니다 - interestId = {}",interestId);
+      return;
+    }
+    for (UserActivity userActivity : userActivityList) {
+      userActivity.getSubscriptions()
+          .removeIf(s -> s.interestId().equals(interestId));
+    }
+
+    userActivityRepository.saveAll(userActivityList);
+    log.info("[사용자 활동] 구독 취소 완료 - interestId = {}", interestId);
   }
 
   // ================================== 댓글 (최신 10개) ==================================

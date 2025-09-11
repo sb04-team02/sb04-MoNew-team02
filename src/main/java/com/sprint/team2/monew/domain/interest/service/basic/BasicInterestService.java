@@ -22,6 +22,7 @@ import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +126,7 @@ public class BasicInterestService implements InterestService {
         log.info("[구독] 구독 취소 완료");
 
         // ============== User Activity 이벤트 추가 ==============
-        publisher.publishEvent(new SubscriptionDeleteEvent(
+        publisher.publishEvent(new SubscriptionCancelEvent(
             subscription.getId(),
             interestId,
             userId
@@ -141,6 +142,11 @@ public class BasicInterestService implements InterestService {
         log.debug("[구독] 관심사 삭제에 따라 구독 삭제");
         interestRepository.delete(interest);
         log.info("[관심사] 관심사 삭제 완료");
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionDeleteEvent(
+            interestId
+        ));
     }
 
     @Override

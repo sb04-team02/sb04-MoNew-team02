@@ -4,9 +4,11 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+
 @Getter
 @RequiredArgsConstructor
-public class SubscriptionDeleteEvent {
+public class SubscriptionCancelEvent {
+  private final UUID id; // subscription Id
   private final UUID interestId;
-
+  private final UUID userId;
 }
