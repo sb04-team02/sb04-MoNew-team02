@@ -49,6 +49,7 @@ public class RestoreBatchConfig {
   private final ResourcePatternResolver resourcePatternResolver;
   private final int chunkSize = 100;
 
+  // ===================== Job =====================
   @Bean(name="restoreNewsJob")
   public Job restoreNewsJob(
       JobRepository jobRepository,
@@ -59,7 +60,7 @@ public class RestoreBatchConfig {
         .build();
   }
 
-  // ===================== Step (used in Job) =====================
+  // ===================== Step (Job에서 사용) =====================
   @Bean
   public Step newsRestoreStep(
       MultiResourceItemReader<Article> newsRestoreReader,
@@ -77,7 +78,7 @@ public class RestoreBatchConfig {
   }
 
   // ===================== ItemReader, ItemProcessor, ItemWriter =====================
-  // Reader - Reads Article objects from S3 for a specific date
+  // Reader - 특정 날짜의 Article 객체를 S3에서 읽음
   @Bean
   @StepScope
   public MultiResourceItemReader<Article> newsRestoreReader(
@@ -114,7 +115,7 @@ public class RestoreBatchConfig {
     }
   }
 
-  // *Helper bean - defines how to read a single JSON file (delegate for MultiResourceItemReader)
+  // *Helper bean - 단일 JSON 파일을 읽는 방법 정의 (MultiResourceItemReader의 delegate 역할)
   @Bean
   public JsonItemReader<Article> singleJsonFileReader() {
     return new JsonItemReaderBuilder<Article>()
@@ -123,13 +124,13 @@ public class RestoreBatchConfig {
         .build();
   }
 
-  // Processor - only return if it doesn't exist in current DB
+  // Processor - 현재 DB에 존재하지 않는 경우만 반환
   @Bean
   public ItemProcessor<Article, Article> newsRestoreProcessor() {
     return article -> articleRepository.existsById(article.getId()) ? null : article;
   }
 
-  // Writer - Saves all restored files in repository
+  // Writer - 복원된 모든 파일을 저장소에 저장
   @Bean
   @StepScope
   public ItemWriter<Article> newsRestoreWriter() {
@@ -148,18 +149,18 @@ public class RestoreBatchConfig {
 
       @SuppressWarnings("unchecked")
       @Override
-      public void write(Chunk<? extends Article> chunk) throws Exception {
-        // get list of articles to be written from chunk
+      public void write(Chunk<? extends Article> chunk) {
+        // chunk에서 기록할 Article 목록 가져오기
         List<? extends Article> savedArticles = chunk.getItems();
 
-        // save to db
+        // DB에 저장
         articleRepository.saveAll(savedArticles);
 
-        // getting existing list from execution context & adding the saved articles
-        List<Article> itemsList = (List<Article>) stepExecution.getExecutionContext().get("items"); // empty
+        // 실행 컨텍스트에서 기존 목록을 가져와 저장된 Article 추가
+        List<Article> itemsList = (List<Article>) stepExecution.getExecutionContext().get("items"); // 빈 리스트
         itemsList.addAll(savedArticles);
-        // put the updated list back into the execution context
-        // needed for retrieving it after the job is done
+        // 업데이트된 목록을 실행 컨텍스트에 다시 저장
+        // 작업이 끝난 후에 가져올 수 있도록 필요함
         this.stepExecution.getExecutionContext().put("items", itemsList);
 
       }

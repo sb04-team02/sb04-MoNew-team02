@@ -40,7 +40,6 @@ public class BasicArticleStorageService implements ArticleStorageService {
   private final Job restoreNewsJob;
   private final ArticleRepository articleRepository;
 
-
   @Override
   public void backupToS3(String filename, String aggregateJson){
 
@@ -94,7 +93,7 @@ public class BasicArticleStorageService implements ArticleStorageService {
         if (articles == null) {
           articles = new ArrayList<>();
         }
-        
+
         // save to db
         articleRepository.saveAll(articles);
 

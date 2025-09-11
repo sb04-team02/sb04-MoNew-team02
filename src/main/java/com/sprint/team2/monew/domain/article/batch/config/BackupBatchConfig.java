@@ -43,7 +43,7 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // ===================== Step (used in Job) =====================
+  // ===================== Step (Job에서 사용) =====================
   @Bean
   public Step newsBackupStep(
       JpaPagingItemReader<Article> newsBackupReader,
@@ -62,7 +62,7 @@ public class BackupBatchConfig {
 
   // ===================== ItemReader, ItemProcessor, ItemWriter =====================
 
-  // Reader - Reads Article objects from the database for a specific date
+  // Reader - 특정 날짜의 Article 객체를 데이터베이스에서 읽음
   @Bean
   @StepScope
   public JpaPagingItemReader<Article> newsBackupReader(
@@ -85,14 +85,14 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // Processor - Transforms each Article object into JSON
+  // Processor - 각 Article 객체를 JSON으로 변환
   @Bean
   public ItemProcessor<Article, String> newsBackupProcessor() {
     // return article -> objectMapper.writeValueAsString(article)
     return objectMapper::writeValueAsString;
   }
 
-  // Writer - Writes the processed data (JSON) to a file in AWS S3 (배치로 S3에 백업)
+  // Writer - 변환된 데이터(JSON)를 AWS S3에 파일로 기록 (배치 방식으로 S3에 백업)
   @Bean
   @StepScope
   public ItemWriter<String> newsBackupWriter(
