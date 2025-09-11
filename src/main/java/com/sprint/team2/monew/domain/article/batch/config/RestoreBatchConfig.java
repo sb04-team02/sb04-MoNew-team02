@@ -1,11 +1,16 @@
 package com.sprint.team2.monew.domain.article.batch.config;
 
 import com.sprint.team2.monew.domain.article.entity.Article;
+import com.sprint.team2.monew.domain.article.exception.ArticleErrorCode;
+import com.sprint.team2.monew.domain.article.exception.ArticleException;
+import com.sprint.team2.monew.domain.article.exception.S3FailureException;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.global.config.aws.S3Properties;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -31,7 +36,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class RestoreBatchConfig {
@@ -75,7 +82,7 @@ public class RestoreBatchConfig {
   @StepScope
   public MultiResourceItemReader<Article> newsRestoreReader(
       @Value("#{jobParameters['backupDate']}") String restoreDate
-  ) {
+  ) throws IOException {
 
     String s3PathPattern = String.format("s3://%s/articles-%s/chunk-*.json",
         s3Properties.bucket(),
@@ -86,10 +93,24 @@ public class RestoreBatchConfig {
       Resource[] resources = resourcePatternResolver.getResources(s3PathPattern);
       resourceItemReader.setResources(resources);
       resourceItemReader.setDelegate(singleJsonFileReader());
-      return resourceItemReader ;
-    } catch (Exception e) {
-      // custom error로 대체하기
-      throw new RuntimeException("Failed to find S3 backup files for date: " + restoreDate, e);
+      return resourceItemReader;
+    } catch (S3Exception e) {
+      String errorMessage = String.format(
+          "[뉴스 기사 복구] S3의 %s 날짜의 파일에 접근하는 중 S3 서비스 오류가 발생 - 상태 코드: %d, AWS 오류 코드: %s",
+          restoreDate,
+          e.statusCode(),
+          e.awsErrorDetails().errorCode()
+      );
+      log.error(errorMessage, e);
+      throw new S3FailureException();
+    } catch (IOException e) {
+      String errorMessage = String.format(
+          "[뉴스 기사 복구] S3의 %s 날짜의 파일에 접근하는 중 S3 서비스 오류가 발생 - 어류 메세지: %s",
+          restoreDate,
+          e.getMessage()
+      );
+      log.error(errorMessage, e);
+      throw new IOException();
     }
   }
 
@@ -138,7 +159,7 @@ public class RestoreBatchConfig {
         List<Article> itemsList = (List<Article>) stepExecution.getExecutionContext().get("items"); // empty
         itemsList.addAll(savedArticles);
         // put the updated list back into the execution context
-        // needed for retrieving it after the job is done.
+        // needed for retrieving it after the job is done
         this.stepExecution.getExecutionContext().put("items", itemsList);
 
       }
