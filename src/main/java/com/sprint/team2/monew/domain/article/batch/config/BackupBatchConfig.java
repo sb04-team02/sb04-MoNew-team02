@@ -2,7 +2,7 @@ package com.sprint.team2.monew.domain.article.batch.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.service.ArticleBackupService;
+import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -28,12 +28,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class BackupBatchConfig {
 
-  private final ArticleBackupService articleBackupService;
+  private final ArticleStorageService articleStorageService;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final int chunkSize = 100;
 
   // ===================== Job =====================
-  @Bean
+  @Bean(name="backupNewsJob")
   public Job backupNewsJob(
       JobRepository jobRepository,
       Step newsBackupStep
@@ -60,7 +60,7 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // ===================== Components in Step: ItemReader, ItemProcessor, ItemWriter =====================
+  // ===================== ItemReader, ItemProcessor, ItemWriter =====================
 
   // Reader - Reads Article objects from the database for a specific date
   @Bean
@@ -104,7 +104,7 @@ public class BackupBatchConfig {
           backupDateStr,
           UUID.randomUUID()
           );
-      articleBackupService.backupToS3(filename, aggregatedJson);
+      articleStorageService.backupToS3(filename, aggregatedJson);
     };
   }
 

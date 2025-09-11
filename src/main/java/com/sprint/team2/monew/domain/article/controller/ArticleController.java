@@ -1,6 +1,8 @@
 package com.sprint.team2.monew.domain.article.controller;
 
+import com.sprint.team2.monew.domain.article.dto.response.ArticleRestoreResultDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleStorageService articleStorageService;
 
     @GetMapping
     // TODO: ENUM 사용
@@ -44,4 +47,14 @@ public class ArticleController {
                 .status(HttpStatus.OK)
                 .body(result);
     }
+
+    @GetMapping("/restore")
+    public ResponseEntity<ArticleRestoreResultDto> restoreArticles(@RequestParam("from") LocalDateTime from,
+                                                                   @RequestParam("to") LocalDateTime to
+    ) {
+
+        ArticleRestoreResultDto articleRestoreResultDto = articleStorageService.restoreArticle(from, to);
+        return ResponseEntity.ok(articleRestoreResultDto);
+    }
+
 }
