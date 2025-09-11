@@ -192,7 +192,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 실패 테스트 - 이메일 또는 비밀번호 불일치")
+    @DisplayName("로그인 실패 테스트 - 이메일 혹은 비밀번호가 잘못됨")
     void loginUserFailureWrongEmailOrPassword() throws Exception {
         // 요청 생성
         UserLoginRequest request = new UserLoginRequest(
