@@ -140,8 +140,12 @@ public class BasicArticleService implements ArticleService {
     @Override
     public void softDelete(UUID articleId) {
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> ArticleNotFoundException.withId(articleId));
+                .orElseThrow(() -> {
+                    log.error("[Article] 논리 삭제 실패, 존재하지 않는 뉴스 기사, id = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
 
         article.setDeletedAt(LocalDateTime.now());
+        log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
     }
 }
