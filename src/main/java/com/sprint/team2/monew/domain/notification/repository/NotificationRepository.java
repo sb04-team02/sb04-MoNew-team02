@@ -28,9 +28,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     Optional<Notification> findByUserId(UUID userId);
 
-    //기존
-    void deleteByCommentId(UUID commentId);
-
-    //변경 제안 ⬇️
     void deleteByResourceTypeAndResourceId(ResourceType resourceType, UUID resourceId);
 }
