@@ -46,4 +46,13 @@ public class ArticleController {
                 .status(HttpStatus.OK)
                 .body(result);
     }
+
+    @DeleteMapping("/{articleId}")
+    public ResponseEntity<Void> deleteArticle(@PathVariable("articleId") UUID articleId) {
+        articleService.softDelete(articleId);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }
