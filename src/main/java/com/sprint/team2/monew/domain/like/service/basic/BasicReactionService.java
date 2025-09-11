@@ -40,6 +40,10 @@ public class BasicReactionService implements ReactionService {
     private final ApplicationEventPublisher eventPublisher;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    // User Activity 이벤트
+    private final ApplicationEventPublisher publisher;
+
+
     @Override
     public CommentLikeDto likeComment(UUID commentId, UUID requesterUserId) {
         log.info("댓글 좋아요 요청: commentId={}, requesterUserId={}", commentId, requesterUserId);

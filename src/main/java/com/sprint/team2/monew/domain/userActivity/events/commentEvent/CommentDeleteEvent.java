@@ -4,10 +4,8 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
-public class CommentDeleteEvent {
-  private final UUID commentId;
-  private final UUID userId;
-
+public record CommentDeleteEvent (
+  UUID commentId,
+  UUID userId
+) {
 }

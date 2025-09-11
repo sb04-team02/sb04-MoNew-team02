@@ -8,7 +8,8 @@ import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
 import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
-import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
@@ -46,9 +47,9 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserCreate(UserCreateEvent event) {
-    UUID id = event.getId();
-    String email = event.getEmail();
-    String nickname = event.getNickname();
+    UUID id = event.id();
+    String email = event.email();
+    String nickname = event.nickname();
     UserActivity newUserActivity = new UserActivity(
         id,
         email,
@@ -66,8 +67,8 @@ public class UserActivityListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserUpdate(UserUpdateEvent event) {
 
-    UUID userId = event.getId();
-    String nickname = event.getNickname();
+    UUID userId = event.id();
+    String nickname = event.nickname();
 
     log.info("[사용자 활동] 닉네임 수정 시작 - userId = {}", userId);
     UserActivity userActivity = userActivityRepository.findById(userId)
@@ -84,7 +85,7 @@ public class UserActivityListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserDelete(UserDeleteEvent event) {
 
-    UUID userId = event.getUserId();
+    UUID userId = event.userId();
 
     log.info("[사용자 활동] 유저 삭제 시작 - userId = {}", userId);
     userActivityRepository.deleteById(userId);
@@ -97,8 +98,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionAdd(SubscriptionAddEvent event) {
-    UUID userId = event.getUserId();
-    UUID subscriptionId = event.getId();
+    UUID userId = event.userId();
+    UUID subscriptionId = event.id();
     SubscriptionDto subscriptionDto = userActivityMapper.toSubscriptionDto(event);
 
     log.info("[사용자 활동] 구독 추가 시작 - subscriptionId = {}",subscriptionId);
@@ -125,8 +126,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionCancel(SubscriptionCancelEvent event) {
-    UUID userId = event.getUserId();
-    UUID subscriptionId = event.getId();
+    UUID userId = event.userId();
+    UUID subscriptionId = event.id();
 
     log.info("[사용자 활동] 구독 취소 시작 - subscriptionId = {}",subscriptionId);
 
@@ -134,7 +135,7 @@ public class UserActivityListener {
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
 
     userActivity.getSubscriptions()
-        .removeIf(s -> s.interestId().equals(event.getInterestId()));
+        .removeIf(s -> s.interestId().equals(event.interestId()));
 
     userActivityRepository.save(userActivity);
 
@@ -145,7 +146,7 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
-    UUID interestId = event.getInterestId();
+    UUID interestId = event.interestId();
 
     log.info("[사용자 활동] 구독 삭제 시작 - interestId = {}",interestId);
 
@@ -168,8 +169,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentAdd(CommentAddEvent event) {
-    UUID userId = event.getUserId();
-    UUID commentId = event.getId();
+    UUID userId = event.userId();
+    UUID commentId = event.id();
     CommentActivityDto commentActivityDto = userActivityMapper.toCommentActivityDto(event);
 
     log.info("[사용자 활동] 댓글 추가 시작 - commentId = {}",commentId);
@@ -192,8 +193,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentUpdate(CommentUpdateEvent event) {
-    UUID commentId = event.getId();
-    UUID userId = event.getUserId();
+    UUID commentId = event.id();
+    UUID userId = event.userId();
 
     log.info("[사용자 활동] 댓글 수정 시작 - commentId = {}", commentId);
 
@@ -222,8 +223,8 @@ public class UserActivityListener {
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentDelete(CommentDeleteEvent event) {
-    UUID userId = event.getUserId();
-    UUID commentId = event.getCommentId();
+    UUID userId = event.userId();
+    UUID commentId = event.commentId();
 
     log.info("[사용자 활동] 댓글 삭제 시작 - commentId = {}", commentId);
 
@@ -243,9 +244,9 @@ public class UserActivityListener {
   // 유저 댓글 좋아요
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void handleCommentLikeAdd(CommentLikeEvent event) {
-    UUID commentId = event.getCommentId();
-    UUID commentUserId = event.getCommentUserId();
+  public void handleCommentLikeAdd(CommentLikeAddEvent event) {
+    UUID commentId = event.commentId();
+    UUID commentUserId = event.commentUserId();
     CommentActivityLikeDto commentActivityLikeDto = userActivityMapper.toCommentActivityLikeDto(event);
 
     log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId = {}",commentId);
@@ -272,9 +273,9 @@ public class UserActivityListener {
   // 유저 댓글 좋아요 취소
   @EventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void handleCommentLikeCancel(CommentLikeEvent event) {
-    UUID commentId = event.getCommentId();
-    UUID commentUserId = event.getCommentUserId();
+  public void handleCommentLikeCancel(CommentLikeCancelEvent event) {
+    UUID commentId = event.id();
+    UUID commentUserId = event.commentUserId();
 
     log.info("[사용자 활동] 댓글 좋아요 삭제 시작 - commentId = {}", commentId);
 

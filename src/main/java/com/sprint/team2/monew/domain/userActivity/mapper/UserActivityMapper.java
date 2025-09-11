@@ -9,7 +9,7 @@ import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
 import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
-import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import org.mapstruct.Mapper;
@@ -33,5 +33,5 @@ public interface UserActivityMapper {
 
   CommentActivityDto toCommentActivityDto(CommentDeleteEvent event);
 
-  CommentActivityLikeDto toCommentActivityLikeDto(CommentLikeEvent event);
+  CommentActivityLikeDto toCommentActivityLikeDto(CommentLikeAddEvent event);
 }

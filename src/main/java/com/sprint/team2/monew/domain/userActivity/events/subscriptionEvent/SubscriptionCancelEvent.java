@@ -1,14 +1,11 @@
 package com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent;
 
 import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+public record SubscriptionCancelEvent (
+  UUID id, // subscription Id
+  UUID interestId,
+  UUID userId
+){
 
-@Getter
-@RequiredArgsConstructor
-public class SubscriptionCancelEvent {
-  private final UUID id; // subscription Id
-  private final UUID interestId;
-  private final UUID userId;
 }
