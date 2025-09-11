@@ -1,6 +1,8 @@
 package com.sprint.team2.monew.domain.article.controller;
 
+import com.sprint.team2.monew.domain.article.dto.response.ArticleRestoreResultDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleStorageService articleStorageService;
 
     @GetMapping
     public ResponseEntity<CursorPageResponseArticleDto> getArticles(@RequestHeader("Monew-Request-User-ID") UUID userId,
@@ -46,6 +49,16 @@ public class ArticleController {
                 .status(HttpStatus.OK)
                 .body(result);
     }
+
+    @GetMapping("/restore")
+    public ResponseEntity<ArticleRestoreResultDto> restoreArticles(@RequestParam("from") LocalDateTime from,
+                                                                   @RequestParam("to") LocalDateTime to
+    ) {
+
+        ArticleRestoreResultDto articleRestoreResultDto = articleStorageService.restoreArticle(from, to);
+        return ResponseEntity.ok(articleRestoreResultDto);
+    }
+
 
     @DeleteMapping("/{articleId}")
     public ResponseEntity<Void> deleteArticle(@PathVariable("articleId") UUID articleId) {

@@ -2,7 +2,7 @@ package com.sprint.team2.monew.domain.article.batch.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.entity.Article;
-import com.sprint.team2.monew.domain.article.service.ArticleBackupService;
+import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -28,12 +28,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class BackupBatchConfig {
 
-  private final ArticleBackupService articleBackupService;
+  private final ArticleStorageService articleStorageService;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final int chunkSize = 100;
 
   // ===================== Job =====================
-  @Bean
+  @Bean(name="backupNewsJob")
   public Job backupNewsJob(
       JobRepository jobRepository,
       Step newsBackupStep
@@ -43,7 +43,7 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // ===================== Step (used in Job) =====================
+  // ===================== Step (Job에서 사용) =====================
   @Bean
   public Step newsBackupStep(
       JpaPagingItemReader<Article> newsBackupReader,
@@ -60,9 +60,9 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // ===================== Components in Step: ItemReader, ItemProcessor, ItemWriter =====================
+  // ===================== ItemReader, ItemProcessor, ItemWriter =====================
 
-  // Reader - Reads Article objects from the database for a specific date
+  // Reader - 특정 날짜의 Article 객체를 데이터베이스에서 읽음
   @Bean
   @StepScope
   public JpaPagingItemReader<Article> newsBackupReader(
@@ -85,14 +85,14 @@ public class BackupBatchConfig {
         .build();
   }
 
-  // Processor - Transforms each Article object into JSON
+  // Processor - 각 Article 객체를 JSON으로 변환
   @Bean
   public ItemProcessor<Article, String> newsBackupProcessor() {
     // return article -> objectMapper.writeValueAsString(article)
     return objectMapper::writeValueAsString;
   }
 
-  // Writer - Writes the processed data (JSON) to a file in AWS S3 (배치로 S3에 백업)
+  // Writer - 변환된 데이터(JSON)를 AWS S3에 파일로 기록 (배치 방식으로 S3에 백업)
   @Bean
   @StepScope
   public ItemWriter<String> newsBackupWriter(
@@ -104,7 +104,7 @@ public class BackupBatchConfig {
           backupDateStr,
           UUID.randomUUID()
           );
-      articleBackupService.backupToS3(filename, aggregatedJson);
+      articleStorageService.backupToS3(filename, aggregatedJson);
     };
   }
 
