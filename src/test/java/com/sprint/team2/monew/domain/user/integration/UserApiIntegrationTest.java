@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
@@ -60,14 +62,7 @@ class UserApiIntegrationTest {
 
         // when & then
         // 사용자 생성 성공
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.email").value(email))
-                .andExpect(jsonPath("$.nickname").value(nickname))
-                .andExpect(jsonPath("$.createdAt", notNullValue()));
+        registerUser(email, nickname, password);
     }
 
     @Test
@@ -105,11 +100,8 @@ class UserApiIntegrationTest {
         // given
         // 사용자 생성 요청 2개 생성, 중복된 이메일
         String duplicatedEmail = "duplicatedEmail@email.com";
-        UserRegisterRequest originalUserRegisterRequest = new UserRegisterRequest(
-                duplicatedEmail,
-                "test1",
-                "test1234"
-        );
+        String nickname = "tset";
+        String password = "test1234";
 
         UserRegisterRequest duplicateUserRegisterRequest = new UserRegisterRequest(
                 duplicatedEmail,
@@ -117,15 +109,11 @@ class UserApiIntegrationTest {
                 "test1234"
         );
 
-        String originalUserRequestBody = objectMapper.writeValueAsString(originalUserRegisterRequest);
         String duplicateUserRequestBody = objectMapper.writeValueAsString(duplicateUserRegisterRequest);
 
         // when & then
         // 첫 번째 사용자 생성 성공
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(originalUserRequestBody))
-                .andExpect(status().isCreated());
+        registerUser(duplicatedEmail, nickname, password);
 
         // 두 번째 사용자 생성 실패 - 중복된 이메일
         mockMvc.perform(post("/api/users")
@@ -145,29 +133,18 @@ class UserApiIntegrationTest {
         String nickname = "loginTest";
         String password = "test1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
         UserLoginRequest loginRequest = new UserLoginRequest(
                 email,
                 password
         );
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
+
         String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
 
         // when & then
         // 사용자 생성
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(registerResponse).read("$.createdAt", LocalDateTime.class);
+        Map<String, String> registerUserMap = registerUser(email, nickname, password);
+        String userId = registerUserMap.get("id");
+        String createdAt = registerUserMap.get("createdAt");
 
         // 로그인 성공
         mockMvc.perform(post("/api/users/login")
@@ -216,25 +193,15 @@ class UserApiIntegrationTest {
         String wrongEmail = "wrongEmail@email.com";
         String wrongPassword = "wrongPassword";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
         UserLoginRequest wrongLoginRequest = new UserLoginRequest(
                 wrongEmail,
                 wrongPassword
         );
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
         String wrongLoginRequestBody = objectMapper.writeValueAsString(wrongLoginRequest);
 
         // when & then
         // 사용자 생성
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated());
+        registerUser(email, nickname, password);
 
         // 로그인 실패 - 잘못된 이메일, 비밀번호
         mockMvc.perform(post("/api/users/login")
@@ -254,49 +221,23 @@ class UserApiIntegrationTest {
         String password = "test1234";
 
         String newNickname = "newNickname";
-
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-
         UserUpdateRequest updateRequest = new UserUpdateRequest(newNickname);
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
         String updateRequestBody = objectMapper.writeValueAsString(updateRequest);
 
         // when & then
         // 사용자 생성 (업데이트 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (업데이트 시도자 = 업데이트 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(loginResponse).read("$.createdAt", LocalDateTime.class);
+        Map<String, String> loginUserMap = loginUser(email, password);
+        String loginUserId = loginUserMap.get("id");
+        String createdAt = loginUserMap.get("createdAt");
 
         // 업데이트 성공 - 업데이트 대상자와 시도자가 같고 닉네임이 제약조건에 위배되지 않음
-        mockMvc.perform(patch("/api/users/{userId}", userId.toString())
+        mockMvc.perform(patch("/api/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequestBody)
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(loginUserId))
                 .andExpect(jsonPath("$.email", is(email)))
@@ -313,52 +254,25 @@ class UserApiIntegrationTest {
         String nickname = "updateTest";
         String password = "test1234";
 
-        String invalidNickname = "invalidNicknameInvalidNickname"; // 닉네임 2자 이상 20자 이하 위반
-
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-
-        UserUpdateRequest updateRequest = new UserUpdateRequest(invalidNickname);
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
+        String invalidNewNickname = "invalidNewNicknameInvalidNewNickname"; // 닉네임 2자 이상 20자 이하 위반
+        UserUpdateRequest updateRequest = new UserUpdateRequest(invalidNewNickname);
         String updateRequestBody = objectMapper.writeValueAsString(updateRequest);
 
         // when & then
         // 사용자 생성 (업데이트 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (업데이트 시도자 = 업데이트 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
+        String loginUserId = loginUser(email, password).get("id");
 
         // 업데이트 실패 - 닉네임 제약조건 위반 (1자 이상 20자 이하 위반)
-        mockMvc.perform(patch("/api/users/{userId}", userId.toString())
+        mockMvc.perform(patch("/api/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequestBody)
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(BaseErrorCode.INVALID_INPUT_VALUE))
-                .andExpect(jsonPath("$.details.email").value(invalidNickname));
+                .andExpect(jsonPath("$.details.email").value(invalidNewNickname));
     }
 
     @Test
@@ -375,62 +289,25 @@ class UserApiIntegrationTest {
         String otherPassword = "other1234";
 
         String newNickname = "newNickname"; // 닉네임 2자 이상 20자 이하 위반
-
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserRegisterRequest otherRegisterRequest = new UserRegisterRequest(
-                otherEmail,
-                otherNickname,
-                otherPassword
-        );
-
-        UserLoginRequest otherLoginRequest = new UserLoginRequest(
-                otherEmail,
-                otherPassword
-        );
-
         UserUpdateRequest updateRequest = new UserUpdateRequest(newNickname);
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String otherRegisterRequestBody = objectMapper.writeValueAsString(otherRegisterRequest);
-        String otherLoginRequestBody = objectMapper.writeValueAsString(otherLoginRequest);
         String updateRequestBody = objectMapper.writeValueAsString(updateRequest);
 
         // when & then
         // 회원가입
         // 사용자 생성 (업데이트 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 생성 (업데이트 시도자)
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(otherRegisterRequestBody))
-                .andExpect(status().isCreated());
+        registerUser(otherEmail, otherNickname, otherPassword);
 
         // 사용자 로그인 - 업데이트 시도자로 로그인 (업데이트 시도자 =/ 업데이트 대상자)
-        MvcResult otherLoginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(otherLoginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String otherLoginResponse = otherLoginResult.getResponse().getContentAsString();
-        UUID otherLoginUserId = JsonPath.parse(otherLoginResponse).read("$.id", UUID.class);
+        String otherLoginUserId = loginUser(otherEmail, otherPassword).get("id");
 
         // 업데이트 실패 - 대상자를 업데이트할 권한이 시도자에게 없음 (ID가 다름)
-        mockMvc.perform(patch("/api/users/{userId}", userId.toString())
+        mockMvc.perform(patch("/api/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequestBody)
-                        .header("Monew-Request-User-ID", otherLoginUserId.toString()))
+                        .header("Monew-Request-User-ID", otherLoginUserId))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_UPDATE))
                 .andExpect(jsonPath("$.details.userId").value(userId))
@@ -447,54 +324,24 @@ class UserApiIntegrationTest {
         String password = "test1234";
 
         String newNickname = "newNickname";
-
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-
         UserUpdateRequest updateRequest = new UserUpdateRequest(newNickname);
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
         String updateRequestBody = objectMapper.writeValueAsString(updateRequest);
 
         // when & then
         // 사용자 생성 (업데이트 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (업데이트 시도자 = 업데이트 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(loginResponse).read("$.createdAt", LocalDateTime.class);
+        String loginUserId = loginUser(email, password).get("id");
 
         // 사용자 논리적 삭제
-        mockMvc.perform(delete("/api/users/{userId}", userId.toString())
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
-                .andExpect(status().isNoContent());
+        deleteUserLogically(userId, loginUserId);
 
-        // 업데이트 실패 - 논리적 삭제된 사용자는 업데이트 할 수 없음 (사용자 정보 없음)
-        mockMvc.perform(patch("/api/users/{userId}", userId.toString())
+        // 사용자 업데이트 실패 - 논리적 삭제된 사용자는 업데이트 할 수 없음 (사용자 정보 없음)
+        mockMvc.perform(patch("/api/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequestBody)
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
                 .andExpect(jsonPath("$.details.userId").value(userId));
@@ -504,55 +351,27 @@ class UserApiIntegrationTest {
     @DisplayName("사용자 논리적 삭제 API 통합 테스트")
     void deleteLogicallyUserSuccess() throws Exception {
         // given
-        // 사용자 생성, 로그인 요청 생성
+        // 사용자 생성, 로그인 요청용 데이터 생성
         String email = "deleteTest@email.com";
         String nickname = "deleteTest";
         String password = "test1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
-
         // when & then
         // 사용자 생성 (논리적 삭제 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (논리적 삭제 시도자 = 논리적 삭제 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
+        String loginUserId = loginUser(email, password).get("id");
 
-        // 사용자 논리적 삭제
-        mockMvc.perform(delete("/api/users/{userId}", userId.toString())
-                .header("Monew-Request-User-ID", loginUserId.toString()))
-                .andExpect(status().isNoContent());
+        // 사용자 논리적 삭제 성공
+        deleteUserLogically(userId, loginUserId);
     }
 
     @Test
     @DisplayName("사용자 논리적 삭제 실패 API 통합 테스트 - 삭제 권한 없음")
     void deleteLogicallyUserFailureForbiddenUserAuthority() throws Exception {
         // given
-        // 2명의 사용자 생성 요청과 로그인 요청 생성
+        // 2명의 사용자 생성 요청과 로그인 요청용 데이터 생성
         String email = "deleteTest@email.com";
         String nickname = "deleteTest";
         String password = "test1234";
@@ -561,56 +380,20 @@ class UserApiIntegrationTest {
         String otherNickname = "other";
         String otherPassword = "other1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserRegisterRequest otherRegisterRequest = new UserRegisterRequest(
-                otherEmail,
-                otherNickname,
-                otherPassword
-        );
-
-        UserLoginRequest otherLoginRequest = new UserLoginRequest(
-                otherEmail,
-                otherPassword
-        );
-        
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String otherRegisterRequestBody = objectMapper.writeValueAsString(otherRegisterRequest);
-        String otherLoginRequestBody = objectMapper.writeValueAsString(otherLoginRequest);
-
         // when & then
         // 회원가입
         // 사용자 생성 (논리적 삭제 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 생성 (논리적 삭제 시도자)
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(otherRegisterRequestBody))
-                .andExpect(status().isCreated());
+        registerUser(otherEmail, otherNickname, otherPassword);
 
         // 사용자 로그인 - 논리적 삭제 시도자로 로그인 (논리적 삭제 시도자 =/ 논리적 삭제 대상자)
-        MvcResult otherLoginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(otherLoginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String otherLoginResponse = otherLoginResult.getResponse().getContentAsString();
-        UUID otherLoginUserId = JsonPath.parse(otherLoginResponse).read("$.id", UUID.class);
+        String otherLoginUserId = loginUser(otherEmail, otherPassword).get("id");
 
-        // 논리적 삭제 실패 - 대상자를 논리적으로 삭제할 권한이 시도자에게 없음 (ID가 다름)
-        mockMvc.perform(delete("/api/users/{userId}", userId.toString())
-                        .header("Monew-Request-User-ID", otherLoginUserId.toString()))
+        // 사용자 논리적 삭제 실패 - 대상자를 논리적으로 삭제할 권한이 시도자에게 없음 (ID가 다름)
+        mockMvc.perform(delete("/api/users/{userId}", userId)
+                        .header("Monew-Request-User-ID", otherLoginUserId))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE))
                 .andExpect(jsonPath("$.details.userId").value(userId))
@@ -621,53 +404,24 @@ class UserApiIntegrationTest {
     @DisplayName("사용자 논리적 삭제 실패 API 통합 테스트 - 사용자 정보 없음")
     void deleteLogicallyUserFailureUserNotFound() throws Exception {
         // given
-        // 사용자 생성, 로그인 요청 생성
+        // 사용자 생성, 로그인 요청용 데이터 생성
         String email = "deleteTest@email.com";
         String nickname = "deleteTest";
         String password = "test1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
-
         // when & then
         // 사용자 생성 (논리적 삭제 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (논리적 삭제 시도자 = 논리적 삭제 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
-        LocalDateTime createdAt = JsonPath.parse(loginResponse).read("$.createdAt", LocalDateTime.class);
+        String loginUserId = loginUser(email, password).get("id");
 
         // 사용자 물리적 삭제(강제)
-        mockMvc.perform(delete("/api/users/{userId}/hard", userId.toString())
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
-                .andExpect(status().isNoContent());
+        deleteUserPhysically(userId, loginUserId);
 
-        // 논리적 삭제 실패 - 사용자 데이터 없음
-        mockMvc.perform(delete("/api/users/{userId}", userId.toString())
-                        .header("Monew-Request-User-ID", loginUserId.toString()))
+        // 사용자 논리적 삭제 실패 - 사용자 데이터 없음
+        mockMvc.perform(delete("/api/users/{userId}", userId)
+                        .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
                 .andExpect(jsonPath("$.details.userId").value(userId));
@@ -677,63 +431,143 @@ class UserApiIntegrationTest {
     @DisplayName("사용자 물리적 삭제 성공 API 통합 테스트")
     void deletePhysicallyUserSuccess() throws Exception {
         // given
-        // 사용자 생성, 로그인 요청 생성
+        // 사용자 생성, 로그인 요청용 데이터 생성
         String email = "deleteTest@email.com";
         String nickname = "deleteTest";
         String password = "test1234";
 
-        UserRegisterRequest registerRequest = new UserRegisterRequest(
-                email,
-                nickname,
-                password
-        );
-
-        UserLoginRequest loginRequest = new UserLoginRequest(
-                email,
-                password
-        );
-        
-        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
-        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
-
         // when & then
         // 사용자 생성 (물리적 삭제 대상자)
-        MvcResult registerResult = mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String registerResponse = registerResult.getResponse().getContentAsString();
-        UUID userId = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        String userId = registerUser(email, nickname, password).get("id");
 
         // 사용자 로그인 (물리적 삭제 시도자 = 물리적 삭제 대상자)
-        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        String loginResponse = loginResult.getResponse().getContentAsString();
-        UUID loginUserId = JsonPath.parse(loginResponse).read("$.id", UUID.class);
+        String loginUserId = loginUser(email, password).get("id");
 
         // 사용자 물리적 삭제 성공
-        mockMvc.perform(delete("/api/users/{userId}/hard", userId.toString())
-                .header("Monew-Request-User-ID", loginUserId.toString()))
-                .andExpect(status().isNoContent());
+        deleteUserPhysically(userId, loginUserId);
     }
 
     @Test
     @DisplayName("사용자 물리적 삭제 실패 API 통합 테스트 - 삭제 권한 없음")
     void deletePhysicallyUserFailureForbiddenUserAuthority() throws Exception {
         // given
+        // 사용자 2명 생성 요청용 데이터 생성
+        String email = "test@email.com";
+        String nickname = "test";
+        String password = "test1234";
+
+        String otherEmail = "otherEmail@email.com";
+        String otherNickname = "other";
+        String otherPassword = "other1234";
 
         // when & then
+        // 사용자 생성 (물리적 삭제 대상자)
+        String userId = registerUser(email, nickname, password).get("id");
+
+        // 사용자 생성 (물리적 삭제 시도자)
+        registerUser(otherEmail, otherNickname, otherPassword);
+
+        // 사용자 로그인 (물리적 삭제 시도자 =/ 물리적 삭제 대상자)
+        String loginUserId = loginUser(otherEmail, otherPassword).get("id");
+
+        // 사용자 물리적 삭제 실패 - 대상자를 물리적으로 삭제할 권한이 시도자에게 없음 (ID가 다름)
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                .header("Monew-Request-User-ID", loginUserId))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE))
+                .andExpect(jsonPath("$.details.userId").value(userId))
+                .andExpect(jsonPath("$.details.loginUserId").value(loginUserId));
     }
 
     @Test
     @DisplayName("사용자 물리적 삭제 실패 API 통합 테스트 - 사용자 정보 없음")
     void deletePhysicallyUserFailureUserNotFound() throws Exception {
         // given
+        // 사용자 생성 요청 데이터 생성
+        String email = "test@email.com";
+        String password = "test1234";
+        String nickname = "test";
 
         // when & then
+        // 사용자 생성 (물리적 삭제 대상자)
+        String userId = registerUser(email, nickname, password).get("id");
+
+        // 사용자 로그인 (물리적 삭제 시도자 = 물리적 삭제 대상자)
+        String loginUserId = loginUser(email, password).get("id");
+
+        // 사용자 논리적 삭제
+        deleteUserLogically(userId, loginUserId);
+
+        // 사용자 물리적 삭제 실패 - 사용자 정보 없음
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                .header("Monew-Request-User-ID", loginUserId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
+                .andExpect(jsonPath("$.details.userId").value(userId));
+    }
+
+    private Map<String, String> registerUser(String email, String nickname, String password) throws Exception {
+        UserRegisterRequest registerRequest = new UserRegisterRequest(
+                email,
+                nickname,
+                password
+        );
+
+        String registerRequestBody = objectMapper.writeValueAsString(registerRequest);
+
+        MvcResult registerResult = mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerRequestBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.email").value(registerRequest.email()))
+                .andExpect(jsonPath("$.nickname").value(registerRequest.nickname()))
+                .andExpect(jsonPath("$.createdAt", notNullValue()))
+                .andReturn();
+
+        String registerResponse = registerResult.getResponse().getContentAsString();
+        UUID id = JsonPath.parse(registerResponse).read("$.id", UUID.class);
+        LocalDateTime createdAt = JsonPath.parse(registerResponse).read("$.createdAt", LocalDateTime.class);
+        Map<String, String> registerResultMap = new HashMap<>();
+        registerResultMap.put("id", id.toString());
+        registerResultMap.put("createdAt", createdAt.toString());
+        return registerResultMap;
+    }
+
+    private Map<String, String> loginUser(String email, String password) throws Exception {
+        UserLoginRequest loginRequest = new UserLoginRequest(
+                email,
+                password
+        );
+
+        String loginRequestBody = objectMapper.writeValueAsString(loginRequest);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.email").value(loginRequest.email()))
+                .andReturn();
+
+        String loginResponse = loginResult.getResponse().getContentAsString();
+        UUID id = JsonPath.parse(loginResponse).read("$.id", UUID.class);
+        LocalDateTime createdAt = JsonPath.parse(loginResponse).read("$.createdAt", LocalDateTime.class);
+        Map<String, String> loginResultMap = new HashMap<>();
+        loginResultMap.put("id", id.toString());
+        loginResultMap.put("createdAt", createdAt.toString());
+        return loginResultMap;
+    }
+
+    private void deleteUserLogically(String userId, String loginUserId) throws Exception {
+        mockMvc.perform(delete("/api/users/{userId}", userId)
+                        .header("Monew-Request-User-ID", loginUserId))
+                .andExpect(status().isNoContent());
+    }
+
+    private void deleteUserPhysically(String userId, String loginUserId) throws Exception {
+        mockMvc.perform(delete("/api/users/{userId}/hard", userId)
+                        .header("Monew-Request-User-ID", loginUserId))
+                .andExpect(status().isNoContent());
     }
 }
