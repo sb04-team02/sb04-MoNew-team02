@@ -168,7 +168,7 @@ class UserApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(BaseErrorCode.INVALID_INPUT_VALUE))
+                .andExpect(jsonPath("$.code").value(BaseErrorCode.INVALID_INPUT_VALUE.toString()))
                 .andExpect(jsonPath("$.details.email").value(invalidEmail))
                 .andExpect(jsonPath("$.details.password").value(invalidPassword));
     }
@@ -200,7 +200,7 @@ class UserApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(wrongLoginRequestBody))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.LOGIN_FAILED));
+                .andExpect(jsonPath("$.code").value(UserErrorCode.LOGIN_FAILED.toString()));
     }
 
     @Test
@@ -263,8 +263,8 @@ class UserApiIntegrationTest {
                         .content(updateRequestBody)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(BaseErrorCode.INVALID_INPUT_VALUE))
-                .andExpect(jsonPath("$.details.email").value(invalidNewNickname));
+                .andExpect(jsonPath("$.code").value(BaseErrorCode.INVALID_INPUT_VALUE.toString()))
+                .andExpect(jsonPath("$.details.nickname").value(invalidNewNickname));
     }
 
     @Test
@@ -301,7 +301,7 @@ class UserApiIntegrationTest {
                         .content(updateRequestBody)
                         .header("Monew-Request-User-ID", otherLoginUserId))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_UPDATE))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_UPDATE.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId))
                 .andExpect(jsonPath("$.details.loginUserId").value(otherLoginUserId));
     }
@@ -335,7 +335,7 @@ class UserApiIntegrationTest {
                         .content(updateRequestBody)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId));
     }
 
@@ -387,7 +387,7 @@ class UserApiIntegrationTest {
         mockMvc.perform(delete("/api/users/{userId}", userId)
                         .header("Monew-Request-User-ID", otherLoginUserId))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId))
                 .andExpect(jsonPath("$.details.loginUserId").value(otherLoginUserId));
     }
@@ -415,7 +415,7 @@ class UserApiIntegrationTest {
         mockMvc.perform(delete("/api/users/{userId}", userId)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId));
     }
 
@@ -466,7 +466,7 @@ class UserApiIntegrationTest {
         mockMvc.perform(delete("/api/users/{userId}/hard", userId)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.FORBIDDEN_USER_DELETE.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId))
                 .andExpect(jsonPath("$.details.loginUserId").value(loginUserId));
     }
@@ -494,7 +494,7 @@ class UserApiIntegrationTest {
         mockMvc.perform(delete("/api/users/{userId}/hard", userId)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_NOT_FOUND.toString()))
                 .andExpect(jsonPath("$.details.userId").value(userId));
     }
 
