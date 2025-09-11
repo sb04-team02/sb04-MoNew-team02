@@ -6,7 +6,6 @@ import com.sprint.team2.monew.domain.user.dto.request.UserLoginRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserRegisterRequest;
 import com.sprint.team2.monew.domain.user.dto.request.UserUpdateRequest;
 import com.sprint.team2.monew.domain.user.exception.UserErrorCode;
-import com.sprint.team2.monew.domain.user.service.UserService;
 import com.sprint.team2.monew.global.error.BaseErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,9 +37,6 @@ class UserApiIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserService userService;
 
     @Test
     @DisplayName("사용자 생성 API 통합 테스트")
@@ -487,10 +481,10 @@ class UserApiIntegrationTest {
         // 사용자 로그인 (물리적 삭제 시도자 = 물리적 삭제 대상자)
         String loginUserId = loginUser(email, password).get("id");
 
-        // 사용자 논리적 삭제
-        deleteUserLogically(userId, loginUserId);
+        // 사용자 물리적 삭제
+        deleteUserPhysically(userId, loginUserId);
 
-        // 사용자 물리적 삭제 실패 - 사용자 정보 없음
+        // 사용자 물리적 삭제 실패 - 사용자 정보 없음 (이미 삭제됨)
         mockMvc.perform(delete("/api/users/{userId}/hard", userId)
                         .header("Monew-Request-User-ID", loginUserId))
                 .andExpect(status().isNotFound())
