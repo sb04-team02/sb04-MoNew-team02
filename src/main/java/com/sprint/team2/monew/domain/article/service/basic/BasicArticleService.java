@@ -165,4 +165,5 @@ public class BasicArticleService implements ArticleService {
         articleRepository.delete(article);
         log.info("[Article] 물리 삭제 성공");
     }
+
 }

@@ -21,4 +21,5 @@ public interface ArticleService {
     void softDelete(UUID articleId);
 
     void hardDelete(UUID articleId);
+
 }
