@@ -8,6 +8,7 @@ import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
+import com.sprint.team2.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
 import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
@@ -54,7 +55,7 @@ public class BasicArticleService implements ArticleService {
             }
 
             for (ArticleDto dto : articles) {
-                if (!articleRepository.existsBySourceUrl(dto.sourceUrl())) {
+                if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
                     Article articleEntity = articleMapper.toEntity(dto);
                     try {
                         articleRepository.save(articleEntity);
@@ -104,7 +105,7 @@ public class BasicArticleService implements ArticleService {
             articles = articles.subList(0, limit);
         }
 
-        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCurosr = {}",
+        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCursor = {}",
                 userId, keyword, interestId, articles.size(), hasNext,
                 !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
 
@@ -134,5 +135,13 @@ public class BasicArticleService implements ArticleService {
                 totalElements,
                 hasNext
         );
+    }
+
+    @Override
+    public void softDelete(UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> ArticleNotFoundException.withId(articleId));
+
+        article.setDeletedAt(LocalDateTime.now());
     }
 }

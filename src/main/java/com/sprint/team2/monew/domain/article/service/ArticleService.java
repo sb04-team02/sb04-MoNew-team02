@@ -17,4 +17,6 @@ public interface ArticleService {
                                       String keyword,
                                       UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                       String cursor, LocalDateTime after);
+
+    void softDelete(UUID articleId);
 }
