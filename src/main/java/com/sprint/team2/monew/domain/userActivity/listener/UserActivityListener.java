@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -42,6 +44,7 @@ public class UserActivityListener {
   // ================================== 사용자 ==================================
   // 사용자 생성
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserCreate(UserCreateEvent event) {
     UUID id = event.getId();
     String email = event.getEmail();
@@ -60,6 +63,7 @@ public class UserActivityListener {
 
   // 사용자 닉네임 수정
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserUpdate(UserUpdateEvent event) {
 
     UUID userId = event.getId();
@@ -77,6 +81,7 @@ public class UserActivityListener {
 
   // 사용자 삭제
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserDelete(UserDeleteEvent event) {
 
     UUID userId = event.getUserId();
@@ -90,6 +95,7 @@ public class UserActivityListener {
   // ================================== 구독 ==================================
   // 구독 업데이트
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionAdd(SubscriptionAddEvent event) {
     UUID userId = event.getUserId();
     UUID subscriptionId = event.getId();
@@ -117,6 +123,7 @@ public class UserActivityListener {
 
   // 구독 업데이트
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionCancel(SubscriptionCancelEvent event) {
     UUID userId = event.getUserId();
     UUID subscriptionId = event.getId();
@@ -136,6 +143,7 @@ public class UserActivityListener {
 
   // 관심사가 삭제되었을 때, 유저가 구독했으면 삭제
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
     UUID interestId = event.getInterestId();
 
@@ -158,6 +166,7 @@ public class UserActivityListener {
   // ================================== 댓글 (최신 10개) ==================================
   // 유저 댓글 추가
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentAdd(CommentAddEvent event) {
     UUID userId = event.getUserId();
     UUID commentId = event.getId();
@@ -181,6 +190,7 @@ public class UserActivityListener {
   }
 
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentUpdate(CommentUpdateEvent event) {
     UUID commentId = event.getId();
     UUID userId = event.getUserId();
@@ -210,6 +220,7 @@ public class UserActivityListener {
 
   // 유저 댓글 삭제
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentDelete(CommentDeleteEvent event) {
     UUID userId = event.getUserId();
     UUID commentId = event.getCommentId();
@@ -231,6 +242,7 @@ public class UserActivityListener {
 
   // 유저 댓글 좋아요
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentLikeAdd(CommentLikeEvent event) {
     UUID commentId = event.getCommentId();
     UUID commentUserId = event.getCommentUserId();
@@ -259,6 +271,7 @@ public class UserActivityListener {
 
   // 유저 댓글 좋아요 취소
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentLikeCancel(CommentLikeEvent event) {
     UUID commentId = event.getCommentId();
     UUID commentUserId = event.getCommentUserId();
@@ -281,6 +294,7 @@ public class UserActivityListener {
 
   // 유저가 최근에 읽은 기사
   @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleArticleViewAdd(ArticleViewEvent event) {
     UUID userId = event.getId();
     UUID articleId = event.getArticleId();
