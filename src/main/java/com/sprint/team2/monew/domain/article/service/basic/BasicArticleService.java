@@ -18,7 +18,6 @@ import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,7 +41,6 @@ public class BasicArticleService implements ArticleService {
 
     private final InterestRepository interestRepository;
   
-    private final JPAQueryFactory jpaQueryFactory;
     private final ApplicationEventPublisher applicationEventPublisher;
 
 
