@@ -16,7 +16,7 @@ CREATE TABLE interests
     updated_at         TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
     name               VARCHAR(50) NOT NULL,
     subscription_count BIGINT,
-    keywords           VARCHAR(20)[]
+    keywords           JSON
 );
 
 CREATE TABLE subscriptions
@@ -37,9 +37,9 @@ CREATE TABLE articles
     deleted_at    TIMESTAMPTZ,
     source        VARCHAR(30)         NOT NULL,
     source_url    VARCHAR(255) UNIQUE NOT NULL,
-    title         VARCHAR(50)         NOT NULL,
+    title         VARCHAR(150)        NOT NULL,
     publish_date  TIMESTAMPTZ         NOT NULL,
-    summary       VARCHAR(100)        NOT NULL,
+    summary       TEXT                NOT NULL,
     comment_count BIGINT              NOT NULL DEFAULT 0,
     view_count    BIGINT              NOT NULL DEFAULT 0,
     interest_id   uuid,
@@ -53,21 +53,23 @@ CREATE TABLE comments
     updated_at TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ,
     content    TEXT        NOT NULL,
-    like_count BIGINT,
+    like_count BIGINT      NOT NULL DEFAULT 0,
     article_id uuid,
     user_id    uuid,
     FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT comments_like_count_nonnegative CHECK ( like_count >= 0 )
 );
 
 CREATE TABLE likes
 (
     id         uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    user_id    uuid,
-    comment_id uuid,
+    user_id    uuid        NOT NULL,
+    comment_id uuid        NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE
+    FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE,
+    CONSTRAINT uk_likes_user_comment UNIQUE (user_id, comment_id)
 );
 
 CREATE TABLE notifications

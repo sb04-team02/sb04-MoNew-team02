@@ -24,4 +24,15 @@ public record CursorPageResponseInterestDto<T> (
                 page.hasNext()
         );
     }
+
+    public static <T> CursorPageResponseInterestDto<T> from(Slice<T> slice, String cursor, LocalDateTime after, Long totalElements) {
+        return new CursorPageResponseInterestDto<>(
+                slice.getContent(),
+                cursor,
+                after,
+                slice.getSize(),
+                totalElements,
+                slice.hasNext()
+        );
+    }
 }

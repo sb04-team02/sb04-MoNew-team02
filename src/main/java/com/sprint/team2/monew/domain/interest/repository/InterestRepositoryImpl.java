@@ -10,10 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.interest.dto.request.CursorPageRequestInterestDto;
 import com.sprint.team2.monew.domain.interest.dto.response.InterestQueryDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -30,8 +27,18 @@ import static com.sprint.team2.monew.domain.subscription.entity.QSubscription.su
 public class InterestRepositoryImpl implements InterestRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Page<InterestQueryDto> findAllPage(CursorPageRequestInterestDto request, UUID userId) {
+    public Long countTotalElements(String keyword) {
+        Long totalElements = jpaQueryFactory.select(interest.count())
+                .from(interest)
+                .where(partialMatch(keyword))
+                .fetchFirst();
+
+        return totalElements;
+    }
+
+    public Slice<InterestQueryDto> findAllPage(CursorPageRequestInterestDto request, UUID userId) {
         OrderSpecifier[] orderSpecifiers = createOrderSpecifier(request.orderBy(), request.direction());
+
         JPAQuery query = jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -48,24 +55,20 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
                 .leftJoin(subscription).on(subscription.interest.id.eq(interest.id))
                 .where(partialMatch(request.keyword()))
                 .orderBy(orderSpecifiers)
-                .limit(request.limit());
+                .limit(request.limit()+1);
+
         if (StringUtils.hasText(request.cursor())) {
             query.where(createCursorAfter(request.orderBy(), request.direction(), request.cursor(), request.after()));
         }
+
         List<InterestQueryDto> content = query.fetch();
 
-        JPAQuery totalQuery = jpaQueryFactory.select(interest.count())
-                .from(interest)
-                .where(partialMatch(request.keyword()));
-        if (StringUtils.hasText(request.cursor())) {
-            totalQuery.where(createCursorAfter(request.orderBy(), request.direction(), request.cursor(), request.after()));
+        boolean hasNext = content!=null && content.size() > request.limit();
+        if (hasNext) {
+            content = content.subList(0, request.limit());
         }
-        Long totalElements = jpaQueryFactory.select(interest.count())
-                .from(interest)
-                .where(partialMatch(request.keyword()))
-                .fetchFirst();
 
-        return new PageImpl<>(content, PageRequest.of(0,request.limit(), Sort.Direction.valueOf(request.direction()),request.orderBy()), totalElements);
+        return new SliceImpl<>(content, PageRequest.of(0,request.limit(), Sort.Direction.valueOf(request.direction().toUpperCase()),request.orderBy()),hasNext);
     }
 
     private OrderSpecifier[] createOrderSpecifier(String orderBy, String direction) {
@@ -129,8 +132,9 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
 
         predicate.or(interest.name.containsIgnoreCase(keyword));
         predicate.or(Expressions.stringTemplate(
-                "array_to_string({0}, ',')", interest.keywords
-        ).containsIgnoreCase(keyword));
+                        "lower(cast({0} as string))", interest.keywords)
+                .like("%" + keyword.toLowerCase() + "%"
+                ));
         return predicate;
     }
 }

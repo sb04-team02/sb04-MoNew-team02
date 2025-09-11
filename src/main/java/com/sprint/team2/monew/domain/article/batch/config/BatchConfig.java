@@ -29,9 +29,9 @@ public class BatchConfig {
     private final PlatformTransactionManager transactionManager;
 
     @Bean
-    public Job newsCollectJob(Step step) {
+    public Job newsCollectJob(Step newsCollectStep) {
         return new JobBuilder("NewsCollectJob", jobRepository)
-                .start(step)
+                .start(newsCollectStep)
                 .build();
     }
 
