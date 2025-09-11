@@ -116,8 +116,8 @@ public class BasicUserService implements UserService {
 
         // ============== User Activity 이벤트 추가 ==============
         publisher.publishEvent(new UserUpdateEvent(
-            user.getId(),
-            user.getNickname()
+            user.getNickname(),
+            user.getId()
         ));
 
         return userDto;
