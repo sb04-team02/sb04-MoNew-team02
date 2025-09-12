@@ -74,6 +74,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # 디버깅 스텝
+      - name: ECS_TASK_DEFINITION 확인
+        run: |
+          if [ -z "${{ secrets.ECS_TASK_DEFINITION }}" ]; then
+            echo "::error:: The ECS_TASK_DEFINITION secret is empty or not set."
+            exit 1
+          else
+            echo "ECS_TASK_DEFINITION secret is present."
+          fi
+
       # 기존 ECS 태스크 정의 다운로드
       - name: 기존 ECS 태스크 정의 다운로드
         run: aws ecs describe-task-definition \
