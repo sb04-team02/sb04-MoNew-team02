@@ -40,8 +40,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationServiceTest {
@@ -305,6 +304,46 @@ public class NotificationServiceTest {
             assertThrows(NotificationNotFoundException.class, () -> {
                 notificationService.confirmNotification(userId,notificationId );
             });
+        }
+    }
+
+    @Nested
+    @DisplayName("delete()")
+    class DeleteNotification {
+
+        @Test
+        @DisplayName("알림 삭제 성공")
+        void shouldDeleteConfirmedNotification() {
+            // given
+            Notification noti1 = TestNotificationFactory.createConfirmNotification();
+            Notification noti2 = TestNotificationFactory.createConfirmNotification();
+            List<Notification> notifications = List.of(noti1, noti2);
+
+            LocalDateTime threshold = LocalDateTime.of(2024, 1, 1, 0, 0);
+            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(any()))
+                    .willReturn(notifications);
+
+            // when
+            notificationService.deleteAllConfirmedNotifications();
+
+            //then
+            assertThat(noti1.isConfirmed()).isTrue();
+            assertThat(noti2.isConfirmed()).isTrue();
+            verify(notificationRepository).deleteAll(notifications);
+        }
+
+        @Test
+        @DisplayName("삭제할 알림이 없는 경우 삭제 발생하지 않음")
+        void shouldThrowWhenNotificationDoesNotExist() {
+            //given
+            LocalDateTime threshold = LocalDateTime.of(2024, 1, 1, 0, 0);
+            given(notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(any()))
+                    .willReturn(List.of());
+            //when
+            notificationService.deleteAllConfirmedNotifications();
+
+            //then
+            verify(notificationRepository, never()).deleteAll(any());
         }
     }
 }
