@@ -34,6 +34,18 @@ public class UserCleanupJobListener implements JobExecutionListener {
         Gauge.builder("batch.user_cleanup.current_deleted_count", currentDeleteCount, AtomicLong::get)
                 .description("현재 사용자 삭제 배치 처리 작업에서 삭제된 사용자의 수")
                 .register(registry);
+
+        Counter.builder("batch.user_cleanup.total_deleted_count")
+                .description("사용자 삭제 배치 처리 작업에서 삭제된 사용자의 총합")
+                .register(registry);
+
+        Counter.builder("batch.user_cleanup.total_success")
+                .description("사용자 삭제 배치 처리 작업의 총 성공 횟수")
+                .register(registry);
+
+        Counter.builder("batch.user_cleanup.total_failure")
+                .description("사용자 삭제 배치 처리 작업의 총 실패 횟수")
+                .register(registry);
     }
 
     @Override
@@ -47,17 +59,9 @@ public class UserCleanupJobListener implements JobExecutionListener {
         sample.stop(registry.timer("batch.user_cleanup.duration"));
         running.set(0);
 
-        Counter totalDeletedCount = Counter.builder("batch.user_cleanup.total_deleted_count")
-                .description("사용자 삭제 배치 처리 작업에서 삭제된 사용자의 총합")
-                .register(registry);
-
-        Counter totalSuccess = Counter.builder("batch.user_cleanup.total_success")
-                .description("사용자 삭제 배치 처리 작업의 총 성공 횟수")
-                .register(registry);
-
-        Counter totalFailure = Counter.builder("batch.user_cleanup.total_failure")
-                .description("사용자 삭제 배치 처리 작업의 총 실패 횟수")
-                .register(registry);
+        Counter totalDeletedCount = registry.get("batch.user_cleanup.total_deleted_count").counter();
+        Counter totalSuccess = registry.get("batch.user_cleanup.total_success").counter();
+        Counter totalFailure = registry.get("batch.user_cleanup.total_failure").counter();
 
         if (jobExecution.getStatus().isUnsuccessful()) {
             totalFailure.increment();

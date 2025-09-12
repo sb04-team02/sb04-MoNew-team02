@@ -60,6 +60,7 @@ dependencies {
 
     // Spring Batch
     implementation 'org.springframework.batch:spring-batch-core'
+    testImplementation 'org.springframework.batch:spring-batch-test'
 
     // metric
     implementation 'io.micrometer:micrometer-core'
