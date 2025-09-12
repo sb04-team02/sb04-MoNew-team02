@@ -40,6 +40,8 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
+        env:
+          AWS_DEFAULT_REGION: us-east-1
 
       # ============== docker 빌드하고 ecr로 푸쉬 ==============
       # 이미지 태그 구성 - 커밋 해시 7자리 + latest
