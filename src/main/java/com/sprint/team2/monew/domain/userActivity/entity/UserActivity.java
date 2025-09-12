@@ -5,6 +5,7 @@ import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import jakarta.persistence.Id;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Document
 public class UserActivity {
 
@@ -29,14 +29,15 @@ public class UserActivity {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
-  private List<SubscriptionDto> subscriptions;
-  private List<CommentActivityDto> comments;
-  private List<CommentActivityLikeDto> commentLikes;
-  private List<ArticleViewDto> articleViews;
+  private List<SubscriptionDto> subscriptions = new ArrayList<>();
+  private List<CommentActivityDto> comments = new ArrayList<>();
+  private List<CommentActivityLikeDto> commentLikes = new ArrayList<>();
+  private List<ArticleViewDto> articleViews = new ArrayList<>();
 
   public UserActivity(UUID id, String email, String nickname) {
     this.id = id;
     this.email = email;
     this.nickname = nickname;
+    this.createdAt = LocalDateTime.now();
   }
 }

@@ -1,8 +1,8 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
+import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
@@ -16,11 +16,18 @@ import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
+import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
+import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
+import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,12 +35,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Builder
 @Transactional
 public class BasicArticleService implements ArticleService {
 
@@ -43,11 +52,15 @@ public class BasicArticleService implements ArticleService {
     private final NaverApiCollector naverApiCollector;
 
     private final InterestRepository interestRepository;
-  
+
     private final ApplicationEventPublisher applicationEventPublisher;
 
-
+    private final UserActivityRepository userActivityRepository;
     private final UserActivityRepositoryCustom userActivityRepositoryCustom;
+
+    private final CommentRepository commentRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -88,6 +101,84 @@ public class BasicArticleService implements ArticleService {
             }
             log.info("[Article] keyword({})로 뉴스 수집 완료, total = {}", keyword, articles.size());
         }
+    }
+
+    @Override
+    public ArticleViewDto view(UUID userId, UUID articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {
+                    log.error("[Article] 존재하지 않는 뉴스 기사, articleId = {}", articleId);
+                    return ArticleNotFoundException.withId(articleId);
+                });
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("[User] 존재하지 않는 사용자, userId = {}", userId);
+                    return UserNotFoundException.withId(userId);
+                });
+
+        UserActivity userActivity = userActivityRepository.findById(userId)
+                .map(activity -> {
+                    if (activity.getArticleViews() == null) activity.setArticleViews(new ArrayList<>());
+                    if (activity.getComments() == null) activity.setComments(new ArrayList<>());
+                    if (activity.getCommentLikes() == null) activity.setCommentLikes(new ArrayList<>());
+                    if (activity.getSubscriptions() == null) activity.setSubscriptions(new ArrayList<>());
+                    return activity;
+                })
+                .orElseGet(() -> {
+                    log.info("[UserActivity] 활동내역이 없어서 새로 생성, userId = {}", userId);
+                    UserActivity newActivity = new UserActivity(user.getId(), user.getEmail(), user.getNickname());
+                    return userActivityRepository.save(newActivity);
+                });
+
+        boolean alreadyViewed = userActivityRepositoryCustom.existsByArticleId(articleId);
+
+        ArticleViewDto dto;
+        if (!alreadyViewed) {
+            dto = new ArticleViewDto(
+                    UUID.randomUUID(),
+                    userId,
+                    LocalDateTime.now(),
+                    article.getId(),
+                    article.getSource().name(),
+                    article.getSourceUrl(),
+                    article.getTitle(),
+                    article.getPublishDate(),
+                    article.getSummary(),
+                    0L,
+                    article.getViewCount() + 1
+            );
+
+            userActivity.getArticleViews().add(dto);
+            userActivityRepository.save(userActivity);
+
+            article.setViewCount(article.getViewCount() + 1);
+            articleRepository.save(article);
+        } else {
+            dto = userActivity.getArticleViews().stream()
+                    .filter(articleView -> articleView.articleId().equals(articleId))
+                    .findFirst()
+                    .orElseThrow(() -> {
+                        log.error("[UserActivity] 조회 기록 없음, userActivityId = {}", userActivity.getId());
+                        return ArticleNotFoundException.withId(userActivity.getId());
+                    });
+        }
+
+        long commentCount = commentRepository.countByArticleId(articleId);
+
+        return new ArticleViewDto(
+                UUID.randomUUID(),
+                userId,
+                dto.createdAt(),
+                article.getId(),
+                article.getSource().name(),
+                article.getSourceUrl(),
+                article.getTitle(),
+                article.getPublishDate(),
+                article.getSummary(),
+                commentCount,
+                article.getViewCount()
+        );
     }
 
     @Override

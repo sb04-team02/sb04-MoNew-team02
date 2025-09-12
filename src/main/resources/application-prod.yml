@@ -18,6 +18,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URL}
+      database: ${MONGODB_DB}
 
   sql:
     init:

@@ -9,14 +9,19 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
+        database-platform: org.hibernate.dialect.H2Dialect
         format_sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
 
 logging:
   level:
-    com.sprint.mission.discodeit: debug
+    com.sprint.team2.monew: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace

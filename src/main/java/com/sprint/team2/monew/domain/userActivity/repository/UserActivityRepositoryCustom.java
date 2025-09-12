@@ -12,8 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 /*
- * Article 에서 물리 삭제 시,
- * 해당 Article과 연관된 UserActivity의 articleView 배열에서 참조를 제거하기 위한 커스텀 레포지토리
+ * Article과 연관된 UserActivity의 articleView 배열에서 참조를 제거하기 위한 커스텀 레포지토리
  */
 
 @Repository
@@ -21,6 +20,11 @@ import java.util.UUID;
 public class UserActivityRepositoryCustom {
 
     private final MongoTemplate mongoTemplate;
+
+    public boolean existsByArticleId(UUID articleId) {
+        Query query = new Query(Criteria.where("articleViews.articleId").is(articleId));
+        return mongoTemplate.exists(query, UserActivity.class);
+    }
 
     public void deleteByArticleId(UUID articleId) {
         Query query = new Query(Criteria.where("articleViews.articleId").is(articleId));

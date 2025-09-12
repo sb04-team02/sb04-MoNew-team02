@@ -17,12 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserCleanupJobListenerTest {
 
     private MeterRegistry registry;
-
     private UserCleanupJobListener listener;
 
     @BeforeEach
     void setUp() {
-        // 매 테스트마다 새로운 레지스트리 생성
         registry = new SimpleMeterRegistry();
         listener = new UserCleanupJobListener(registry);
     }
