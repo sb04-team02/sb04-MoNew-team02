@@ -16,6 +16,7 @@ import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.Subsc
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserLoginEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
@@ -48,6 +49,28 @@ public class UserActivityListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserCreate(UserCreateEvent event) {
     UUID id = event.id();
+    String email = event.email();
+    String nickname = event.nickname();
+    UserActivity newUserActivity = new UserActivity(
+        id,
+        email,
+        nickname
+    );
+    log.info("[사용자 활동] 생성 시작 - id = {}",id);
+    // save to mongodb
+    userActivityRepository.save(newUserActivity);
+
+    log.info("[사용자 활동] 생성 완료 - id = {}", id);
+  }
+
+  @EventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void handleUserLogin(UserLoginEvent event) {
+    UUID id = event.id();
+    if (userActivityRepository.existsById(id)) {
+      log.info("[사용자 활동] 로그인 - id = {}",id);
+      return;
+    }
     String email = event.email();
     String nickname = event.nickname();
     UserActivity newUserActivity = new UserActivity(

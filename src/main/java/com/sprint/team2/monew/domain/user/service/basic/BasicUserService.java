@@ -14,6 +14,7 @@ import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.user.service.UserService;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserLoginEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,15 @@ public class BasicUserService implements UserService {
 
         UserDto userDto = userMapper.toDto(user);
         log.info("[사용자] 로그인 성공 - id={}", userDto.id());
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new UserLoginEvent(
+            user.getId(),
+            user.getEmail(),
+            user.getNickname(),
+            user.getCreatedAt()
+        ));
+
         return userDto;
     }
 
