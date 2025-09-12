@@ -56,7 +56,7 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
                         )
                 )
                 .from(interest)
-                .leftJoin(subscription).on(subscription.interest.id.eq(interest.id))
+                .leftJoin(subscription).on(subscription.interest.id.eq(interest.id).and(subscription.user.id.eq(userId)))
                 .where(partialMatch(keyword))
                 .orderBy(orderSpecifiers)
                 .limit(request.limit()+1);
