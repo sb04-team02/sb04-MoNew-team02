@@ -48,7 +48,6 @@ public class BasicNotificationsService implements NotificationService {
     private final CommentRepository commentRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final NotificationMapper notificationMapper;
-    private final NotificationService notificationService;
 
     @Override
     @EventListener
