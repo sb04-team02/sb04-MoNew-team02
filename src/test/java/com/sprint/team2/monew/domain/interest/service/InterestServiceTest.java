@@ -20,6 +20,7 @@ import com.sprint.team2.monew.domain.subscription.mapper.SubscriptionMapper;
 import com.sprint.team2.monew.domain.subscription.repository.SubscriptionRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import com.sprint.team2.monew.global.error.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -54,6 +56,8 @@ public class InterestServiceTest {
     private SubscriptionMapper subscriptionMapper;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     @InjectMocks
     private BasicInterestService interestService;
@@ -128,7 +132,7 @@ public class InterestServiceTest {
         given(subscriptionMapper.toDto(any(Subscription.class))).willReturn(subscriptionDto);
         given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(new User("email@email.com","password","nickname")));
         given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(new Interest()));
-
+        willDoNothing().given(publisher).publishEvent(any(SubscriptionAddEvent.class));
         // when
         SubscriptionDto createdDto = interestService.subscribe(userId,interestId);
 
@@ -192,7 +196,7 @@ public class InterestServiceTest {
         UUID userId = UUID.randomUUID();
         Subscription subscription = new Subscription();
         given(subscriptionRepository.findByUser_IdAndInterest_Id(userId,interestId)).willReturn(Optional.of(subscription));
-        willDoNothing().given(subscriptionRepository).delete(subscription);
+        willDoNothing().given(subscriptionRepository).delete(any(Subscription.class));
         given(interestRepository.findById(interestId)).willReturn(Optional.of(new Interest()));
 
         // when
@@ -224,7 +228,7 @@ public class InterestServiceTest {
         Interest interest = new Interest("name", List.of("keyword1","keyword2"),1);
         Subscription subscription = new Subscription();
         given(subscriptionRepository.findByUser_IdAndInterest_Id(userId,interestId)).willReturn(Optional.of(subscription));
-        willDoNothing().given(subscriptionRepository).delete(subscription);
+        willDoNothing().given(subscriptionRepository).delete(any(Subscription.class));
         given(interestRepository.findById(any(UUID.class))).willReturn(Optional.of(interest));
 
         // when
