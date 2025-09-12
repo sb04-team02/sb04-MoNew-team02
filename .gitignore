@@ -39,6 +39,6 @@ out/
 ### 숨김 파일 ###
 !.gitignore
 !.dockerignore
-.env
+*.env
 *.env.DS_Store
 .logs
