@@ -19,7 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Document
 public class UserActivity {
 
@@ -30,20 +29,15 @@ public class UserActivity {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
-  private List<SubscriptionDto> subscriptions;
-  private List<CommentActivityDto> comments;
-  private List<CommentActivityLikeDto> commentLikes;
-  private List<ArticleViewDto> articleViews;
+  private List<SubscriptionDto> subscriptions = new ArrayList<>();
+  private List<CommentActivityDto> comments = new ArrayList<>();
+  private List<CommentActivityLikeDto> commentLikes = new ArrayList<>();
+  private List<ArticleViewDto> articleViews = new ArrayList<>();
 
-  // 회원가입할때 새로 생성됨
   public UserActivity(UUID id, String email, String nickname) {
     this.id = id;
     this.email = email;
     this.nickname = nickname;
-    this.subscriptions = new ArrayList<>();
-    this.comments = new ArrayList<>();
-    this.commentLikes = new ArrayList<>();
-    this.articleViews = new ArrayList<>();
     this.createdAt = LocalDateTime.now();
   }
 }
