@@ -19,7 +19,7 @@ jobs:
       REPO_URI: ${{ secrets.ECR_REPOSITORY_URI }}
 
     outputs:
-      image_tag: ${{ steps.prep.outputs.image_tag }}
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}
 
     steps:
       # 소스 코드 다운로드/체크아웃
@@ -42,21 +42,28 @@ jobs:
           registry-type: public
 
       # ============== docker 빌드하고 ecr로 푸쉬 ==============
+
+      # docker Buildx 설정 (캐싱을 위해 필요)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # 이미지 태그 구성 - 커밋 해시 7자리 + latest
       - name: Set Image Tag
         id: set-tag
-        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        run: echo "image_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       # Docker 빌드 (dockerfile 사용)
-      - name: Build Docker image
-        run: |
-          docker build -t "${{ env.REPO_URI }}:${{ steps.set-tag.outputs.tag }}" -t "${{ env.REPO_URI }}:latest" .
-
-      # ecr로 푸쉬
-      - name: Push to ECR
-        run: |
-          docker push "${{ env.REPO_URI }}:${{ steps.set-tag.outputs.tag }}"
-          docker push "${{ env.REPO_URI }}:latest"
+      - name: Build and push Docker image with ECR cache
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REPO_URI }}:${{ steps.set-tag.outputs.image_tag }}
+            ${{ env.REPO_URI }}:latest
+          cache-from: type=registry,ref=${{ env.REPO_URI }}:buildcache
+          cache-to: type=registry,ref=${{ env.REPO_URI }}:buildcache,mode=max
+          platforms: linux/amd64
 
   # ----------------------------------------------------------------
   # JOB 2: 새 이미지를 ECS 서비스에 배포
