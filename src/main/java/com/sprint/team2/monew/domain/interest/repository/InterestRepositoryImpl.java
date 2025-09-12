@@ -39,7 +39,7 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
     public Slice<InterestQueryDto> findAllPage(CursorPageRequestInterestDto request, UUID userId) {
         String keyword = "";
         if (StringUtils.hasText(request.keyword())) {
-            keyword = keyword;
+            keyword = request.keyword();
         }
         OrderSpecifier[] orderSpecifiers = createOrderSpecifier(request.orderBy(), request.direction());
 
