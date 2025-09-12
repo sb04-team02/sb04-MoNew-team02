@@ -31,6 +31,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -66,6 +67,11 @@ public class BasicCommentServiceTest {
 
     @InjectMocks
     private BasicCommentService commentService;
+
+    // User Activity 용 Publisher
+    @Mock
+    private ApplicationEventPublisher publisher;
+
 
     private UUID commentId;
     private UUID ownerId;
