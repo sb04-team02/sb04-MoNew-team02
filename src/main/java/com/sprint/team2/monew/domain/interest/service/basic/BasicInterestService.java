@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -69,7 +70,11 @@ public class BasicInterestService implements InterestService {
 
         LocalDateTime lastItemAfter = lastDto.createdAt();
         Slice<InterestDto> page = pageQuery.map(interestMapper::toDto);
-        Long totalElements = interestRepository.countTotalElements(pageRequestDto.keyword());
+        String keyword = "";
+        if(StringUtils.hasText(pageRequestDto.keyword())){
+            keyword = pageRequestDto.keyword();
+        }
+        Long totalElements = interestRepository.countTotalElements(keyword);
         CursorPageResponseInterestDto response = CursorPageResponseInterestDto.from(page,lastItemCursor,lastItemAfter,totalElements);
         log.info("[관심사] 목록 조회 완료 userId = {}, 검색어 = {}, 결과수 = {}",userId, pageRequestDto.keyword(),response.content().size());
         log.debug("[관심사] 목록 조회 완료 cursor = {}, after = {}", lastItemCursor, lastItemAfter);
