@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.article.controller;
 
+import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleRestoreResultDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.service.ArticleStorageService;
@@ -25,6 +26,16 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final ArticleStorageService articleStorageService;
+
+    @PostMapping("{articleId}/article-views")
+    public ResponseEntity<ArticleViewDto> postArticleView(@RequestHeader("Monew-Request-User-ID") UUID userId,
+                                                          @PathVariable UUID articleId) {
+        ArticleViewDto result = articleService.view(userId, articleId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
+    }
 
     @GetMapping
     public ResponseEntity<CursorPageResponseArticleDto> getArticles(@RequestHeader("Monew-Request-User-ID") UUID userId,

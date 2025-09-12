@@ -9,6 +9,8 @@ import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface ArticleMapper {
+
+    @Mapping(target = "viewedByMe", constant = "false")
     ArticleDto toArticleDto(Article article);
 
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
@@ -22,5 +24,7 @@ public interface ArticleMapper {
     @Mapping(target = "viewedByMe", constant = "false")
     ArticleDto toArticleDto(Map<String, String> items);
 
+    @Mapping(target = "interest", ignore = true)
+    @Mapping(target = "comments", ignore = true)
     Article toEntity(ArticleDto articleDto);
 }

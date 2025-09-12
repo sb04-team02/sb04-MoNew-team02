@@ -89,5 +89,5 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
            """)
     int softDeleteById(@Param("id") UUID id);
 
-
+    long countByArticleId(UUID articleId);
 }
