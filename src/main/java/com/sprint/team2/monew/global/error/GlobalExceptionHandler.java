@@ -34,22 +34,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public void handleValidationExceptions(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
         Map<String, Object> details = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(fieldError -> {
             String fieldName = fieldError.getField();
-            String errorMessage = fieldError.getDefaultMessage();
-            details.put(fieldName, errorMessage);
+            Object rejectedValue = fieldError.getRejectedValue();
+            details.put(fieldName, rejectedValue);
         });
 
-        throw new DomainException(details);
-    }
+        DomainException domainException = new DomainException(details);
+        log.error("요청 유효성 커스텀 예외 발생: code={}, message={}", domainException.getErrorCode(), domainException.getMessage(), domainException);
 
-    @ExceptionHandler(DomainException.class)
-    public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
-        log.error("요청 유효성 커스텀 예외 발생: code={}, message={}", e.getErrorCode(), e.getMessage(), e);
-        return ResponseEntity.status(e.getStatus())
-                .body(new ErrorResponse(e));
+        return ResponseEntity.status(domainException.getStatus())
+                .body(new ErrorResponse(domainException));
     }
 
     // 필수 쿼리 파라미터 누락 → 400
