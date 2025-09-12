@@ -33,15 +33,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          aws-region: us-east-1
 
       # ecr 로그인
       - name: AWS Public ECR 로그인
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
-        env:
-          AWS_DEFAULT_REGION: us-east-1
 
       # ============== docker 빌드하고 ecr로 푸쉬 ==============
       # 이미지 태그 구성 - 커밋 해시 7자리 + latest
@@ -74,7 +72,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ap-northeast-2
 
       # 디버깅 스텝
       - name: ECS_TASK_DEFINITION 확인
