@@ -87,7 +87,7 @@ jobs:
       # 기존 ECS 태스크 정의 다운로드
       - name: 기존 ECS 태스크 정의 다운로드
         run: aws ecs describe-task-definition \
-          --task-definition ${{ secrets.ECS_TASK_DEFINITION }} \
+          --task-definition "${{ secrets.ECS_TASK_DEFINITION }}" \
           --query taskDefinition > task-def.json
 
       # 새 ECR 이미지로 태스크 정의 업데이트
