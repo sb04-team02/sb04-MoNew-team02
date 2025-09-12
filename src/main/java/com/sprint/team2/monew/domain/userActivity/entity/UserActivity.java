@@ -5,6 +5,7 @@ import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import jakarta.persistence.Id;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,9 +35,15 @@ public class UserActivity {
   private List<CommentActivityLikeDto> commentLikes;
   private List<ArticleViewDto> articleViews;
 
+  // 회원가입할때 새로 생성됨
   public UserActivity(UUID id, String email, String nickname) {
     this.id = id;
     this.email = email;
     this.nickname = nickname;
+    this.subscriptions = new ArrayList<>();
+    this.comments = new ArrayList<>();
+    this.commentLikes = new ArrayList<>();
+    this.articleViews = new ArrayList<>();
+    this.createdAt = LocalDateTime.now();
   }
 }
