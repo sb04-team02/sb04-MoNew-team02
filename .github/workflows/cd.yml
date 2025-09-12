@@ -112,7 +112,4 @@ jobs:
       # 배포 상태 확인
       - name: ECS 배포 상태 확인
         run: |
-          aws ecs describe-services \
-            --cluster ${{ secrets.ECS_CLUSTER }}
-            --services ${{ secrets.ECS_SERVICE }}
-            --query "services[0].deployments"
+          aws ecs describe-services --cluster ${{ secrets.ECS_CLUSTER }} --services ${{ secrets.ECS_SERVICE }} --query "services[0].deployments"
