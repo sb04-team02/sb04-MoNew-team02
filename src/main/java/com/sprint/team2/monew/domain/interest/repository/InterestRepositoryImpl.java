@@ -37,6 +37,10 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
     }
 
     public Slice<InterestQueryDto> findAllPage(CursorPageRequestInterestDto request, UUID userId) {
+        String keyword = "";
+        if (StringUtils.hasText(request.keyword())) {
+            keyword = request.keyword();
+        }
         OrderSpecifier[] orderSpecifiers = createOrderSpecifier(request.orderBy(), request.direction());
 
         JPAQuery query = jpaQueryFactory
@@ -53,7 +57,7 @@ public class InterestRepositoryImpl implements InterestRepositoryCustom {
                 )
                 .from(interest)
                 .leftJoin(subscription).on(subscription.interest.id.eq(interest.id))
-                .where(partialMatch(request.keyword()))
+                .where(partialMatch(keyword))
                 .orderBy(orderSpecifiers)
                 .limit(request.limit()+1);
 

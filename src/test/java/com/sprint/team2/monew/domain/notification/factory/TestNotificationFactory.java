@@ -24,4 +24,18 @@ public class TestNotificationFactory {
         ReflectionTestUtils.setField(notification, "createdAt", LocalDateTime.now());
         return notification;
     }
+
+    public static Notification createConfirmNotification() {
+        User user = TestUserFactory.createUser();
+        Notification notification = Notification.builder()
+                .user(user)
+                .resourceType(ResourceType.COMMENT)
+                .resourceId(UUID.randomUUID())
+                .confirmed(true)
+                .content("테스트 알림")
+                .build();
+
+        ReflectionTestUtils.setField(notification, "updatedAt", LocalDateTime.now().minusDays(7));
+        return notification;
+    }
 }

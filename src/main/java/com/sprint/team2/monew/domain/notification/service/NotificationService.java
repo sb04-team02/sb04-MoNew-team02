@@ -21,5 +21,5 @@ public interface NotificationService {
 
     CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size);
 
-    void deleteConfirmedNotifications();
+    void deleteAllConfirmedNotifications();
 }
