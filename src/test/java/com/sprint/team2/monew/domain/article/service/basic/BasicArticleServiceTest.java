@@ -1,6 +1,7 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
+import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
 import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
@@ -9,6 +10,11 @@ import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.mapper.ArticleMapper;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepository;
 import com.sprint.team2.monew.domain.article.repository.ArticleRepositoryCustom;
+import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
+import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.domain.user.repository.UserRepository;
+import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,8 +41,19 @@ class BasicArticleServiceTest {
     private ArticleRepository articleRepository;
     @Mock
     private ArticleMapper articleMapper;
+
+    @Mock
+    private UserActivityRepository userActivityRepository;
     @Mock
     private UserActivityRepositoryCustom userActivityRepositoryCustom;
+    @Mock
+    private UserActivity userActivity;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
 
     @InjectMocks
     private BasicArticleService basicArticleService;
@@ -91,6 +108,49 @@ class BasicArticleServiceTest {
                 any(), any(), anyInt()
         );
         verify(articleMapper, times(1)).toArticleDto(article);
+    }
+
+    @Test
+    @DisplayName("뉴스 기사 뷰 등록 성공: 첫 조회명 view count 증가")
+    void viewArticleFirstTimeSuccess() {
+        // given
+        UUID articleId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        Article article = Article.builder()
+                .source(ArticleSource.NAVER)
+                .sourceUrl("https://article.com")
+                .title("title")
+                .publishDate(LocalDateTime.now().minusDays(1))
+                .summary("summary")
+                .commentCount(0)
+                .viewCount(0)
+                .build();
+
+        User user = User.builder()
+                .email("user@monew.com")
+                .nickname("user")
+                .build();
+
+        UserActivity userActivity = new UserActivity(userId, user.getEmail(), user.getNickname());
+        userActivity.setId(UUID.randomUUID());
+
+        when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userActivityRepository.findById(userId)).thenReturn(Optional.of(userActivity));
+        when(userActivityRepository.save(any(UserActivity.class))).thenReturn(userActivity);
+        when(commentRepository.countByArticleId(articleId)).thenReturn(0L);
+
+        // when
+        ArticleViewDto result = basicArticleService.view(userId, articleId);
+
+        // then
+        assertThat(result.viewedBy()).isEqualTo(userId);
+        assertThat(result.articleViewCount()).isEqualTo(1);
+        assertThat(result.articleCommentCount()).isEqualTo(0);
+
+        verify(articleRepository, times(1)).save(any(Article.class));
+        verify(userActivityRepository, times(1)).save(any(UserActivity.class));
     }
 
     @Test

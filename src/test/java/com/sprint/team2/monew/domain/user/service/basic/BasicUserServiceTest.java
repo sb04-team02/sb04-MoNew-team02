@@ -202,11 +202,12 @@ class BasicUserServiceTest {
         // 기본 변수 및 객체 설정
         UserUpdateRequest request = new UserUpdateRequest("newNickname");
         UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
         String email = "test@test.com";
         String password = "test1234";
         String nickname = "test";
         User user = new User(email, password, nickname);
-        UUID loginUserId = userId;
 
         // Dto
         UserDto userDto = new UserDto(
@@ -259,6 +260,29 @@ class BasicUserServiceTest {
                 .isInstanceOf(UserNotFoundException.class);
     }
 
+    @Test
+    @DisplayName("논리적 삭제된 사용자로 정보 수정 시도 시 실패")
+    void updateUserLogicallyDeletedUserThrowsException() {
+        // 기본 변수 및 객체 설정
+        UserUpdateRequest request = new UserUpdateRequest("newNickname");
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+        user.setDeletedAt(LocalDateTime.now());
+
+        // given
+        // 해당 UUID에 해당하는 유저를 찾지 못함 -> UserNotFoundException
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> userService.update(userId, request, loginUserId))
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
     // 삭제 테스트 - 논리 삭제
     @Test
     @DisplayName("논리적 사용자 삭제 성공")
@@ -305,6 +329,26 @@ class BasicUserServiceTest {
 
         // given
         given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("이미 논리적 삭제된 사용자에 대해 논리적 삭제 다시 시도 시 실패")
+    void deleteLogicallyUserLogicallyDeletedUserThrowsException() {
+        // 기본 변수 및 객체 설정
+        UUID userId = UUID.randomUUID();
+        UUID loginUserId = userId;
+        String email = "test@test.com";
+        String password = "test1234";
+        String nickname = "test";
+        User user = new User(email, password, nickname);
+        user.setDeletedAt(LocalDateTime.now());
+
+        // given
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
         // when & then
         assertThatThrownBy(() -> userService.deleteLogically(userId, loginUserId))
