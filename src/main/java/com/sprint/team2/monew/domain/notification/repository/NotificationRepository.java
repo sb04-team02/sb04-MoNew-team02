@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-    Slice<Notification> findAllByUserIdAndIsConfirmedFalseOrderByCreatedAtDesc(
+    Slice<Notification> findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(
             UUID userId,
             LocalDateTime nextAfter,
             Pageable pageable);
