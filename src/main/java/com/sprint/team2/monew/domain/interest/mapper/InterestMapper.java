@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 public interface InterestMapper {
     @Mapping(target = "subscribedByMe", constant = "false")
     InterestDto toDto(Interest interest);
+    @Mapping(target = "updatedAt",  ignore = true)
+    @Mapping(target = "subscriberCount", ignore = true)
     Interest toEntity(InterestRegisterRequest interestRegisterRequest);
 
     InterestDto toDto(InterestQueryDto interestQueryDto);

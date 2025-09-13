@@ -109,6 +109,12 @@ public class BasicUserService implements UserService {
                     return UserNotFoundException.withId(userId);
                 });
 
+        // 논리적 삭제이지만 물리적 삭제인것처럼 동작
+        if (user.getDeletedAt() != null) {
+            log.error("[사용자] 정보 수정 실패 - 존재하지 않는 사용자 id={}", userId);
+            throw UserNotFoundException.withId(userId);
+        }
+
         log.debug("[사용자] 정보 수정 전 - id={}, nickname={}", userId, user.getNickname());
         user.update(request.nickname());
         UserDto userDto = userMapper.toDto(user);
@@ -139,6 +145,11 @@ public class BasicUserService implements UserService {
                     log.error("[사용자] 논리적 삭제 실패 - 존재하지 않는 사용자 id={}", userId);
                     return UserNotFoundException.withId(userId);
                 });
+
+        if (user.getDeletedAt() != null) {
+            log.error("[사용자] 논리적 삭제 실패 - 이미 삭제된 사용자 id={}", userId);
+            throw UserNotFoundException.withId(userId);
+        }
 
         user.setDeletedAt(LocalDateTime.now());
         log.debug("[사용자] 논리적 삭제 수행 - id={}, deletedAt={}", userId, user.getDeletedAt());

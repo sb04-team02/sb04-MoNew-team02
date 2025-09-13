@@ -25,7 +25,6 @@ class UserCleanupStepListenerTest {
 
     @BeforeEach
     void setUp() {
-        // 매 테스트마다 새로운 레지스트리 생성
         registry = new SimpleMeterRegistry();
         listener = new UserCleanupStepListener(registry);
     }

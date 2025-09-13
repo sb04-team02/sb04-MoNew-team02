@@ -23,7 +23,7 @@ public class UserActivityController {
 
   private final BasicUserActivityService userActivityService;
 
-  @GetMapping("{userId}")
+  @GetMapping("/{userId}")
   public ResponseEntity<UserActivityResponseDto> find(@PathVariable("userId") UUID userId) {
     log.info("[활동 내역] 활동 내역 정보 요청 수신");
     UserActivityResponseDto userActivityResponseDto = userActivityService.getUserActivity(userId);

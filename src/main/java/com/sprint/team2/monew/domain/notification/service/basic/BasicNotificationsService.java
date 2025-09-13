@@ -207,5 +207,17 @@ public class BasicNotificationsService implements NotificationService {
     }
 
     @Override
-    public void deleteConfirmedNotifications() {}
+    public void deleteAllConfirmedNotifications() {
+        LocalDateTime threshold = LocalDateTime.now().minusDays(7);
+        log.info("[알림] 알림 삭제 시작 / now={}, threshold={}", LocalDateTime.now(), threshold);
+
+        List<Notification> notifications = notificationRepository.findAllByConfirmedIsTrueAndUpdatedAtBefore(threshold);
+        long totalElements = notifications.size();
+        log.debug("[알림] 삭제되는 알림 개수 - totalElements={}", totalElements);
+
+        if (!notifications.isEmpty()) {
+            notificationRepository.deleteAll(notifications);
+        }
+        log.info("[알림] 최종 삭제 완료 - 삭제된 알림 수={}", totalElements);
+    }
 }
