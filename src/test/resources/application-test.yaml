@@ -25,3 +25,23 @@ logging:
     com.sprint.team2.monew: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+
+# ====== 테스트 전용 오버라이드 ====== #
+monew:
+  backup:
+    s3:
+      access-key: dummy
+      secret-key: dummy
+      region: ap-northeast-2
+      bucket: test-bucket
+      presigned-url: 600   # 기본값: 10분
+  storage:
+    type: local
+    path: /tmp/monew-test-storage  # 로컬 temp 경로 사용
+
+naver:
+  api:
+    base-url: https://openapi.naver.com
+    naver-client-id: dummy
+    naver-client-secret: dummy
