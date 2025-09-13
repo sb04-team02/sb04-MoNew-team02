@@ -2,6 +2,7 @@ package com.sprint.team2.monew.global.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -9,6 +10,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,5 +42,20 @@ public class WebConfig implements WebMvcConfigurer {
         );
       }
     }
+  }
+
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(String.class, LocalDateTime.class, source -> {
+      if (source == null || source.isEmpty()) return null;
+
+      if (source.endsWith("Z")) {
+        return OffsetDateTime.parse(source)
+                .atZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
+      } else {
+        return LocalDateTime.parse(source);
+      }
+    });
   }
 }
