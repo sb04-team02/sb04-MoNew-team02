@@ -35,45 +35,47 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     // 날짜 기준 커서 페이지네이션
     @Query("""
-           select c from Comment c
-           where c.article.id = :articleId
-             and c.deletedAt is null
-             and (
-                  :cursor is null
-                  or (:isAsc = true and c.createdAt > coalesce(:cursor, c.createdAt))
-                  or (:isAsc = false and c.createdAt < coalesce(:cursor, c.createdAt))
-                 )
-           """)
+        select c from Comment c
+        where c.article.id = :articleId
+          and c.deletedAt is null
+          and (:afterDate is null or
+               (:isAsc = true  and c.createdAt > :afterDate) or
+               (:isAsc = false and c.createdAt < :afterDate))
+          and (:cursor is null or
+               (:isAsc = true  and c.createdAt > :cursor) or
+               (:isAsc = false and c.createdAt < :cursor))
+""")
     Slice<Comment> findByArticle_IdWithDateCursor(
             @Param("articleId") UUID articleId,
             @Param("cursor") LocalDateTime cursor,
+            @Param("afterDate") LocalDateTime afterDate,
             @Param("isAsc") boolean isAsc,
             Pageable pageable
     );
 
     // 좋아요 수 기준 커서 페이지네이션 (Slice 활용)
     @Query("""
-           select c from Comment c
-           where c.article.id = :articleId
-             and c.deletedAt is null
-             and (
-                    :cursor is null
-                    or (:isAsc = true and (
-                               c.likeCount > coalesce(:cursor, c.likeCount)
-                               or (c.likeCount = coalesce(:cursor, c.likeCount)
-                                      and c.createdAt > coalesce(:cursorDate, c.createdAt))
-                    ))
-                    or (:isAsc = false and (
-                           c.likeCount < coalesce(:cursor, c.likeCount)
-                           or (c.likeCount = coalesce(:cursor, c.likeCount)
-                                  and c.createdAt < coalesce(:cursorDate, c.createdAt))
-                    ))
-                 )
-           """)
+        select c from Comment c
+        where c.article.id = :articleId
+          and c.deletedAt is null
+          and (:afterDate is null or
+               (:isAsc = true  and c.createdAt > :afterDate) or
+               (:isAsc = false and c.createdAt < :afterDate))
+          and (:cursor is null or
+               (:isAsc = true and (
+                   c.likeCount > :cursor or
+                   (c.likeCount = :cursor and c.createdAt > :cursorDate)
+               )) or
+               (:isAsc = false and (
+                   c.likeCount < :cursor or
+                   (c.likeCount = :cursor and c.createdAt < :cursorDate)
+               )))
+""")
     Slice<Comment> findByArticle_IdWithLikeCountCursor(
             @Param("articleId") UUID articleId,
             @Param("cursor") Long cursor,
             @Param("cursorDate") LocalDateTime cursorDate,
+            @Param("afterDate") LocalDateTime afterDate,
             @Param("isAsc") boolean isAsc,
             Pageable pageable
     );

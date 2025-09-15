@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -229,6 +230,7 @@ public class BasicCommentService implements CommentService {
     @Transactional(readOnly = true)
     public CursorPageResponseCommentDto getAllArticleComment(UUID articleId, UUID requesterUserId,
                                                              String cursor, int size,
+                                                             OffsetDateTime after,
                                                              CommentSortType sortType, boolean asc) {
         log.info("댓글 목록 조회 시작: articleId={}, sortType={}, asc={}, size={}",
                 articleId, sortType, asc, size);
@@ -280,14 +282,16 @@ public class BasicCommentService implements CommentService {
 
         Pageable pageable = PageRequest.of(0, size, sort);
 
+        LocalDateTime afterDate = (after != null) ? after.toLocalDateTime() : null;
+
         // Slice 조회 (Spring Data가 자동으로 size+1 조회하고 hasNext 계산)
         Slice<Comment> slice;
         if (sortType == CommentSortType.DATE) {
             slice = commentRepository.findByArticle_IdWithDateCursor(
-                    articleId, cursorDate, asc, pageable);
+                    articleId, cursorDate, afterDate, asc, pageable);
         } else {
             slice = commentRepository.findByArticle_IdWithLikeCountCursor(
-                    articleId, cursorLikeCount, cursorDate, asc, pageable);
+                    articleId, cursorLikeCount, cursorDate, afterDate, asc, pageable);
         }
 
         // Slice에서 자동으로 content와 hasNext 추출
