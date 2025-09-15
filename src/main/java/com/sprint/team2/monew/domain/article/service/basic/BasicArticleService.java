@@ -23,7 +23,10 @@ import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
 import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
+import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
@@ -60,6 +63,8 @@ public class BasicArticleService implements ArticleService {
     private final CommentRepository commentRepository;
 
     private final UserRepository userRepository;
+
+    private final UserActivityMapper userActivityMapper;
 
     @Override
     public void saveByInterest(UUID interestId) {
@@ -117,61 +122,43 @@ public class BasicArticleService implements ArticleService {
                     return UserNotFoundException.withId(userId);
                 });
 
-        UserActivity userActivity = userActivityRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.error("[UserActivity] 그런 활동 없음, userId = {}", userId);
-                    return UserActivityNotFoundException.withId(userId);
-                });
-
         boolean alreadyViewed = hasUserViewedArticle(userId, articleId);
 
-        ArticleViewDto dto;
+        LocalDateTime viewedDate;
+        long articleCommentCount = 0L;
+        long articleViewCount = article.getViewCount();
+
         if (!alreadyViewed) {
-            dto = new ArticleViewDto(
-                    UUID.randomUUID(),
-                    userId,
-                    LocalDateTime.now(),
-                    article.getId(),
-                    article.getSource().name(),
-                    article.getSourceUrl(),
-                    article.getTitle(),
-                    article.getPublishDate(),
-                    article.getSummary(),
-                    0L,
-                    article.getViewCount() + 1
-            );
+            viewedDate = LocalDateTime.now();
+            articleViewCount += 1;
+            article.setViewCount(articleViewCount);
 
-            userActivity.getArticleViews().add(dto);
-            userActivityRepository.save(userActivity);
-
-            article.setViewCount(article.getViewCount() + 1);
             articleRepository.save(article);
         } else {
-            dto = userActivity.getArticleViews().stream()
-                    .filter(articleView -> articleView.articleId().equals(articleId))
-                    .findFirst()
-                    .orElseThrow(() -> {
-                        log.error("[UserActivity] 조회 기록 없음, userActivityId = {}", userActivity.getId());
-                        return ArticleNotFoundException.withId(userActivity.getId());
-                    });
+            viewedDate = userActivityRepositoryCustom.findByArticleId(userId ,articleId).createdAt();
         }
 
-        long commentCount = commentRepository.countByArticle_Id(articleId);
+        articleCommentCount = commentRepository.countByArticle_Id(articleId);
 
         log.info("[Article] 기사 뷰 등록 성공");
-        return new ArticleViewDto(
+        ArticleViewDto articleViewDto = new ArticleViewDto(
                 UUID.randomUUID(),
                 userId,
-                dto.createdAt(),
+                viewedDate,
                 article.getId(),
                 article.getSource().name(),
                 article.getSourceUrl(),
                 article.getTitle(),
                 article.getPublishDate(),
                 article.getSummary(),
-                commentCount,
-                article.getViewCount()
+                articleCommentCount,
+                articleViewCount
         );
+
+        // publish event
+        applicationEventPublisher.publishEvent(userActivityMapper.toArticleViewEvent(articleViewDto));
+
+        return articleViewDto;
     }
 
     @Override
@@ -241,7 +228,7 @@ public class BasicArticleService implements ArticleService {
                         article.getTitle(),
                         article.getPublishDate(),
                         article.getSummary(),
-                        commentRepository.countByArticleId(article.getId()),
+                        commentRepository.countByArticle_Id(article.getId()),
                         article.getViewCount(),
                         hasUserViewedArticle(userId, article.getId())
                 ))
@@ -275,6 +262,10 @@ public class BasicArticleService implements ArticleService {
 
         article.setDeletedAt(LocalDateTime.now());
         log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
+
+        applicationEventPublisher.publishEvent(new ArticleDeleteEvent(
+            articleId
+        ));
     }
 
     @Override
@@ -285,7 +276,9 @@ public class BasicArticleService implements ArticleService {
                     return ArticleNotFoundException.withId(articleId);
                 });
 
-        userActivityRepositoryCustom.deleteByArticleId(articleId);
+        applicationEventPublisher.publishEvent(new ArticleDeleteEvent(
+            articleId
+        ));
 
         articleRepository.delete(article);
         log.info("[Article] 물리 삭제 성공");

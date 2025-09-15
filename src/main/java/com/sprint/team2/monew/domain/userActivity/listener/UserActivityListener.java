@@ -6,6 +6,7 @@ import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityCancelDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
@@ -194,35 +195,29 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 좋아요 삭제 완료 - commentId = {}", commentId);
   }
 
-  // ================================== 읽은 기사 *NOT DONE ==================================
+  // ================================== 기사 ==================================
 
-  // 유저가 최근에 읽은 기사
   @TransactionalEventListener
   public void handleArticleViewAdd(ArticleViewEvent event) {
-    UUID userId = event.getId();
-    UUID articleId = event.getArticleId();
+    UUID articleId = event.articleId();
     ArticleViewDto articleViewDto = userActivityMapper.toArticleViewDto(event);
 
     log.info("[사용자 활동] 읽은 기사 추가 시작 - articleId = {}", articleId);
-
-    UserActivity userActivity = userActivityRepository.findById(userId)
-        .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
-    List<ArticleViewDto> articleViewDtos = userActivity.getArticleViews();
-
-//    if (!articleViewDtos.contains(articleViewDto)) {
-//      articleViewDtos.add(0, articleViewDto);
-//    }
-
-    articleViewDtos.add(0, articleViewDto);
-
-    if (articleViewDtos.size() > 10) {
-      articleViewDtos.remove(articleViewDtos.size() - 1); // removing oldest item
-    }
-
-    userActivityRepository.save(userActivity);
-
+    userActivityRepositoryCustom.addArticleView(articleViewDto);
     log.info("[사용자 활동] 읽은 기사 추가 완료 - articleId = {}", articleId);
   }
+
+  @TransactionalEventListener
+  public void handleArticleDelete(ArticleDeleteEvent event) {
+    UUID articleId = event.articleId();
+
+    log.info("[사용자 활동] 기사 관련 활동 삭제 시작 - articleId = {}", articleId);
+    userActivityRepositoryCustom.deleteByArticleId(articleId);
+    log.info("[사용자 활동] 기사 관련 활동 삭제 완료 - articleId = {}", articleId);
+
+  }
+
+
 }
 
 

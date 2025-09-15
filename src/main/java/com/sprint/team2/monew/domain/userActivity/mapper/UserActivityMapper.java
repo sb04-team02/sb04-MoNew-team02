@@ -27,6 +27,8 @@ public interface UserActivityMapper {
 
   ArticleViewDto toArticleViewDto(ArticleViewEvent event);
 
+  ArticleViewEvent toArticleViewEvent(ArticleViewDto dto);
+
   SubscriptionDto toSubscriptionDto(SubscriptionAddEvent event);
 
   CommentActivityDto toCommentActivityDto(CommentUpdateEvent event);

@@ -4,6 +4,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
+import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.subscription.entity.Subscription;
@@ -67,7 +68,7 @@ public class UserActivityRepositoryCustom {
         Update update = new Update()
             .pull("subscriptions", Query.query(Criteria.where("interestId").is(interestId)));
 
-        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class);
         log.info("[사용자 활동] 전체 구독 삭제 완료 - interestId = {}. {}명의 사용자에게서 삭제됨.",
             interestId, result.getModifiedCount());
     }
@@ -78,7 +79,7 @@ public class UserActivityRepositoryCustom {
         Update update = new Update()
             .set("subscriptions.$.interestKeywords", keywords);
 
-        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class);
         if (result.getModifiedCount() == 0) {
             log.warn("[사용자 활동] 구독 키워드 수정 실패 - 매칭되는 interestId가 없습니다. interestId = {}", interestId);
         }
@@ -166,6 +167,32 @@ public class UserActivityRepositoryCustom {
     /**
      * Article 관련
      */
+    public ArticleViewDto findByArticleId(UUID userId, UUID articleId) {
+        Query query = new Query(Criteria.where("_id").is(userId)
+            .and("articleViews.articleId").is(articleId));
+        query.fields().include("articleViews.$");
+        UserActivity userActivity = mongoTemplate.findOne(query, UserActivity.class);
+        if (userActivity != null && !userActivity.getArticleViews().isEmpty()) {
+            return userActivity.getArticleViews().get(0);
+        }
+        return null; // Or throw an exception
+    }
+
+    public void addArticleView(ArticleViewDto articleViewDto) {
+        UUID userId = articleViewDto.viewedBy();
+        Query query = new Query(Criteria.where("_id").is(userId));
+        Update update = new Update()
+            .push("articleViews")
+            .atPosition(0)
+            .slice(10)
+            .each(articleViewDto);
+
+        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+        if (result.getMatchedCount() == 0) {
+            throw UserActivityNotFoundException.withId(userId);
+        }
+    }
+
     public boolean existsByArticleId(UUID articleId) {
         Query query = new Query(where("articleViews.articleId").is(articleId));
         return mongoTemplate.exists(query, UserActivity.class);
