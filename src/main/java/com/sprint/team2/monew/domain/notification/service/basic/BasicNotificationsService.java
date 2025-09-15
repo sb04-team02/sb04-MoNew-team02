@@ -166,7 +166,7 @@ public class BasicNotificationsService implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size) {
+    public CursorPageResponseNotificationDto getAllNotifications( String nextCursor, UUID userId, LocalDateTime nextAfter, int size) {
         log.info("[알림] 알림 목록 조회 시작 / 사용자 ID={}", userId);
 
         User user = userRepository.findById(userId)
@@ -176,7 +176,7 @@ public class BasicNotificationsService implements NotificationService {
                 });
         //Pageable 설정
         Pageable pageableRequest = PageRequest.of(0, size, Sort.by("createdAt").descending());
-        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(userId, nextAfter, pageableRequest);
+        Slice<Notification> slice = notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageableRequest);
 
         List<Notification> notifications = slice.getContent();
 
@@ -186,7 +186,7 @@ public class BasicNotificationsService implements NotificationService {
                 .map(notificationMapper::toNotificationDto)
                 .toList();
 
-        String nextCursor = null;
+        nextCursor = null;
         if (!notifications.isEmpty()) {
             nextCursor = notifications.get(notifications.size() - 1).getCreatedAt().toString();
         }

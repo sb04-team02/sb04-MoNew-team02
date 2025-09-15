@@ -31,7 +31,7 @@ public class NotificationController {
             @RequestParam (value = "limit") @Positive int size
             ) {
         log.info("[알림] 확인하지 않은 알림 조회 요청 / 요청자 ID={}", userId);
-        CursorPageResponseNotificationDto response = notificationService.getAllNotifications(userId,nextAfter,size);
+        CursorPageResponseNotificationDto response = notificationService.getAllNotifications( nextCursor, userId,nextAfter,size);
         log.info("[알림] 확인하지 않은 알림 조회 응답 / 요청자 ID={}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
