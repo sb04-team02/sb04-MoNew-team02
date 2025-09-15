@@ -3,6 +3,7 @@ package com.sprint.team2.monew.domain.userActivity.mapper;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
+import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityCancelDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import com.sprint.team2.monew.domain.userActivity.dto.response.UserActivityResponseDto;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
@@ -10,6 +11,7 @@ import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleVie
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeAddEvent;
+import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import org.mapstruct.Mapper;
@@ -34,4 +36,7 @@ public interface UserActivityMapper {
   CommentActivityDto toCommentActivityDto(CommentDeleteEvent event);
 
   CommentActivityLikeDto toCommentActivityLikeDto(CommentLikeAddEvent event);
+
+  CommentActivityCancelDto toCommentActivityCancelDto(CommentLikeCancelEvent event);
+
 }

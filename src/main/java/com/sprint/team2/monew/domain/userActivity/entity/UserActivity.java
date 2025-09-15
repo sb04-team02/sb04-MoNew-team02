@@ -38,15 +38,7 @@ public class UserActivity {
   private List<CommentActivityLikeDto> commentLikes = new ArrayList<>();
   private List<ArticleViewDto> articleViews = new ArrayList<>();
 
-  public UserActivity() {
-    this.subscriptions = new ArrayList<>();
-    this.comments = new ArrayList<>();
-    this.commentLikes = new ArrayList<>();
-    this.articleViews = new ArrayList<>();
-  }
-
   public UserActivity(UUID id, String email, String nickname) {
-    this();
     this.id = id;
     this.email = email;
     this.nickname = nickname;
