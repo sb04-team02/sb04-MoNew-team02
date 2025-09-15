@@ -11,6 +11,7 @@ import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityCancelDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
 import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,11 +34,6 @@ public class UserActivityRepositoryCustom {
     private final MongoTemplate mongoTemplate;
 
     /**
-     * User 관련
-     */
-
-
-    /**
      * Subscription 관련
      */
     public void addSubscription(UUID userId, SubscriptionDto subscriptionDto) {
@@ -56,7 +52,7 @@ public class UserActivityRepositoryCustom {
 
     public void cancelSubscription(UUID userId, UUID subscriptionId) {
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
-        Update update = new Update() // for comments array (child)
+        Update update = new Update()
             .pull("subscriptions", Query.query(Criteria.where("id").is(subscriptionId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
@@ -65,7 +61,7 @@ public class UserActivityRepositoryCustom {
         }
     }
 
-    // 구독을 포함한 모든 유저의 정보도 업데이트 됨
+    // 모든 유저의 정보도 업데이트
     public void deleteSubscription(UUID interestId) {
         Query query = new Query(Criteria.where("subscriptions.interestId").is(interestId));
         Update update = new Update()
@@ -74,6 +70,18 @@ public class UserActivityRepositoryCustom {
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         log.info("[사용자 활동] 전체 구독 삭제 완료 - interestId = {}. {}명의 사용자에게서 삭제됨.",
             interestId, result.getModifiedCount());
+    }
+
+    // 모든 유저의 정보도 업데이트
+    public void updateSubscriptionKeyword(UUID interestId, List<String> keywords) {
+        Query query = new Query(Criteria.where("subscriptions.interestId").is(interestId));
+        Update update = new Update()
+            .set("subscriptions.$.interestKeywords", keywords);
+
+        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+        if (result.getModifiedCount() == 0) {
+            log.warn("[사용자 활동] 구독 키워드 수정 실패 - 매칭되는 interestId가 없습니다. interestId = {}", interestId);
+        }
     }
 
     /**
@@ -154,7 +162,6 @@ public class UserActivityRepositoryCustom {
             log.warn("[사용자 활동] 삭제할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
         }
     }
-
 
     /**
      * Article 관련

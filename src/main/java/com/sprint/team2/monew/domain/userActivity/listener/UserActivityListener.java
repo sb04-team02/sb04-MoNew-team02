@@ -1,6 +1,5 @@
 package com.sprint.team2.monew.domain.userActivity.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
@@ -16,6 +15,7 @@ import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpd
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionKeywordUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserLoginEvent;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,18 +39,11 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class UserActivityListener {
 
-  /**
-   * 나중에 최적화:
-   * - repository에 @Query, @Update 알아보기
-   */
-
   public final UserActivityRepository userActivityRepository;
   public final UserActivityMapper userActivityMapper;
-  private final ObjectMapper objectMapper;
   private final UserActivityRepositoryCustom userActivityRepositoryCustom;
 
-  // ================================== 사용자 *NOT DONE ==================================
-  // 사용자 생성
+  // ================================== 사용자 ==================================
   @TransactionalEventListener
   public void handleUserCreate(UserCreateEvent event) {
     UUID id = event.id();
@@ -63,16 +55,7 @@ public class UserActivityListener {
         nickname
     );
     log.info("[사용자 활동] 생성 시작 - id = {}",id);
-    // save to mongodb
-    userActivityRepository.save(newUserActivity);
-
-    try {
-      String jsonObject = objectMapper.writeValueAsString(newUserActivity);
-      log.info("[사용자 활동] Saving object state: {}", jsonObject);
-    } catch (Exception e) {
-      log.error("[사용자 활동] Error serializing object", e);
-    }
-
+    userActivityRepository.insert(newUserActivity);
     log.info("[사용자 활동] 생성 완료 - id = {}", id);
   }
 
@@ -91,13 +74,10 @@ public class UserActivityListener {
         nickname
     );
     log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
-    // save to mongodb
     userActivityRepository.save(newUserActivity);
-
     log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
   }
 
-  // 사용자 닉네임 수정
   @TransactionalEventListener
   public void handleUserUpdate(UserUpdateEvent event) {
 
@@ -107,26 +87,21 @@ public class UserActivityListener {
     log.info("[사용자 활동] 닉네임 수정 시작 - userId = {}", userId);
     UserActivity userActivity = userActivityRepository.findById(userId)
         .orElseThrow(() -> UserActivityNotFoundException.withId(userId));
-    // save to mongodb
     userActivity.setNickname(nickname);
     userActivityRepository.save(userActivity);
-
     log.info("[사용자 활동] 닉네임 수정 완료 - userId = {}", userId);
   }
 
-  // 사용자 삭제
   @TransactionalEventListener
   public void handleUserDelete(UserDeleteEvent event) {
-
     UUID userId = event.userId();
 
     log.info("[사용자 활동] 유저 삭제 시작 - userId = {}", userId);
     userActivityRepository.deleteById(userId);
-
     log.info("[사용자 활동] 유저 삭제 완료 - userId = {}", userId);
   }
 
-  // ================================== 구독  * NOT DONE - 키워드 ==================================
+  // ================================== 구독 ==================================
   @TransactionalEventListener
   public void handleSubscriptionAdd(SubscriptionAddEvent event) {
     UUID userId = event.userId();
@@ -155,6 +130,16 @@ public class UserActivityListener {
     log.info("[사용자 활동] 구독 삭제 시작 - interestId = {}",interestId);
     userActivityRepositoryCustom.deleteSubscription(interestId);
     log.info("[사용자 활동] 구독 취소 완료 - interestId = {}", interestId);
+  }
+
+  @TransactionalEventListener
+  public void handleSubscriptionKeywordUpdate(SubscriptionKeywordUpdateEvent event) {
+    UUID interestId = event.interestId();
+    List<String> keywords = event.keywords();
+
+    log.info("[사용자 활동] 구독 키워드 수정 시작 - interestId = {}",interestId);
+    userActivityRepositoryCustom.updateSubscriptionKeyword(interestId, keywords);
+    log.info("[사용자 활동] 구독 키워드 수정 시작 - interestId = {}", interestId);
   }
 
   // ================================== 댓글 ==================================

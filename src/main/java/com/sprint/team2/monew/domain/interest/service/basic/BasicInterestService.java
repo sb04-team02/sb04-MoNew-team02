@@ -24,6 +24,7 @@ import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionCancelEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionKeywordUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -165,6 +166,13 @@ public class BasicInterestService implements InterestService {
         log.debug("[관심사] 수정 후 키워드 keywords = {}",interest.getKeywords());
         interestRepository.save(interest);
         log.info("[관심사] 관심사 수정 완료 id = {}", interestId);
+
+        // ============== User Activity 이벤트 추가 ==============
+        publisher.publishEvent(new SubscriptionKeywordUpdateEvent(
+            interestId,
+            interest.getKeywords()
+        ));
+
         return interestMapper.toDto(interest);
     }
 
