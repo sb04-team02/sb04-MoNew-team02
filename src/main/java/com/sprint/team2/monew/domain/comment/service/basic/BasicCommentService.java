@@ -12,7 +12,6 @@ import com.sprint.team2.monew.domain.comment.entity.CommentSortType;
 import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
 import com.sprint.team2.monew.domain.comment.exception.CommentForbiddenException;
 import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
-import com.sprint.team2.monew.domain.comment.exception.InvalidPageSizeException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -228,103 +228,106 @@ public class BasicCommentService implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseCommentDto getAllArticleComment(UUID articleId, UUID requesterUserId,
-                                                             String cursor, int size,
-                                                             CommentSortType sortType, boolean asc) {
+    public CursorPageResponseCommentDto getAllArticleComment(
+            UUID articleId,
+            UUID requesterUserId,
+            String cursor,
+            int size,
+            OffsetDateTime after,
+            CommentSortType sortType,
+            boolean asc
+    ) {
         log.info("댓글 목록 조회 시작: articleId={}, sortType={}, asc={}, size={}",
                 articleId, sortType, asc, size);
 
-
-        if (sortType == null) {sortType = CommentSortType.DATE;}
-
-        if (size <= 0 || size > 100) {
-            size = 20;
-        }
+        if (sortType == null) sortType = CommentSortType.DATE;
+        if (size <= 0 || size > 100) size = 20;
 
         if (!articleRepository.existsById(articleId)) {
             log.error("뉴스기사가 존재하지 않습니다.");
             throw new ArticleNotFoundException();
         }
 
-        // 커서 파싱
+        // === after 보정 및 플래그 ===
+        final LocalDateTime afterDate = (after != null) ? after.toLocalDateTime() : null;
+        final boolean hasAfter = (afterDate != null);
+
+        // === cursor 파싱 및 플래그 ===
         LocalDateTime cursorDate = null;
-        Long cursorLikeCount = null;
+        Long cursorLike = null;
 
         if (cursor != null && !cursor.isBlank()) {
             try {
                 if (sortType == CommentSortType.DATE) {
                     cursorDate = LocalDateTime.parse(cursor);
-                } else if (sortType == CommentSortType.LIKE_COUNT) {
-                    // 좋아요 수와 날짜를 함께 인코딩
+                } else { // LIKE_COUNT
                     String[] parts = cursor.split("\\|");
-                    if (parts.length == 2) {
-                        cursorLikeCount = Long.parseLong(parts[0]);
-                        cursorDate = LocalDateTime.parse(parts[1]);
-                    } else {
-                        throw new IllegalArgumentException("좋아요 정렬에 대한 잘못된 커서 형식입니다");
-                    }
+                    if (parts.length != 2) throw new IllegalArgumentException("좋아요 정렬에 대한 잘못된 커서 형식입니다");
+                    cursorLike = Long.parseLong(parts[0]);
+                    cursorDate = LocalDateTime.parse(parts[1]);
                 }
             } catch (Exception e) {
                 log.error("잘못된 커서 형식: cursor={}, sortType={}", cursor, sortType);
                 throw new IllegalArgumentException("잘못된 커서 형식입니다.");
             }
         }
+        final boolean hasCursor = (sortType == CommentSortType.DATE)
+                ? (cursorDate != null)
+                : (cursorLike != null && cursorDate != null);
 
-        // Pageable 설정 (Spring Data가 size+1 조회를 자동 처리)
+        // === 정렬/페이지 설정 ===
         Sort.Direction direction = asc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        String sortProperty = (sortType == CommentSortType.DATE) ? "createdAt" : "likeCount";
-
-        // 좋아요 정렬의 경우 보조 정렬 추가 (likeCount, createdAt)
         Sort sort = (sortType == CommentSortType.LIKE_COUNT)
                 ? Sort.by(direction, "likeCount").and(Sort.by(direction, "createdAt"))
-                : Sort.by(direction, sortProperty);
-
+                : Sort.by(direction, "createdAt");
         Pageable pageable = PageRequest.of(0, size, sort);
 
-        // Slice 조회 (Spring Data가 자동으로 size+1 조회하고 hasNext 계산)
-        Slice<Comment> slice;
-        if (sortType == CommentSortType.DATE) {
-            slice = commentRepository.findByArticleIdWithDateCursor(
-                    articleId, cursorDate, asc, pageable);
-        } else {
-            slice = commentRepository.findByArticleIdWithLikeCountCursor(
-                    articleId, cursorLikeCount, cursorDate, asc, pageable);
-        }
+        // === 조회 ===
+        Slice<Comment> slice = (sortType == CommentSortType.DATE)
+                ? commentRepository.findByArticle_IdWithDateCursor(
+                /* :articleId */ articleId,
+                /* :hasAfter  */ hasAfter,
+                /* :afterDate */ afterDate,
+                /* :hasCursor */ hasCursor,
+                /* :cursorDate*/ cursorDate,
+                /* :asc       */ asc,
+                pageable
+        )
+                : commentRepository.findByArticle_IdWithLikeCountCursor(
+                /* :articleId  */ articleId,
+                /* :hasAfter   */ hasAfter,
+                /* :afterDate  */ afterDate,
+                /* :hasCursor  */ hasCursor,
+                /* :cursorLike */ cursorLike,
+                /* :cursorDate */ cursorDate,
+                /* :asc        */ asc,
+                pageable
+        );
 
-        // Slice에서 자동으로 content와 hasNext 추출
-        List<Comment> comments = slice.getContent();  // 최대 size 개
-        boolean hasNext = slice.hasNext();            // Spring이 자동 계산
+        // === 변환 ===
+        List<Comment> comments = slice.getContent();
+        boolean hasNext = slice.hasNext();
 
-        // 댓글 DTO 변환 (좋아요 여부 포함)
         List<CommentDto> commentDtos = comments.stream()
-                .map(comment -> {
-                    boolean likedByMe = false;
-                    if (requesterUserId != null) {
-                        likedByMe = reactionRepository.existsByUserIdAndCommentId(
-                                requesterUserId, comment.getId());
-                    }
-                    return commentMapper.toDto(comment, likedByMe);
+                .map(c -> {
+                    boolean likedByMe = (requesterUserId != null)
+                            && reactionRepository.existsByUserIdAndCommentId(requesterUserId, c.getId());
+                    return commentMapper.toDto(c, likedByMe);
                 })
                 .toList();
 
-        // 다음 커서 생성
+        // === nextCursor / nextAfter ===
         String nextCursor = null;
         LocalDateTime nextAfter = null;
-
         if (hasNext && !comments.isEmpty()) {
-            Comment lastComment = comments.get(comments.size() - 1);
-            nextAfter = lastComment.getCreatedAt();
-
-            if (sortType == CommentSortType.DATE) {
-                nextCursor = lastComment.getCreatedAt().toString();
-            } else if (sortType == CommentSortType.LIKE_COUNT) {
-                // 좋아요 수와 날짜를 함께 인코딩
-                nextCursor = lastComment.getLikeCount() + "|" + lastComment.getCreatedAt().toString();
-            }
+            Comment last = comments.get(comments.size() - 1);
+            nextAfter = last.getCreatedAt(); // DTO 필드명과 동일
+            nextCursor = (sortType == CommentSortType.LIKE_COUNT)
+                    ? last.getLikeCount() + "|" + last.getCreatedAt()
+                    : last.getCreatedAt().toString();
         }
 
-        // 전체 개수 조회
-        long totalElements = commentRepository.countByArticleIdAndNotDeleted(articleId);
+        long totalElements = commentRepository.countByArticle_IdAndNotDeleted(articleId);
 
         log.info("댓글 목록 조회 완료: articleId={}, 조회된 수={}, 전체 수={}, hasNext={}",
                 articleId, commentDtos.size(), totalElements, hasNext);
@@ -338,5 +341,6 @@ public class BasicCommentService implements CommentService {
                 hasNext
         );
     }
+
 
 }
