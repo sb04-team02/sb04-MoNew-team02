@@ -241,7 +241,7 @@ public class BasicArticleService implements ArticleService {
                         article.getTitle(),
                         article.getPublishDate(),
                         article.getSummary(),
-                        commentRepository.countByArticleId(article.getId()),
+                        commentRepository.countByArticle_Id(article.getId()),
                         article.getViewCount(),
                         hasUserViewedArticle(userId, article.getId())
                 ))

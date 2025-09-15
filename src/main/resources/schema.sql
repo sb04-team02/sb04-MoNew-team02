@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id         uuid PRIMARY KEY             DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -9,7 +9,7 @@ CREATE TABLE users
     password   VARCHAR(50)         NOT NULL
 );
 
-CREATE TABLE interests
+CREATE TABLE IF NOT EXISTS interests
 (
     id                 uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -19,7 +19,7 @@ CREATE TABLE interests
     keywords           JSON
 );
 
-CREATE TABLE subscriptions
+CREATE TABLE IF NOT EXISTS subscriptions
 (
     id          uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -29,7 +29,7 @@ CREATE TABLE subscriptions
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE articles
+CREATE TABLE IF NOT EXISTS articles
 (
     id            uuid PRIMARY KEY             DEFAULT uuid_generate_v4(),
     created_at    TIMESTAMPTZ         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -46,7 +46,7 @@ CREATE TABLE articles
     FOREIGN KEY (interest_id) REFERENCES interests (id) ON DELETE SET NULL
 );
 
-CREATE TABLE comments
+CREATE TABLE IF NOT EXISTS comments
 (
     id         uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -61,7 +61,7 @@ CREATE TABLE comments
     CONSTRAINT comments_like_count_nonnegative CHECK ( like_count >= 0 )
 );
 
-CREATE TABLE likes
+CREATE TABLE IF NOT EXISTS likes
 (
     id         uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -72,7 +72,7 @@ CREATE TABLE likes
     CONSTRAINT uk_likes_user_comment UNIQUE (user_id, comment_id)
 );
 
-CREATE TABLE notifications
+CREATE TABLE IF NOT EXISTS notifications
 (
     id            uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -85,7 +85,7 @@ CREATE TABLE notifications
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_activities
+CREATE TABLE IF NOT EXISTS user_activities
 (
     id              uuid PRIMARY KEY     DEFAULT uuid_generate_v4(),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
