@@ -464,7 +464,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 true // hasNext
         );
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(asc), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), eq(asc), any(PageRequest.class)))
                 .willReturn(slice);
 
         // likedByMe: true, false, true
@@ -480,7 +480,7 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(c2, false)).willReturn(dto2);
         given(commentMapper.toDto(c3, true)).willReturn(dto3);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(42L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(42L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
@@ -495,13 +495,13 @@ public class BasicCommentServiceTest {
 
         then(articleRepository).should().existsById(articleId);
         then(commentRepository).should()
-                .findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class));
+                .findByArticle_IdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class));
         then(reactionRepository).should(times(3))
                 .existsByUserIdAndCommentId(eq(requesterId), any(UUID.class));
         then(commentMapper).should().toDto(c1, true);
         then(commentMapper).should().toDto(c2, false);
         then(commentMapper).should().toDto(c3, true);
-        then(commentRepository).should().countByArticleIdAndNotDeleted(articleId);
+        then(commentRepository).should().countByArticle_IdAndNotDeleted(articleId);
         then(commentRepository).shouldHaveNoMoreInteractions();
     }
 
@@ -538,7 +538,7 @@ public class BasicCommentServiceTest {
                         .and(Sort.by(Sort.Direction.DESC, "createdAt"))),
                 true
         );
-        given(commentRepository.findByArticleIdWithLikeCountCursor(
+        given(commentRepository.findByArticle_IdWithLikeCountCursor(
                 eq(articleId), isNull(), isNull(), eq(asc), any(PageRequest.class)))
                 .willReturn(slice);
 
@@ -551,7 +551,7 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(a, false)).willReturn(dtoA);
         given(commentMapper.toDto(b, true)).willReturn(dtoB);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(7L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(7L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
@@ -563,7 +563,7 @@ public class BasicCommentServiceTest {
         assertThat(result.totalElements()).isEqualTo(7L);
         assertThat(result.nextCursor()).isEqualTo("10|" + t2);
 
-        then(commentRepository).should().findByArticleIdWithLikeCountCursor(
+        then(commentRepository).should().findByArticle_IdWithLikeCountCursor(
                 eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class));
     }
 
@@ -589,7 +589,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 false
         );
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
                 .willReturn(slice);
 
         CommentDto dto1 = mock(CommentDto.class);
@@ -597,7 +597,7 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(eq(c1), anyBoolean())).willReturn(dto1);
         given(commentMapper.toDto(eq(c2), anyBoolean())).willReturn(dto2);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(2L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(2L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
@@ -674,15 +674,15 @@ public class BasicCommentServiceTest {
                 false
         );
 
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
                 .willReturn(emptySlice);
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(0L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(0L);
 
         //when
         commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, requestedSize, CommentSortType.DATE, false);
 
         //then
-        then(commentRepository).should().findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), pageRequestCaptor.capture());
+        then(commentRepository).should().findByArticle_IdWithDateCursor(eq(articleId), isNull(), eq(false), pageRequestCaptor.capture());
         PageRequest pr = pageRequestCaptor.getValue();
         assertThat(pr.getPageSize()).isEqualTo(20);
         assertThat(pr.getSort()).isEqualTo(Sort.by(Sort.Direction.DESC, "createdAt"));

@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +25,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     @Modifying
     @Query("""
-           update Comment c 
+           update Comment c
               set c.likeCount = case when c.likeCount > 0 then c.likeCount - 1 else 0 end
             where c.id = :id
            """)
@@ -34,19 +33,18 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     Optional<Comment> findByIdAndDeletedAtIsNull(UUID id);
 
-    //일반 페이지네이션
-    List<Comment> findByArticleIdAndDeletedAtIsNull(UUID articleId, Pageable pageable);
-
     // 날짜 기준 커서 페이지네이션
     @Query("""
            select c from Comment c
-           where c.article.id = :articleId 
+           where c.article.id = :articleId
              and c.deletedAt is null
-             and (:cursor is null or 
-                  (:isAsc = true and c.createdAt > :cursor) or
-                  (:isAsc = false and c.createdAt < :cursor))
+             and (
+                  :cursor is null
+                  or (:isAsc = true and c.createdAt > coalesce(:cursor, c.createdAt))
+                  or (:isAsc = false and c.createdAt < coalesce(:cursor, c.createdAt))
+                 )
            """)
-    Slice<Comment> findByArticleIdWithDateCursor(
+    Slice<Comment> findByArticle_IdWithDateCursor(
             @Param("articleId") UUID articleId,
             @Param("cursor") LocalDateTime cursor,
             @Param("isAsc") boolean isAsc,
@@ -56,15 +54,23 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     // 좋아요 수 기준 커서 페이지네이션 (Slice 활용)
     @Query("""
            select c from Comment c
-           where c.article.id = :articleId 
+           where c.article.id = :articleId
              and c.deletedAt is null
-             and (:cursor is null or 
-                  (:isAsc = true and (c.likeCount > :cursor or 
-                                     (c.likeCount = :cursor and c.createdAt > :cursorDate))) or
-                  (:isAsc = false and (c.likeCount < :cursor or 
-                                      (c.likeCount = :cursor and c.createdAt < :cursorDate))))
+             and (
+                    :cursor is null
+                    or (:isAsc = true and (
+                               c.likeCount > coalesce(:cursor, c.likeCount)
+                               or (c.likeCount = coalesce(:cursor, c.likeCount)
+                                      and c.createdAt > coalesce(:cursorDate, c.createdAt))
+                    ))
+                    or (:isAsc = false and (
+                           c.likeCount < coalesce(:cursor, c.likeCount)
+                           or (c.likeCount = coalesce(:cursor, c.likeCount)
+                                  and c.createdAt < coalesce(:cursorDate, c.createdAt))
+                    ))
+                 )
            """)
-    Slice<Comment> findByArticleIdWithLikeCountCursor(
+    Slice<Comment> findByArticle_IdWithLikeCountCursor(
             @Param("articleId") UUID articleId,
             @Param("cursor") Long cursor,
             @Param("cursorDate") LocalDateTime cursorDate,
@@ -75,10 +81,10 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     // 전체 댓글 수 조회 (삭제되지 않은 것만)
     @Query("""
            select count(c) from Comment c
-           where c.article.id = :articleId 
+           where c.article.id = :articleId
              and c.deletedAt is null
            """)
-    long countByArticleIdAndNotDeleted(@Param("articleId") UUID articleId);
+    long countByArticle_IdAndNotDeleted(@Param("articleId") UUID articleId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
@@ -89,5 +95,5 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
            """)
     int softDeleteById(@Param("id") UUID id);
 
-    long countByArticleId(UUID articleId);
+    long countByArticle_Id(UUID articleId);
 }

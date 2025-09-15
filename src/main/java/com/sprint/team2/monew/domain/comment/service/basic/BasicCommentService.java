@@ -12,7 +12,6 @@ import com.sprint.team2.monew.domain.comment.entity.CommentSortType;
 import com.sprint.team2.monew.domain.comment.exception.CommentContentRequiredException;
 import com.sprint.team2.monew.domain.comment.exception.CommentForbiddenException;
 import com.sprint.team2.monew.domain.comment.exception.ContentNotFoundException;
-import com.sprint.team2.monew.domain.comment.exception.InvalidPageSizeException;
 import com.sprint.team2.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.comment.service.CommentService;
@@ -284,10 +283,10 @@ public class BasicCommentService implements CommentService {
         // Slice 조회 (Spring Data가 자동으로 size+1 조회하고 hasNext 계산)
         Slice<Comment> slice;
         if (sortType == CommentSortType.DATE) {
-            slice = commentRepository.findByArticleIdWithDateCursor(
+            slice = commentRepository.findByArticle_IdWithDateCursor(
                     articleId, cursorDate, asc, pageable);
         } else {
-            slice = commentRepository.findByArticleIdWithLikeCountCursor(
+            slice = commentRepository.findByArticle_IdWithLikeCountCursor(
                     articleId, cursorLikeCount, cursorDate, asc, pageable);
         }
 
@@ -324,7 +323,7 @@ public class BasicCommentService implements CommentService {
         }
 
         // 전체 개수 조회
-        long totalElements = commentRepository.countByArticleIdAndNotDeleted(articleId);
+        long totalElements = commentRepository.countByArticle_IdAndNotDeleted(articleId);
 
         log.info("댓글 목록 조회 완료: articleId={}, 조회된 수={}, 전체 수={}, hasNext={}",
                 articleId, commentDtos.size(), totalElements, hasNext);

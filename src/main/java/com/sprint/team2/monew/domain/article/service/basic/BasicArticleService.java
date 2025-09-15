@@ -164,7 +164,7 @@ public class BasicArticleService implements ArticleService {
                     });
         }
 
-        long commentCount = commentRepository.countByArticleId(articleId);
+        long commentCount = commentRepository.countByArticle_Id(articleId);
 
         return new ArticleViewDto(
                 UUID.randomUUID(),
