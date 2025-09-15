@@ -24,6 +24,7 @@ import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
@@ -119,20 +120,12 @@ public class BasicArticleService implements ArticleService {
                 });
 
         UserActivity userActivity = userActivityRepository.findById(userId)
-                .map(activity -> {
-                    if (activity.getArticleViews() == null) activity.setArticleViews(new ArrayList<>());
-                    if (activity.getComments() == null) activity.setComments(new ArrayList<>());
-                    if (activity.getCommentLikes() == null) activity.setCommentLikes(new ArrayList<>());
-                    if (activity.getSubscriptions() == null) activity.setSubscriptions(new ArrayList<>());
-                    return activity;
-                })
-                .orElseGet(() -> {
-                    log.info("[UserActivity] 활동내역이 없어서 새로 생성, userId = {}", userId);
-                    UserActivity newActivity = new UserActivity(user.getId(), user.getEmail(), user.getNickname());
-                    return userActivityRepository.save(newActivity);
+                .orElseThrow(() -> {
+                    log.error("[UserActivity] 그런 활동 없음, userId = {}", userId);
+                    return UserActivityNotFoundException.withId(userId);
                 });
 
-        boolean alreadyViewed = userActivityRepositoryCustom.existsByArticleId(articleId);
+        boolean alreadyViewed = hasUserViewedArticle(userId, articleId);
 
         ArticleViewDto dto;
         if (!alreadyViewed) {
