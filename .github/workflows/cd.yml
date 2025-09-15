@@ -61,8 +61,8 @@ jobs:
           tags: |
             ${{ env.REPO_URI }}:${{ steps.set-tag.outputs.image_tag }}
             ${{ env.REPO_URI }}:latest
-          cache-from: type=registry,ref=${{ env.REPO_URI }}:buildcache
-          cache-to: type=registry,ref=${{ env.REPO_URI }}:buildcache,mode=max
+#          cache-from: type=registry,ref=${{ env.REPO_URI }}:buildcache
+#          cache-to: type=registry,ref=${{ env.REPO_URI }}:buildcache,mode=max
           platforms: linux/amd64
 
   # ----------------------------------------------------------------
@@ -114,7 +114,7 @@ jobs:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE }}
           cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: false
+          wait-for-service-stability: true
 
       # 배포 상태 확인
       - name: ECS 배포 상태 확인
