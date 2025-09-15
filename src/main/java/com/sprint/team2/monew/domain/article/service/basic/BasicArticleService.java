@@ -244,6 +244,12 @@ public class BasicArticleService implements ArticleService {
     }
 
     @Override
+    public List<ArticleSource> readSource() {
+
+        return List.of(ArticleSource.values());
+    }
+
+    @Override
     public void softDelete(UUID articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> {
