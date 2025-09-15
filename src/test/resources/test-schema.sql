@@ -1,6 +1,6 @@
 CREATE TABLE users
 (
-    id         UUID PRIMARY KEY,
+    id         VARCHAR(36) PRIMARY KEY,
     created_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
@@ -11,7 +11,7 @@ CREATE TABLE users
 
 CREATE TABLE interests
 (
-    id                 UUID PRIMARY KEY,
+    id                 VARCHAR(36) PRIMARY KEY,
     created_at         TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
     name               VARCHAR(50) NOT NULL,
@@ -21,17 +21,17 @@ CREATE TABLE interests
 
 CREATE TABLE subscriptions
 (
-    id          UUID PRIMARY KEY,
+    id          VARCHAR(36) PRIMARY KEY,
     created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    interest_id UUID,
-    user_id     UUID,
+    interest_id VARCHAR(36),
+    user_id     VARCHAR(36),
     FOREIGN KEY (interest_id) REFERENCES interests (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE articles
 (
-    id            UUID PRIMARY KEY,
+    id            VARCHAR(36) PRIMARY KEY,
     created_at    TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
     deleted_at    TIMESTAMP,
@@ -42,20 +42,20 @@ CREATE TABLE articles
     summary       CLOB                NOT NULL,
     comment_count BIGINT              NOT NULL DEFAULT 0,
     view_count    BIGINT              NOT NULL DEFAULT 0,
-    interest_id   UUID,
+    interest_id   VARCHAR(36),
     FOREIGN KEY (interest_id) REFERENCES interests (id) ON DELETE SET NULL
 );
 
 CREATE TABLE comments
 (
-    id         UUID PRIMARY KEY,
+    id         VARCHAR(36) PRIMARY KEY,
     created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
     content    CLOB        NOT NULL,
     like_count BIGINT      NOT NULL DEFAULT 0,
-    article_id UUID,
-    user_id    UUID,
+    article_id VARCHAR(36),
+    user_id    VARCHAR(36),
     FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
     CONSTRAINT comments_like_count_nonnegative CHECK ( like_count >= 0 )
@@ -63,10 +63,10 @@ CREATE TABLE comments
 
 CREATE TABLE likes
 (
-    id         UUID PRIMARY KEY,
+    id         VARCHAR(36) PRIMARY KEY,
     created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    user_id    UUID        NOT NULL,
-    comment_id UUID        NOT NULL,
+    user_id    VARCHAR(36)        NOT NULL,
+    comment_id VARCHAR(36)        NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE,
     CONSTRAINT uk_likes_user_comment UNIQUE (user_id, comment_id)
@@ -74,27 +74,27 @@ CREATE TABLE likes
 
 CREATE TABLE notifications
 (
-    id            UUID PRIMARY KEY,
+    id            VARCHAR(36) PRIMARY KEY,
     created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
     confirmed     BOOLEAN     NOT NULL,
     content       CLOB,
     resource_type VARCHAR(50) NOT NULL,
-    resource_id   UUID        NOT NULL,
-    user_id       UUID,
+    resource_id   VARCHAR(36)        NOT NULL,
+    user_id       VARCHAR(36),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_activities
 (
-    id              UUID PRIMARY KEY,
+    id              VARCHAR(36) PRIMARY KEY,
     created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
-    user_id         UUID,
-    subscription_id UUID,
-    recent_news     UUID,
-    recent_comments UUID,
-    liked_comments  UUID,
+    user_id         VARCHAR(36),
+    subscription_id VARCHAR(36),
+    recent_news     VARCHAR(36),
+    recent_comments VARCHAR(36),
+    liked_comments  VARCHAR(36),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE SET NULL,
     FOREIGN KEY (recent_news) REFERENCES articles (id) ON DELETE SET NULL,
