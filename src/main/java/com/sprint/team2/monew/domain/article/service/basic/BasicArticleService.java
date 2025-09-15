@@ -156,7 +156,7 @@ public class BasicArticleService implements ArticleService {
                     });
         }
 
-        long commentCount = commentRepository.countByArticleId(articleId);
+        long commentCount = commentRepository.countByArticle_Id(articleId);
 
         log.info("[Article] 기사 뷰 등록 성공");
         return new ArticleViewDto(

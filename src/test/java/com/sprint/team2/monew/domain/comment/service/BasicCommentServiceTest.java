@@ -36,6 +36,7 @@ import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -441,6 +442,9 @@ public class BasicCommentServiceTest {
         int size = 3;
         boolean asc = false;
 
+        OffsetDateTime after = null;
+        LocalDateTime afterDate = null;
+
         LocalDateTime t3 = LocalDateTime.parse("2025-09-10T10:10:00");
 
         Comment c1 = mock(Comment.class);
@@ -464,7 +468,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 true // hasNext
         );
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(asc), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(asc), any(Pageable.class)))
                 .willReturn(slice);
 
         // likedByMe: true, false, true
@@ -480,11 +484,11 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(c2, false)).willReturn(dto2);
         given(commentMapper.toDto(c3, true)).willReturn(dto3);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(42L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(42L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
-                articleId, requesterId, null, size, null, asc);
+                articleId, requesterId, null, size, after,null, asc);
 
         //then
         assertThat(result).isNotNull();
@@ -495,13 +499,13 @@ public class BasicCommentServiceTest {
 
         then(articleRepository).should().existsById(articleId);
         then(commentRepository).should()
-                .findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class));
+                .findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class));
         then(reactionRepository).should(times(3))
                 .existsByUserIdAndCommentId(eq(requesterId), any(UUID.class));
         then(commentMapper).should().toDto(c1, true);
         then(commentMapper).should().toDto(c2, false);
         then(commentMapper).should().toDto(c3, true);
-        then(commentRepository).should().countByArticleIdAndNotDeleted(articleId);
+        then(commentRepository).should().countByArticle_IdAndNotDeleted(articleId);
         then(commentRepository).shouldHaveNoMoreInteractions();
     }
 
@@ -513,6 +517,9 @@ public class BasicCommentServiceTest {
         UUID requesterId = UUID.randomUUID();
         int size = 2;
         boolean asc = false;
+
+        OffsetDateTime after = null;
+        LocalDateTime afterDate = null;
 
         LocalDateTime t1 = LocalDateTime.parse("2025-09-10T09:00:00");
         LocalDateTime t2 = LocalDateTime.parse("2025-09-10T09:01:00");
@@ -538,8 +545,8 @@ public class BasicCommentServiceTest {
                         .and(Sort.by(Sort.Direction.DESC, "createdAt"))),
                 true
         );
-        given(commentRepository.findByArticleIdWithLikeCountCursor(
-                eq(articleId), isNull(), isNull(), eq(asc), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithLikeCountCursor(
+                eq(articleId), eq(false), isNull(), eq(false), isNull(), isNull(), eq(asc), any(Pageable.class)))
                 .willReturn(slice);
 
         given(reactionRepository.existsByUserIdAndCommentId(requesterId, aId)).willReturn(false);
@@ -551,11 +558,11 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(a, false)).willReturn(dtoA);
         given(commentMapper.toDto(b, true)).willReturn(dtoB);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(7L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(7L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
-                articleId, requesterId, null, size, CommentSortType.LIKE_COUNT, asc);
+                articleId, requesterId, null, size, after, CommentSortType.LIKE_COUNT, asc);
 
         //then
         assertThat(result.content()).containsExactly(dtoA, dtoB);
@@ -563,8 +570,8 @@ public class BasicCommentServiceTest {
         assertThat(result.totalElements()).isEqualTo(7L);
         assertThat(result.nextCursor()).isEqualTo("10|" + t2);
 
-        then(commentRepository).should().findByArticleIdWithLikeCountCursor(
-                eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class));
+        then(commentRepository).should().findByArticle_IdWithLikeCountCursor(
+                eq(articleId), eq(false), isNull(), eq(false), isNull(), isNull(), eq(false), any(Pageable.class));
     }
 
     @Test
@@ -573,6 +580,9 @@ public class BasicCommentServiceTest {
         //given
         UUID articleId = UUID.randomUUID();
         int size = 2;
+
+        OffsetDateTime after = null;
+        LocalDateTime afterDate = null;
 
         Comment c1 = mock(Comment.class);
         Comment c2 = mock(Comment.class);
@@ -589,7 +599,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 false
         );
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class)))
                 .willReturn(slice);
 
         CommentDto dto1 = mock(CommentDto.class);
@@ -597,11 +607,11 @@ public class BasicCommentServiceTest {
         given(commentMapper.toDto(eq(c1), anyBoolean())).willReturn(dto1);
         given(commentMapper.toDto(eq(c2), anyBoolean())).willReturn(dto2);
 
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(2L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(2L);
 
         //when
         CursorPageResponseCommentDto result = commentService.getAllArticleComment(
-                articleId, null, null, size, CommentSortType.DATE, false);
+                articleId, null, null, size, after, CommentSortType.DATE, false);
 
         //then
         assertThat(result.hasNext()).isFalse();
@@ -621,7 +631,7 @@ public class BasicCommentServiceTest {
 
         //when + then
         assertThatThrownBy(() ->
-                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, CommentSortType.DATE, false)
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, null, CommentSortType.DATE, false)
         ).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("잘못된 커서 형식");
 
@@ -638,7 +648,7 @@ public class BasicCommentServiceTest {
 
         //when + then
         assertThatThrownBy(() ->
-                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, CommentSortType.LIKE_COUNT, false)
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), badCursor, 10, null, CommentSortType.LIKE_COUNT, false)
         ).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("잘못된 커서 형식");
 
@@ -654,7 +664,7 @@ public class BasicCommentServiceTest {
 
         //when + then
         assertThatThrownBy(() ->
-                commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, 10, CommentSortType.DATE, false)
+                commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, 10, null, CommentSortType.DATE, false)
         ).isInstanceOf(ArticleNotFoundException.class);
 
         then(commentRepository).shouldHaveNoInteractions();
@@ -674,15 +684,15 @@ public class BasicCommentServiceTest {
                 false
         );
 
-        given(commentRepository.findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class)))
                 .willReturn(emptySlice);
-        given(commentRepository.countByArticleIdAndNotDeleted(articleId)).willReturn(0L);
+        given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(0L);
 
         //when
-        commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, requestedSize, CommentSortType.DATE, false);
+        commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, requestedSize, null, CommentSortType.DATE, false);
 
         //then
-        then(commentRepository).should().findByArticleIdWithDateCursor(eq(articleId), isNull(), eq(false), pageRequestCaptor.capture());
+        then(commentRepository).should().findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), pageRequestCaptor.capture());
         PageRequest pr = pageRequestCaptor.getValue();
         assertThat(pr.getPageSize()).isEqualTo(20);
         assertThat(pr.getSort()).isEqualTo(Sort.by(Sort.Direction.DESC, "createdAt"));
