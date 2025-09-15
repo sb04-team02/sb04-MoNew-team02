@@ -14,6 +14,7 @@ import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
     Slice<Notification> findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(
+            String nextCursor,
             UUID userId,
             LocalDateTime nextAfter,
             Pageable pageable);

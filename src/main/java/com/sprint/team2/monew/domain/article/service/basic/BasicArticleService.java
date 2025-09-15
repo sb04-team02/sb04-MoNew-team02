@@ -20,10 +20,10 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
-import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -105,33 +104,26 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     public ArticleViewDto view(UUID userId, UUID articleId) {
+        log.info("[Article] 기사 뷰 등록 시작, userId: {}, articleId: {}", userId, articleId);
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> {
                     log.error("[Article] 존재하지 않는 뉴스 기사, articleId = {}", articleId);
                     return ArticleNotFoundException.withId(articleId);
                 });
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("[User] 존재하지 않는 사용자, userId = {}", userId);
                     return UserNotFoundException.withId(userId);
                 });
 
         UserActivity userActivity = userActivityRepository.findById(userId)
-                .map(activity -> {
-                    if (activity.getArticleViews() == null) activity.setArticleViews(new ArrayList<>());
-                    if (activity.getComments() == null) activity.setComments(new ArrayList<>());
-                    if (activity.getCommentLikes() == null) activity.setCommentLikes(new ArrayList<>());
-                    if (activity.getSubscriptions() == null) activity.setSubscriptions(new ArrayList<>());
-                    return activity;
-                })
-                .orElseGet(() -> {
-                    log.info("[UserActivity] 활동내역이 없어서 새로 생성, userId = {}", userId);
-                    UserActivity newActivity = new UserActivity(user.getId(), user.getEmail(), user.getNickname());
-                    return userActivityRepository.save(newActivity);
+                .orElseThrow(() -> {
+                    log.error("[UserActivity] 그런 활동 없음, userId = {}", userId);
+                    return UserActivityNotFoundException.withId(userId);
                 });
 
-        boolean alreadyViewed = userActivityRepositoryCustom.existsByArticleId(articleId);
+        boolean alreadyViewed = hasUserViewedArticle(userId, articleId);
 
         ArticleViewDto dto;
         if (!alreadyViewed) {
@@ -166,6 +158,7 @@ public class BasicArticleService implements ArticleService {
 
         long commentCount = commentRepository.countByArticleId(articleId);
 
+        log.info("[Article] 기사 뷰 등록 성공");
         return new ArticleViewDto(
                 UUID.randomUUID(),
                 userId,
@@ -183,14 +176,23 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseArticleDto read(UUID userId, ArticleOrderBy orderBy, ArticleDirection direction, int limit,
+    public CursorPageResponseArticleDto read(UUID userId,
+                                             ArticleOrderBy orderBy,
+                                             ArticleDirection direction,
+                                             int limit,
                                              String keyword,
-                                             UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
-                                             String cursor, LocalDateTime after) {
+                                             UUID interestId,
+                                             List<ArticleSource> sourceIn,
+                                             LocalDateTime publishedDateFrom,
+                                             LocalDateTime publishedDateTo,
+                                             String cursor,
+                                             LocalDateTime after) {
 
-        if (limit <= 0) {
-            log.error("[Article] 커서 페이지 크기는 0보다 커야 함, limit = {}", limit);
-            throw InvalidParameterException.invalidParameter();
+        log.info("[Article] 뉴스 기사 목록 조회 시작");
+        if (keyword == null || keyword.isBlank() || cursor == null && after == null) {
+            cursor = null;
+            after = null;
+            limit = 50;
         }
 
         if (orderBy != ArticleOrderBy.publishDate &&
@@ -202,45 +204,65 @@ public class BasicArticleService implements ArticleService {
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
                 keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
-                orderBy, direction,
-                cursor, after, limit
+                orderBy, direction, cursor, after, limit
         );
 
         boolean hasNext = articles.size() > limit;
-        if (hasNext) {
-            articles = articles.subList(0, limit);
-        }
-
-        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCursor = {}",
-                userId, keyword, interestId, articles.size(), hasNext,
-                !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
 
         String nextCursor = null;
         LocalDateTime nextAfter = null;
 
-        if (!articles.isEmpty()) {
-            Article last = articles.get(articles.size() - 1);
-            switch (orderBy) {
-                case commentCount -> nextCursor = String.valueOf(last.getCommentCount());
-                case viewCount -> nextCursor = String.valueOf(last.getViewCount());
-                default -> nextCursor = last.getPublishDate().toString();
-            }
+        if (hasNext) {
+            Article last = articles.get(limit);
 
-            nextAfter = last.getCreatedAt();
+            switch (orderBy) {
+                case commentCount -> {
+                    nextCursor = String.valueOf(last.getCommentCount());
+                    nextAfter = last.getCreatedAt();
+
+                }
+                case viewCount -> {
+                    nextCursor = String.valueOf(last.getViewCount());
+                    nextAfter = last.getCreatedAt();
+                }
+                default -> {
+                    nextAfter = last.getCreatedAt();
+                    nextCursor = last.getPublishDate().toString();
+                }
+            }
+            articles = articles.subList(0, limit);
         }
 
-        long totalElements = articleRepositoryCustom.countArticles(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
-        );
+        List<ArticleDto> content = articles.stream()
+                .map(article -> new ArticleDto(
+                        article.getId(),
+                        article.getSource().name(),
+                        article.getSourceUrl(),
+                        article.getTitle(),
+                        article.getPublishDate(),
+                        article.getSummary(),
+                        commentRepository.countByArticleId(article.getId()),
+                        article.getViewCount(),
+                        hasUserViewedArticle(userId, article.getId())
+                ))
+                .toList();
+
+        log.info("[Article] 뉴스 기사 목록 조회 성공");
 
         return new CursorPageResponseArticleDto(
-                articles.stream().map(articleMapper::toArticleDto).toList(),
+                content,
                 nextCursor,
                 nextAfter,
-                articles.size(),
-                totalElements,
+                content.size(),
+                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo),
                 hasNext
         );
+    }
+
+    @Override
+    public List<ArticleSource> readSource() {
+
+        return List.of(ArticleSource.values());
     }
 
     @Override
@@ -269,4 +291,11 @@ public class BasicArticleService implements ArticleService {
         log.info("[Article] 물리 삭제 성공");
     }
 
+    // 공통 메서드
+    public boolean hasUserViewedArticle(UUID userId, UUID articleId) {
+        return userActivityRepository.findById(userId)
+                .map(userActivity -> userActivity.getArticleViews().stream()
+                        .anyMatch(view -> view.articleId().equals(articleId)))
+                .orElse(false);
+    }
 }

@@ -61,6 +61,15 @@ public class ArticleController {
                 .body(result);
     }
 
+    @GetMapping("/sources")
+    public ResponseEntity<List<ArticleSource>> getSources() {
+        List<ArticleSource> result = articleService.readSource();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
+    }
+
     @GetMapping("/restore")
     public ResponseEntity<ArticleRestoreResultDto> restoreArticles(@RequestParam("from") LocalDateTime from,
                                                                    @RequestParam("to") LocalDateTime to
