@@ -1,11 +1,13 @@
 package com.sprint.team2.monew.domain.user.repository;
 
 import com.sprint.team2.monew.domain.user.entity.User;
+import com.sprint.team2.monew.global.config.QuerydslConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnableJpaAuditing
 @ActiveProfiles("test")
 @Transactional
+@Import(QuerydslConfig.class)
 class UserRepositoryTest {
     
     @Autowired

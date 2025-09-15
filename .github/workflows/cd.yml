@@ -61,8 +61,8 @@ jobs:
           tags: |
             ${{ env.REPO_URI }}:${{ steps.set-tag.outputs.image_tag }}
             ${{ env.REPO_URI }}:latest
-          cache-from: type=registry,ref=${{ env.REPO_URI }}:buildcache
-          cache-to: type=registry,ref=${{ env.REPO_URI }}:buildcache,mode=max
+#          cache-from: type=registry,ref=${{ env.REPO_URI }}:buildcache
+#          cache-to: type=registry,ref=${{ env.REPO_URI }}:buildcache,mode=max
           platforms: linux/amd64
 
   # ----------------------------------------------------------------
@@ -98,6 +98,21 @@ jobs:
       - name: 기존 ECS 태스크 정의 다운로드
         run: aws ecs describe-task-definition --task-definition "${{ secrets.ECS_TASK_DEFINITION }}" --query taskDefinition > task-def.json
 
+      # 기존 태스크 중지
+      - name: 서비스 중지 (Desired Count를 0으로 설정)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --service ${{ secrets.ECS_SERVICE }} \
+            --desired-count 0
+
+      # 서비스 중지 대기
+      - name: 서비스 중지 대기
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --service ${{ secrets.ECS_SERVICE }}
+
       # 새 ECR 이미지로 태스크 정의 업데이트
       - name: 새 ECR 이미지로 태스크 정의 업데이트
         id: render-task-def
@@ -114,7 +129,7 @@ jobs:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE }}
           cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: false
+          wait-for-service-stability: true
 
       # 배포 상태 확인
       - name: ECS 배포 상태 확인

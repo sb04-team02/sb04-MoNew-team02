@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.userActivity.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
@@ -16,6 +17,7 @@ import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.Subsc
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionDeleteEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserCreateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserLoginEvent;
 import com.sprint.team2.monew.domain.userActivity.events.userEvent.UserUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
@@ -28,6 +30,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -41,10 +44,11 @@ public class UserActivityListener {
 
   public final UserActivityRepository userActivityRepository;
   public final UserActivityMapper userActivityMapper;
+  private final ObjectMapper objectMapper;
 
   // ================================== 사용자 ==================================
   // 사용자 생성
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserCreate(UserCreateEvent event) {
     UUID id = event.id();
@@ -59,11 +63,40 @@ public class UserActivityListener {
     // save to mongodb
     userActivityRepository.save(newUserActivity);
 
+    try {
+      String jsonObject = objectMapper.writeValueAsString(newUserActivity);
+      log.info("[사용자 활동] Saving object state: {}", jsonObject);
+    } catch (Exception e) {
+      log.error("[사용자 활동] Error serializing object", e);
+    }
+
     log.info("[사용자 활동] 생성 완료 - id = {}", id);
   }
 
+  @TransactionalEventListener
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void handleUserLogin(UserLoginEvent event) {
+    UUID id = event.id();
+    if (userActivityRepository.existsById(id)) {
+      log.info("[사용자 활동] 로그인 - id = {}",id);
+      return;
+    }
+    String email = event.email();
+    String nickname = event.nickname();
+    UserActivity newUserActivity = new UserActivity(
+        id,
+        email,
+        nickname
+    );
+    log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
+    // save to mongodb
+    userActivityRepository.save(newUserActivity);
+
+    log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
+  }
+
   // 사용자 닉네임 수정
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserUpdate(UserUpdateEvent event) {
 
@@ -81,7 +114,7 @@ public class UserActivityListener {
   }
 
   // 사용자 삭제
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleUserDelete(UserDeleteEvent event) {
 
@@ -95,7 +128,7 @@ public class UserActivityListener {
 
   // ================================== 구독 ==================================
   // 구독 업데이트
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionAdd(SubscriptionAddEvent event) {
     UUID userId = event.userId();
@@ -123,7 +156,7 @@ public class UserActivityListener {
   }
 
   // 구독 업데이트
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionCancel(SubscriptionCancelEvent event) {
     UUID userId = event.userId();
@@ -143,7 +176,7 @@ public class UserActivityListener {
   }
 
   // 관심사가 삭제되었을 때, 유저가 구독했으면 삭제
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleSubscriptionDelete(SubscriptionDeleteEvent event) {
     UUID interestId = event.interestId();
@@ -166,7 +199,7 @@ public class UserActivityListener {
 
   // ================================== 댓글 (최신 10개) ==================================
   // 유저 댓글 추가
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentAdd(CommentAddEvent event) {
     UUID commentId = event.id();
@@ -190,7 +223,7 @@ public class UserActivityListener {
     log.info("[사용자 활동] 댓글 추가 완료- commentId = {}", commentId);
   }
 
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentUpdate(CommentUpdateEvent event) {
     UUID commentId = event.id();
@@ -220,7 +253,7 @@ public class UserActivityListener {
   }
 
   // 유저 댓글 삭제
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentDelete(CommentDeleteEvent event) {
     UUID userId = event.userId();
@@ -242,7 +275,7 @@ public class UserActivityListener {
   // ================================== 댓글 좋아요 (최신 10개) ==================================
 
   // 유저 댓글 좋아요
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentLikeAdd(CommentLikeAddEvent event) {
     UUID commentId = event.commentId();
@@ -271,7 +304,7 @@ public class UserActivityListener {
   }
 
   // 유저 댓글 좋아요 취소
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleCommentLikeCancel(CommentLikeCancelEvent event) {
     UUID commentId = event.id();
@@ -294,7 +327,7 @@ public class UserActivityListener {
   // ================================== 읽은 기사 (최신 10개) ==================================
 
   // 유저가 최근에 읽은 기사
-  @EventListener
+  @TransactionalEventListener
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handleArticleViewAdd(ArticleViewEvent event) {
     UUID userId = event.getId();
