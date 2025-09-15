@@ -18,7 +18,7 @@ public class NewsBatchScheduler {
     private final JobLauncher jobLauncher;
     private final Job newsCollectJob;
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void runNewsCollectionJob() {
         try {
             JobParameters params = new JobParametersBuilder()
