@@ -20,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -280,11 +281,14 @@ public class CommentControllerTest {
     @Test
     @DisplayName("댓글 목록 조회 성공(200) - orderBy=likeCount, direction=DESC")
     void getCommentsOkLikeCountDesc() throws Exception {
-        //given
-        UUID articleId = UUID.randomUUID();
+        // given
+        UUID articleId   = UUID.randomUUID();
         UUID requesterId = UUID.randomUUID();
-        String cursor = "10|2025-09-10T12:34:56";
-        int limit = 2;
+        String cursor    = "10|2025-09-10T12:34:56";
+        int    limit     = 2;
+
+        // after(OffsetDateTime) 파라미터 준비
+        OffsetDateTime after = OffsetDateTime.parse("2025-09-10T12:00:00Z");
 
         CursorPageResponseCommentDto body = new CursorPageResponseCommentDto(
                 List.of(mock(CommentDto.class)),
@@ -296,23 +300,30 @@ public class CommentControllerTest {
         );
 
         given(commentService.getAllArticleComment(
-                eq(articleId), eq(requesterId), eq(cursor), eq(limit),
-                eq(CommentSortType.LIKE_COUNT), eq(false))
-        ).willReturn(body);
+                eq(articleId),
+                eq(requesterId),
+                eq(cursor),
+                eq(limit),
+                eq(after),                 // ⬅️ after 전달
+                eq(CommentSortType.LIKE_COUNT),
+                eq(false)
+        )).willReturn(body);
 
-        //when + then
+        // when + then
         mockMvc.perform(get("/api/comments")
                         .param("articleId", articleId.toString())
                         .param("orderBy", "likeCount")
                         .param("direction", "DESC")
                         .param("cursor", cursor)
+                        .param("after", after.toString()) // ⬅️ 쿼리 파라미터로 after 포함
                         .param("limit", String.valueOf(limit))
                         .header("Monew-Request-User-ID", requesterId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         then(commentService).should().getAllArticleComment(
-                articleId, requesterId, cursor, limit, CommentSortType.LIKE_COUNT, false);
+                articleId, requesterId, cursor, limit, after, CommentSortType.LIKE_COUNT, false
+        );
         then(commentService).shouldHaveNoMoreInteractions();
     }
 
@@ -342,7 +353,7 @@ public class CommentControllerTest {
         int limit = 20;
 
         given(commentService.getAllArticleComment(
-                eq(articleId), eq(requesterId), isNull(), eq(limit),
+                eq(articleId), eq(requesterId), isNull(String.class), eq(limit), isNull(OffsetDateTime.class),
                 eq(CommentSortType.DATE), eq(true))
         ).willThrow(new RuntimeException("unexpected"));
 
@@ -357,7 +368,7 @@ public class CommentControllerTest {
                 .andExpect(status().isInternalServerError());
 
         then(commentService).should().getAllArticleComment(
-                articleId, requesterId, null, limit, CommentSortType.DATE, true);
+                articleId, requesterId, null, limit, null, CommentSortType.DATE, true);
         then(commentService).shouldHaveNoMoreInteractions();
     }
 }

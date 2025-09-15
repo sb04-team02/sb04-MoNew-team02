@@ -9,12 +9,11 @@ import com.sprint.team2.monew.domain.comment.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -96,7 +95,7 @@ public class CommentController {
             @RequestParam("orderBy") String orderBy,
             @RequestParam("direction") String direction,
             @RequestParam(value = "cursor", required = false) String cursor,
-            @RequestParam(value = "after", required = false) LocalDateTime after,
+            @RequestParam(value = "after", required = false) OffsetDateTime after,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestHeader("Monew-Request-User-ID") UUID requesterUserId
     ) {
@@ -113,9 +112,9 @@ public class CommentController {
                 requesterUserId,
                 cursor,
                 limit,
+                after,
                 sortType,
-                asc
-        );
+                asc);
 
         return ResponseEntity.ok(body);
     }
