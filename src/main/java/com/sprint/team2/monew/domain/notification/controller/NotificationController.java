@@ -32,7 +32,7 @@ public class NotificationController {
             ) {
         log.info("[알림] 확인하지 않은 알림 조회 요청 / 요청자 ID={}", userId);
         CursorPageResponseNotificationDto response = notificationService.getAllNotifications( nextCursor, userId,nextAfter,size);
-        log.info("[알림] 확인하지 않은 알림 조회 응답 / 요청자 ID={}", userId);
+        log.info("[알림] 확인하지 않은 알림 조회 응답 / 요청자 ID={}, after={}", userId, nextAfter);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

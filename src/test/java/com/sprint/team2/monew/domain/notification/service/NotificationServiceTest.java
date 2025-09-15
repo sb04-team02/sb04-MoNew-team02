@@ -196,14 +196,14 @@ public class NotificationServiceTest {
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable))
+            given(notificationRepository.findAllByUserIdWithCursorPaging(userId, nextAfter, pageable))
                     .willReturn(slice);
 
             // when
             notificationService.getAllNotifications(nextCursor, userId,nextAfter, size);
 
             // then
-            verify(notificationRepository).findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable);
+            verify(notificationRepository).findAllByUserIdWithCursorPaging(userId, nextAfter, pageable);
         }
 
         @Test
@@ -218,7 +218,7 @@ public class NotificationServiceTest {
             String nextCursor = LocalDateTime.now().minusHours(3).toString();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable))
+            given(notificationRepository.findAllByUserIdWithCursorPaging(userId, nextAfter, pageable))
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when
