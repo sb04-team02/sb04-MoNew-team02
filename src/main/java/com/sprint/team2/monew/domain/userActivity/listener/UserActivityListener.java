@@ -88,11 +88,11 @@ public class UserActivityListener {
         email,
         nickname
     );
-    log.info("[사용자 활동] 생성 시작 - id = {}",id);
+    log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
     // save to mongodb
     userActivityRepository.save(newUserActivity);
 
-    log.info("[사용자 활동] 생성 완료 - id = {}", id);
+    log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
   }
 
   // 사용자 닉네임 수정
