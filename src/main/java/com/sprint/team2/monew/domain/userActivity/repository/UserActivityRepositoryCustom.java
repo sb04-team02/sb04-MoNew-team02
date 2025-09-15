@@ -1,6 +1,7 @@
 package com.sprint.team2.monew.domain.userActivity.repository;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
@@ -54,7 +55,7 @@ public class UserActivityRepositoryCustom {
     public void cancelSubscription(UUID userId, UUID subscriptionId) {
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update()
-            .pull("subscriptions", Query.query(Criteria.where("id").is(subscriptionId)));
+            .pull("subscriptions", query(Criteria.where("id").is(subscriptionId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
@@ -66,7 +67,7 @@ public class UserActivityRepositoryCustom {
     public void deleteSubscription(UUID interestId) {
         Query query = new Query(Criteria.where("subscriptions.interestId").is(interestId));
         Update update = new Update()
-            .pull("subscriptions", Query.query(Criteria.where("interestId").is(interestId)));
+            .pull("subscriptions", query(Criteria.where("interestId").is(interestId)));
 
         UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class);
         log.info("[사용자 활동] 전체 구독 삭제 완료 - interestId = {}. {}명의 사용자에게서 삭제됨.",
@@ -122,7 +123,7 @@ public class UserActivityRepositoryCustom {
         UUID commentId = commentActivityDto.id();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update() // for comments array (child)
-            .pull("comments", Query.query(Criteria.where("id").is(commentId)));
+            .pull("comments", query(Criteria.where("id").is(commentId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
@@ -153,7 +154,7 @@ public class UserActivityRepositoryCustom {
         UUID commentId = commentActivityDto.id();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update() // for comments array (child)
-            .pull("commentLikes", Query.query(Criteria.where("id").is(commentId)));
+            .pull("commentLikes", query(Criteria.where("id").is(commentId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
@@ -200,7 +201,7 @@ public class UserActivityRepositoryCustom {
 
     public void deleteByArticleId(UUID articleId) {
         Query query = new Query(where("articleViews.articleId").is(articleId));
-        Update update = new Update().pull("articleViews", new BasicDBObject("articleId", articleId));
+        Update update = new Update().pull("articleViews", query(where("articleId").is(articleId)));
         mongoTemplate.updateMulti(query, update, UserActivity.class);
     }
 
