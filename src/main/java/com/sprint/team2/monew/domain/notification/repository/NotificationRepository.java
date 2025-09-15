@@ -25,9 +25,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     Long countByUserId(UUID userId);
 
-    List<Notification> findAllByUserId(UUID userId);
-
-    Optional<Notification> findByUserId(UUID userId);
-
     void deleteByResourceTypeAndResourceId(ResourceType resourceType, UUID resourceId);
 }
