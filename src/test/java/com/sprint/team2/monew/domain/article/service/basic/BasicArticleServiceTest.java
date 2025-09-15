@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,16 +64,26 @@ class BasicArticleServiceTest {
     void readArticleSortSuccess() {
         // given
         UUID userId = UUID.randomUUID();
+        LocalDateTime publishDate = LocalDateTime.now().minusDays(1);
+        UUID articleId = UUID.randomUUID();
 
-        Article article = new Article();
-        article.setPublishDate(LocalDateTime.now().minusDays(1));
+        Article article = Article.builder()
+                .source(ArticleSource.NAVER)
+                .sourceUrl("https://article.com")
+                .title("title")
+                .publishDate(publishDate)
+                .summary("summary")
+                .commentCount(0)
+                .viewCount(0)
+                .build();
+        ReflectionTestUtils.setField(article, "id", articleId);
 
         ArticleDto articleDto = new ArticleDto(
-                UUID.randomUUID(),
-                "source",
-                "sourceUrl",
+                articleId,
+                ArticleSource.NAVER.toString(),
+                "https://article.com",
                 "title",
-                LocalDateTime.now().minusDays(1),
+                publishDate,
                 "summary",
                 0,
                 0,
@@ -85,7 +96,6 @@ class BasicArticleServiceTest {
                 any(), any(), anyInt())
         ).thenReturn(List.of(article));
 
-        when(articleMapper.toArticleDto(article)).thenReturn(articleDto);
         when(articleRepositoryCustom.countArticles(
                 any(), any(), any(), any(), any()
         )).thenReturn(1L);
@@ -107,7 +117,6 @@ class BasicArticleServiceTest {
                 eq(ArticleOrderBy.publishDate), eq(ArticleDirection.ASC),
                 any(), any(), anyInt()
         );
-        verify(articleMapper, times(1)).toArticleDto(article);
     }
 
     @Test
