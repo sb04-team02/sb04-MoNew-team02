@@ -121,7 +121,7 @@ public class BasicReactionServiceTest {
         );
 
         given(userRepository.findById(requesterUserId)).willReturn(Optional.of(user));
-        given(commentRepository.findById(commentId))
+        given(commentRepository.findWithArticleAndUserById(commentId))
                 .willReturn(Optional.of(comment))
                 .willReturn(Optional.of(fresh));
 
@@ -144,7 +144,7 @@ public class BasicReactionServiceTest {
         assertThat(result.commentLikeCount()).isEqualTo(1L);
 
         then(userRepository).should().findById(requesterUserId);
-        then(commentRepository).should(times(2)).findById(commentId);
+        then(commentRepository).should(times(2)).findWithArticleAndUserById(commentId);
         then(reactionRepository).should().existsByUser_IdAndComment_Id(requesterUserId, commentId);
         then(reactionRepository).should().saveAndFlush(any(Reaction.class));
 
@@ -172,14 +172,16 @@ public class BasicReactionServiceTest {
         User user = User.builder().email("u@e.com").password("pw").nickname("nick").build();
 
         given(userRepository.findById(requesterId)).willReturn(Optional.of(user));
-        given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+        given(commentRepository.findWithArticleAndUserById(commentId)).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> basicReactionService.likeComment(commentId, requesterId))
                 .isInstanceOf(ContentNotFoundException.class);
 
-        verify(commentRepository).findById(commentId);
+        verify(commentRepository).findWithArticleAndUserById(commentId);
         verifyNoInteractions(reactionRepository, reactionMapper);
+        verify(commentRepository, never()).incrementLikeCount(any());
+        verify(commentRepository, never()).findLikeCountById(any());
     }
 
     @Test
