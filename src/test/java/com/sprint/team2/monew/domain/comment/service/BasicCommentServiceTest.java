@@ -468,7 +468,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 true // hasNext
         );
-        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), isNull(), eq(asc), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(asc), any(Pageable.class)))
                 .willReturn(slice);
 
         // likedByMe: true, false, true
@@ -499,7 +499,7 @@ public class BasicCommentServiceTest {
 
         then(articleRepository).should().existsById(articleId);
         then(commentRepository).should()
-                .findByArticle_IdWithDateCursor(eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class));
+                .findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class));
         then(reactionRepository).should(times(3))
                 .existsByUserIdAndCommentId(eq(requesterId), any(UUID.class));
         then(commentMapper).should().toDto(c1, true);
@@ -546,7 +546,7 @@ public class BasicCommentServiceTest {
                 true
         );
         given(commentRepository.findByArticle_IdWithLikeCountCursor(
-                eq(articleId), isNull(), isNull(), isNull(), eq(asc), any(PageRequest.class)))
+                eq(articleId), eq(false), isNull(), eq(false), isNull(), isNull(), eq(asc), any(Pageable.class)))
                 .willReturn(slice);
 
         given(reactionRepository.existsByUserIdAndCommentId(requesterId, aId)).willReturn(false);
@@ -571,7 +571,7 @@ public class BasicCommentServiceTest {
         assertThat(result.nextCursor()).isEqualTo("10|" + t2);
 
         then(commentRepository).should().findByArticle_IdWithLikeCountCursor(
-                eq(articleId), isNull(), isNull(), isNull(), eq(false), any(PageRequest.class));
+                eq(articleId), eq(false), isNull(), eq(false), isNull(), isNull(), eq(false), any(Pageable.class));
     }
 
     @Test
@@ -599,7 +599,7 @@ public class BasicCommentServiceTest {
                 PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt")),
                 false
         );
-        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class)))
                 .willReturn(slice);
 
         CommentDto dto1 = mock(CommentDto.class);
@@ -684,7 +684,7 @@ public class BasicCommentServiceTest {
                 false
         );
 
-        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), isNull(), isNull(), eq(false), any(PageRequest.class)))
+        given(commentRepository.findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class)))
                 .willReturn(emptySlice);
         given(commentRepository.countByArticle_IdAndNotDeleted(articleId)).willReturn(0L);
 
@@ -692,7 +692,7 @@ public class BasicCommentServiceTest {
         commentService.getAllArticleComment(articleId, UUID.randomUUID(), null, requestedSize, null, CommentSortType.DATE, false);
 
         //then
-        then(commentRepository).should().findByArticle_IdWithDateCursor(eq(articleId), isNull(), isNull(), eq(false), pageRequestCaptor.capture());
+        then(commentRepository).should().findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), pageRequestCaptor.capture());
         PageRequest pr = pageRequestCaptor.getValue();
         assertThat(pr.getPageSize()).isEqualTo(20);
         assertThat(pr.getSort()).isEqualTo(Sort.by(Sort.Direction.DESC, "createdAt"));
