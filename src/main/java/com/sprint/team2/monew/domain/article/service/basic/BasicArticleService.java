@@ -20,10 +20,10 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
-import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import com.sprint.team2.monew.domain.notification.event.InterestArticleRegisteredEvent;
@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -105,33 +104,26 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     public ArticleViewDto view(UUID userId, UUID articleId) {
+        log.info("[Article] 기사 뷰 등록 시작, userId: {}, articleId: {}", userId, articleId);
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> {
                     log.error("[Article] 존재하지 않는 뉴스 기사, articleId = {}", articleId);
                     return ArticleNotFoundException.withId(articleId);
                 });
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("[User] 존재하지 않는 사용자, userId = {}", userId);
                     return UserNotFoundException.withId(userId);
                 });
 
         UserActivity userActivity = userActivityRepository.findById(userId)
-                .map(activity -> {
-                    if (activity.getArticleViews() == null) activity.setArticleViews(new ArrayList<>());
-                    if (activity.getComments() == null) activity.setComments(new ArrayList<>());
-                    if (activity.getCommentLikes() == null) activity.setCommentLikes(new ArrayList<>());
-                    if (activity.getSubscriptions() == null) activity.setSubscriptions(new ArrayList<>());
-                    return activity;
-                })
-                .orElseGet(() -> {
-                    log.info("[UserActivity] 활동내역이 없어서 새로 생성, userId = {}", userId);
-                    UserActivity newActivity = new UserActivity(user.getId(), user.getEmail(), user.getNickname());
-                    return userActivityRepository.save(newActivity);
+                .orElseThrow(() -> {
+                    log.error("[UserActivity] 그런 활동 없음, userId = {}", userId);
+                    return UserActivityNotFoundException.withId(userId);
                 });
 
-        boolean alreadyViewed = userActivityRepositoryCustom.existsByArticleId(articleId);
+        boolean alreadyViewed = hasUserViewedArticle(userId, articleId);
 
         ArticleViewDto dto;
         if (!alreadyViewed) {
@@ -166,6 +158,7 @@ public class BasicArticleService implements ArticleService {
 
         long commentCount = commentRepository.countByArticle_Id(articleId);
 
+        log.info("[Article] 기사 뷰 등록 성공");
         return new ArticleViewDto(
                 UUID.randomUUID(),
                 userId,
@@ -241,7 +234,17 @@ public class BasicArticleService implements ArticleService {
         }
 
         List<ArticleDto> content = articles.stream()
-                .map(articleMapper::toArticleDto)
+                .map(article -> new ArticleDto(
+                        article.getId(),
+                        article.getSource().name(),
+                        article.getSourceUrl(),
+                        article.getTitle(),
+                        article.getPublishDate(),
+                        article.getSummary(),
+                        commentRepository.countByArticleId(article.getId()),
+                        article.getViewCount(),
+                        hasUserViewedArticle(userId, article.getId())
+                ))
                 .toList();
 
         log.info("[Article] 뉴스 기사 목록 조회 성공");
@@ -288,4 +291,11 @@ public class BasicArticleService implements ArticleService {
         log.info("[Article] 물리 삭제 성공");
     }
 
+    // 공통 메서드
+    public boolean hasUserViewedArticle(UUID userId, UUID articleId) {
+        return userActivityRepository.findById(userId)
+                .map(userActivity -> userActivity.getArticleViews().stream()
+                        .anyMatch(view -> view.articleId().equals(articleId)))
+                .orElse(false);
+    }
 }
