@@ -20,7 +20,6 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.interest.entity.Interest;
 import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
-import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -113,7 +111,7 @@ public class BasicArticleService implements ArticleService {
                     return ArticleNotFoundException.withId(articleId);
                 });
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("[User] 존재하지 않는 사용자, userId = {}", userId);
                     return UserNotFoundException.withId(userId);
