@@ -131,7 +131,7 @@ public class BasicCommentService implements CommentService {
         //좋아요 유지 구문
         boolean likedByMe = false;
         if (requesterUserId != null) {
-            likedByMe = reactionRepository.existsByUserIdAndCommentId(requesterUserId, commentId);
+            likedByMe = reactionRepository.existsByUser_IdAndComment_Id(requesterUserId, commentId);
         }
 
         comment.update(request.content());
@@ -210,7 +210,7 @@ public class BasicCommentService implements CommentService {
         }
 
         //연관 데이터 정리
-        reactionRepository.deleteByCommentId(commentId);
+        reactionRepository.deleteByComment_Id(commentId);
         notificationRepository.deleteByResourceTypeAndResourceId(ResourceType.COMMENT, commentId);
         log.info("댓글 연관 좋아요, 알림 삭제 완료: commentId={}", commentId);
 
@@ -311,7 +311,7 @@ public class BasicCommentService implements CommentService {
         List<CommentDto> commentDtos = comments.stream()
                 .map(c -> {
                     boolean likedByMe = (requesterUserId != null)
-                            && reactionRepository.existsByUserIdAndCommentId(requesterUserId, c.getId());
+                            && reactionRepository.existsByUser_IdAndComment_Id(requesterUserId, c.getId());
                     return commentMapper.toDto(c, likedByMe);
                 })
                 .toList();

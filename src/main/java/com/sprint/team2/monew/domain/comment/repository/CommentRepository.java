@@ -18,10 +18,12 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query( value = """
         update comments
             set like_count = like_count + 1
-        where id = :id
-        returning like_count
-    """, nativeQuery = true)
-    long incrementLikeCountReturning(@Param("id") UUID commentId);
+        where id = :id""",
+        nativeQuery = true)
+    int incrementLikeCount(@Param("id") UUID commentId);
+
+    @Query("select c.likeCount from Comment c where c.id = :id")
+    Long findLikeCountById(@Param("id") UUID id);
 
     @Modifying
     @Query("""
@@ -30,6 +32,15 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             where c.id = :id
            """)
     int decrementLikeCount(@Param("id") UUID commentId);
+
+    @Query("""
+      select c
+      from Comment c
+      join fetch c.article a
+      join fetch c.user u
+      where c.id = :id
+    """)
+    Optional<Comment> findWithArticleAndUserById(@Param("id") UUID id);
 
     Optional<Comment> findByIdAndDeletedAtIsNull(UUID id);
 

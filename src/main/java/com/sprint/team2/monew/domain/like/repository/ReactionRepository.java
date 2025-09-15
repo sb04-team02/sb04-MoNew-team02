@@ -9,12 +9,12 @@ import java.util.UUID;
 
 public interface ReactionRepository extends JpaRepository<Reaction, UUID> {
     //중복 체크를 위한 구문
-    boolean existsByUserIdAndCommentId(UUID userId, UUID commentId);
+    boolean existsByUser_IdAndComment_Id(UUID userId, UUID commentId);
 
-    Optional<Reaction> findByUserIdAndCommentId(UUID userId, UUID commentId);
+    Optional<Reaction> findByUser_IdAndComment_Id(UUID userId, UUID commentId);
 
     @Modifying
-    int deleteByUserIdAndCommentId(UUID userId, UUID commentId);
+    int deleteByUser_IdAndComment_Id(UUID userId, UUID commentId);
 
-    void deleteByCommentId(UUID commentId);
+    void deleteByComment_Id(UUID commentId);
 }

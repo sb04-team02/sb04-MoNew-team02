@@ -234,7 +234,7 @@ public class BasicCommentServiceTest {
 
         given(commentRepository.findByIdAndDeletedAtIsNull(commentId))
                 .willReturn(Optional.of(comment));
-        given(reactionRepository.existsByUserIdAndCommentId(ownerId, commentId))
+        given(reactionRepository.existsByUser_IdAndComment_Id(ownerId, commentId))
                 .willReturn(false);
 
         CommentDto expected = new CommentDto(
@@ -254,7 +254,7 @@ public class BasicCommentServiceTest {
         assertThat(comment.getContent()).isEqualTo("수정된 내용");
 
         then(commentRepository).should().findByIdAndDeletedAtIsNull(commentId);
-        then(reactionRepository).should().existsByUserIdAndCommentId(ownerId, commentId);
+        then(reactionRepository).should().existsByUser_IdAndComment_Id(ownerId, commentId);
         then(commentMapper).should().toDto(any(Comment.class), eq(false));
 
         then(userRepository).shouldHaveNoInteractions();
@@ -384,14 +384,14 @@ public class BasicCommentServiceTest {
     void hardDeleteCommentSuccess() {
         //given
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
-        willDoNothing().given(reactionRepository).deleteByCommentId(commentId);
+        willDoNothing().given(reactionRepository).deleteByComment_Id(commentId);
         willDoNothing().given(commentRepository).delete(comment);
         //when + then
         assertThatCode(() -> commentService.hardDeleteComment(commentId, ownerId))
                 .doesNotThrowAnyException();
 
         then(commentRepository).should().findById(commentId);
-        then(reactionRepository).should().deleteByCommentId(commentId);
+        then(reactionRepository).should().deleteByComment_Id(commentId);
         then(notificationRepository).should().deleteByResourceTypeAndResourceId(ResourceType.COMMENT, commentId);
         then(commentRepository).should().delete(comment);
         then(commentRepository).shouldHaveNoMoreInteractions();
@@ -409,7 +409,7 @@ public class BasicCommentServiceTest {
                 .isInstanceOf(CommentForbiddenException.class);
 
         then(commentRepository).should().findById(commentId);
-        then(reactionRepository).should(never()).deleteByCommentId(any());
+        then(reactionRepository).should(never()).deleteByComment_Id(any());
         then(notificationRepository).should(never()).deleteByResourceTypeAndResourceId(any(ResourceType.class), any(UUID.class));
         then(commentRepository).should(never()).delete(any());
         then(commentRepository).shouldHaveNoMoreInteractions();
@@ -472,9 +472,9 @@ public class BasicCommentServiceTest {
                 .willReturn(slice);
 
         // likedByMe: true, false, true
-        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c1Id)).willReturn(true);
-        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c2Id)).willReturn(false);
-        given(reactionRepository.existsByUserIdAndCommentId(requesterId, c3Id)).willReturn(true);
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterId, c1Id)).willReturn(true);
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterId, c2Id)).willReturn(false);
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterId, c3Id)).willReturn(true);
 
         CommentDto dto1 = mock(CommentDto.class);
         CommentDto dto2 = mock(CommentDto.class);
@@ -501,7 +501,7 @@ public class BasicCommentServiceTest {
         then(commentRepository).should()
                 .findByArticle_IdWithDateCursor(eq(articleId), eq(false), isNull(), eq(false), isNull(), eq(false), any(Pageable.class));
         then(reactionRepository).should(times(3))
-                .existsByUserIdAndCommentId(eq(requesterId), any(UUID.class));
+                .existsByUser_IdAndComment_Id(eq(requesterId), any(UUID.class));
         then(commentMapper).should().toDto(c1, true);
         then(commentMapper).should().toDto(c2, false);
         then(commentMapper).should().toDto(c3, true);
@@ -549,8 +549,8 @@ public class BasicCommentServiceTest {
                 eq(articleId), eq(false), isNull(), eq(false), isNull(), isNull(), eq(asc), any(Pageable.class)))
                 .willReturn(slice);
 
-        given(reactionRepository.existsByUserIdAndCommentId(requesterId, aId)).willReturn(false);
-        given(reactionRepository.existsByUserIdAndCommentId(requesterId, bId)).willReturn(true);
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterId, aId)).willReturn(false);
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterId, bId)).willReturn(true);
 
         CommentDto dtoA = mock(CommentDto.class);
         CommentDto dtoB = mock(CommentDto.class);

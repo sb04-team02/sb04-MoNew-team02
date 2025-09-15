@@ -84,7 +84,7 @@ public class BasicReactionServiceTest {
     @Test
     @DisplayName("좋아요 성공 - 좋아요 정보 저장 및 카운트 +1")
     void likeCommentSuccess() {
-        //given
+        // given
         UUID commentId = UUID.randomUUID();
         UUID requesterUserId = UUID.randomUUID();
 
@@ -101,21 +101,38 @@ public class BasicReactionServiceTest {
         fresh.setLikeCount(1L);
         setId(fresh, commentId);
 
+        UUID articleId = UUID.randomUUID();
+        Article article = new Article();
+        setId(article, articleId);
+        article.setTitle("기사 제목");
+
+        // comment / fresh 모두에 article 연결
+        comment.setArticle(article);
+        fresh.setArticle(article);
+
+        // 댓글 작성자 세팅
+        comment.setUser(user);
+        fresh.setUser(user);
+
         CommentLikeDto commentLikeDto = new CommentLikeDto(
                 UUID.randomUUID(), requesterUserId, LocalDateTime.now(),
-                commentId, UUID.randomUUID(),
-                UUID.randomUUID(), "nick", "댓글", 1L, LocalDateTime.now()
+                commentId, articleId,
+                requesterUserId, "nick", "댓글", 1L, fresh.getCreatedAt()
         );
 
         given(userRepository.findById(requesterUserId)).willReturn(Optional.of(user));
         given(commentRepository.findById(commentId))
                 .willReturn(Optional.of(comment))
                 .willReturn(Optional.of(fresh));
-        given(reactionRepository.existsByUserIdAndCommentId(requesterUserId, commentId))
-                .willReturn(false);
-        given(reactionRepository.saveAndFlush(any(Reaction.class)))
-                .willAnswer(inv -> inv.getArgument(0));
-        given(commentRepository.incrementLikeCountReturning(commentId)).willReturn(1L);
+
+        given(reactionRepository.existsByUser_IdAndComment_Id(requesterUserId, commentId)).willReturn(false);
+        given(reactionRepository.saveAndFlush(any(Reaction.class))).willAnswer(inv -> inv.getArgument(0));
+
+        // UPDATE: like_count + 1
+        given(commentRepository.incrementLikeCount(commentId)).willReturn(1);
+        // SELECT: 증가된 like_count 재조회
+        given(commentRepository.findLikeCountById(commentId)).willReturn(1L);
+
         given(reactionMapper.toDto(any(Reaction.class), eq(1L))).willReturn(commentLikeDto);
 
         // when
@@ -128,9 +145,14 @@ public class BasicReactionServiceTest {
 
         then(userRepository).should().findById(requesterUserId);
         then(commentRepository).should(times(2)).findById(commentId);
-        then(reactionRepository).should().existsByUserIdAndCommentId(requesterUserId, commentId);
+        then(reactionRepository).should().existsByUser_IdAndComment_Id(requesterUserId, commentId);
         then(reactionRepository).should().saveAndFlush(any(Reaction.class));
-        then(commentRepository).should().incrementLikeCountReturning(commentId);
+
+        // UPDATE 호출 검증
+        then(commentRepository).should().incrementLikeCount(commentId);
+        // 증가 후 like_count 재조회 검증
+        then(commentRepository).should().findLikeCountById(commentId);
+
         then(reactionMapper).should().toDto(any(Reaction.class), eq(1L));
 
         then(userRepository).shouldHaveNoMoreInteractions();
@@ -138,6 +160,7 @@ public class BasicReactionServiceTest {
         then(reactionRepository).shouldHaveNoMoreInteractions();
         then(reactionMapper).shouldHaveNoMoreInteractions();
     }
+
 
     @Test
     @DisplayName("좋아요 실패 - 댓글 정보 없음")
@@ -168,9 +191,9 @@ public class BasicReactionServiceTest {
 
         given(userRepository.findById(requesterUserId)).willReturn(Optional.of(user));
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
-        given(reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId()))
+        given(reactionRepository.existsByUser_IdAndComment_Id(user.getId(), comment.getId()))
                 .willReturn(true);
-        given(reactionRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId())).willReturn(1);
+        given(reactionRepository.deleteByUser_IdAndComment_Id(user.getId(), comment.getId())).willReturn(1);
         given(commentRepository.decrementLikeCount(comment.getId())).willReturn(1);
 
         //when
@@ -179,8 +202,8 @@ public class BasicReactionServiceTest {
         //then
         then(userRepository).should().findById(requesterUserId);
         then(commentRepository).should().findById(commentId);
-        then(reactionRepository).should().existsByUserIdAndCommentId(user.getId(), comment.getId());
-        then(reactionRepository).should().deleteByUserIdAndCommentId(user.getId(), comment.getId());
+        then(reactionRepository).should().existsByUser_IdAndComment_Id(user.getId(), comment.getId());
+        then(reactionRepository).should().deleteByUser_IdAndComment_Id(user.getId(), comment.getId());
         then(commentRepository).should().decrementLikeCount(comment.getId());
 
         then(userRepository).shouldHaveNoMoreInteractions();
