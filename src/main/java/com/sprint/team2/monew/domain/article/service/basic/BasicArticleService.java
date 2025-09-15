@@ -196,7 +196,11 @@ public class BasicArticleService implements ArticleService {
                                              LocalDateTime after) {
 
         log.info("[Article] 뉴스 기사 목록 조회 시작");
-        limit = 50;
+        if (keyword == null || keyword.isBlank() || cursor == null && after == null) {
+            cursor = null;
+            after = null;
+            limit = 50;
+        }
 
         if (orderBy != ArticleOrderBy.publishDate &&
                 orderBy != ArticleOrderBy.commentCount &&
