@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.userActivity.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
@@ -43,6 +44,7 @@ public class UserActivityListener {
 
   public final UserActivityRepository userActivityRepository;
   public final UserActivityMapper userActivityMapper;
+  private final ObjectMapper objectMapper;
 
   // ================================== 사용자 ==================================
   // 사용자 생성
@@ -60,6 +62,13 @@ public class UserActivityListener {
     log.info("[사용자 활동] 생성 시작 - id = {}",id);
     // save to mongodb
     userActivityRepository.save(newUserActivity);
+
+    try {
+      String jsonObject = objectMapper.writeValueAsString(newUserActivity);
+      log.info("[사용자 활동] Saving object state: {}", jsonObject);
+    } catch (Exception e) {
+      log.error("[사용자 활동] Error serializing object", e);
+    }
 
     log.info("[사용자 활동] 생성 완료 - id = {}", id);
   }
@@ -79,11 +88,11 @@ public class UserActivityListener {
         email,
         nickname
     );
-    log.info("[사용자 활동] 생성 시작 - id = {}",id);
+    log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
     // save to mongodb
     userActivityRepository.save(newUserActivity);
 
-    log.info("[사용자 활동] 생성 완료 - id = {}", id);
+    log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
   }
 
   // 사용자 닉네임 수정
