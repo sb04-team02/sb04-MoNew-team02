@@ -19,7 +19,7 @@ public interface NotificationService {
 
     void confirmAllNotifications(UUID userId);
 
-    CursorPageResponseNotificationDto getAllNotifications(UUID userId, LocalDateTime nextAfter, int size);
+    CursorPageResponseNotificationDto getAllNotifications(String nextCursor, UUID userId, LocalDateTime nextAfter, int size);
 
     void deleteAllConfirmedNotifications();
 }
