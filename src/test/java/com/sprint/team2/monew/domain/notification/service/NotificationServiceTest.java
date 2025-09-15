@@ -186,7 +186,8 @@ public class NotificationServiceTest {
             //given
             User user = TestUserFactory.createUser();
             UUID userId = UUID.randomUUID();
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime nextAfter = LocalDateTime.now().minusDays(1);
+            String nextCursor = LocalDateTime.now().minusHours(3).toString();
             int size = 10;
 
             Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
@@ -195,14 +196,14 @@ public class NotificationServiceTest {
             List<Notification> notifications = List.of(n1, n2);
             Slice<Notification> slice = new SliceImpl<>(notifications, pageable, false);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable))
                     .willReturn(slice);
 
             // when
-            notificationService.getAllNotifications(userId,now, size);
+            notificationService.getAllNotifications(nextCursor, userId,nextAfter, size);
 
             // then
-            verify(notificationRepository).findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable);
+            verify(notificationRepository).findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable);
         }
 
         @Test
@@ -213,14 +214,15 @@ public class NotificationServiceTest {
             UUID userId = UUID.randomUUID();
             int size = 10;
             Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime nextAfter = LocalDateTime.now().minusDays(1);
+            String nextCursor = LocalDateTime.now().minusHours(3).toString();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(userId, now, pageable))
+            given(notificationRepository.findAllByUserIdAndConfirmedFalseOrderByCreatedAtDesc(nextCursor, userId, nextAfter, pageable))
                     .willReturn(new SliceImpl<>(List.of(),pageable, false));
 
             // when
-            var result = notificationService.getAllNotifications(userId,now, size);
+            var result = notificationService.getAllNotifications(nextCursor, userId, nextAfter, size);
 
             // then
             assertThat(result.content()).isEmpty();

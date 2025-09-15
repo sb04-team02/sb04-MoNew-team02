@@ -183,14 +183,23 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPageResponseArticleDto read(UUID userId, ArticleOrderBy orderBy, ArticleDirection direction, int limit,
+    public CursorPageResponseArticleDto read(UUID userId,
+                                             ArticleOrderBy orderBy,
+                                             ArticleDirection direction,
+                                             int limit,
                                              String keyword,
-                                             UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
-                                             String cursor, LocalDateTime after) {
+                                             UUID interestId,
+                                             List<ArticleSource> sourceIn,
+                                             LocalDateTime publishedDateFrom,
+                                             LocalDateTime publishedDateTo,
+                                             String cursor,
+                                             LocalDateTime after) {
 
-        if (limit <= 0) {
-            log.error("[Article] 커서 페이지 크기는 0보다 커야 함, limit = {}", limit);
-            throw InvalidParameterException.invalidParameter();
+        log.info("[Article] 뉴스 기사 목록 조회 시작");
+        if (keyword == null || keyword.isBlank() || cursor == null && after == null) {
+            cursor = null;
+            after = null;
+            limit = 50;
         }
 
         if (orderBy != ArticleOrderBy.publishDate &&
@@ -202,45 +211,55 @@ public class BasicArticleService implements ArticleService {
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
                 keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
-                orderBy, direction,
-                cursor, after, limit
+                orderBy, direction, cursor, after, limit
         );
 
         boolean hasNext = articles.size() > limit;
-        if (hasNext) {
-            articles = articles.subList(0, limit);
-        }
-
-        log.debug("[Article] 조회한 결과 조회, userId = {}, keyword = {}, interestId = {}, size = {}, hasNext = {}, nextCursor = {}",
-                userId, keyword, interestId, articles.size(), hasNext,
-                !articles.isEmpty() ? (orderBy == ArticleOrderBy.publishDate ? articles.get(articles.size() - 1).getPublishDate() : articles.get(articles.size() - 1).getCommentCount()) : null);
 
         String nextCursor = null;
         LocalDateTime nextAfter = null;
 
-        if (!articles.isEmpty()) {
-            Article last = articles.get(articles.size() - 1);
-            switch (orderBy) {
-                case commentCount -> nextCursor = String.valueOf(last.getCommentCount());
-                case viewCount -> nextCursor = String.valueOf(last.getViewCount());
-                default -> nextCursor = last.getPublishDate().toString();
-            }
+        if (hasNext) {
+            Article last = articles.get(limit);
 
-            nextAfter = last.getCreatedAt();
+            switch (orderBy) {
+                case commentCount -> {
+                    nextCursor = String.valueOf(last.getCommentCount());
+                    nextAfter = last.getCreatedAt();
+
+                }
+                case viewCount -> {
+                    nextCursor = String.valueOf(last.getViewCount());
+                    nextAfter = last.getCreatedAt();
+                }
+                default -> {
+                    nextAfter = last.getCreatedAt();
+                    nextCursor = last.getPublishDate().toString();
+                }
+            }
+            articles = articles.subList(0, limit);
         }
 
-        long totalElements = articleRepositoryCustom.countArticles(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
-        );
+        List<ArticleDto> content = articles.stream()
+                .map(articleMapper::toArticleDto)
+                .toList();
+
+        log.info("[Article] 뉴스 기사 목록 조회 성공");
 
         return new CursorPageResponseArticleDto(
-                articles.stream().map(articleMapper::toArticleDto).toList(),
+                content,
                 nextCursor,
                 nextAfter,
-                articles.size(),
-                totalElements,
+                content.size(),
+                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo),
                 hasNext
         );
+    }
+
+    @Override
+    public List<ArticleSource> readSource() {
+
+        return List.of(ArticleSource.values());
     }
 
     @Override

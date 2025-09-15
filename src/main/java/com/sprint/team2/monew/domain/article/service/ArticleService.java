@@ -21,6 +21,8 @@ public interface ArticleService {
                                       UUID interestId, List<ArticleSource> sourceIn, LocalDateTime publishedDateFrom, LocalDateTime publishedDateTo,
                                       String cursor, LocalDateTime after);
 
+    List<ArticleSource> readSource();
+
     void softDelete(UUID articleId);
 
     void hardDelete(UUID articleId);

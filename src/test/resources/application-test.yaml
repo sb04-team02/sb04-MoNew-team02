@@ -31,17 +31,14 @@ logging:
 monew:
   backup:
     s3:
-      access-key: dummy
-      secret-key: dummy
-      region: ap-northeast-2
-      bucket: test-bucket
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
       presigned-url: 600   # 기본값: 10분
-  storage:
-    type: local
-    path: /tmp/monew-test-storage  # 로컬 temp 경로 사용
 
 naver:
   api:
     base-url: https://openapi.naver.com
-    naver-client-id: dummy
-    naver-client-secret: dummy
+    naver-client-id: ${NAVER_CLIENT_ID}
+    naver-client-secret: ${NAVER_CLIENT_SECRET}

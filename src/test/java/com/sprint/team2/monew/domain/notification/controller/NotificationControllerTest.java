@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,8 @@ public class NotificationControllerTest {
     void getNotifications() throws Exception {
         //given
         UUID userId = UUID.randomUUID();
-        LocalDateTime after = LocalDateTime.now().minusDays(1);
+        LocalDateTime nextAfter = LocalDateTime.now().minusDays(1);
+        String nextCursor = LocalDateTime.now().minusHours(3).toString();
         int size = 10;
         Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
         List<NotificationDto> notificationDtoList = List.of(
@@ -74,19 +76,20 @@ public class NotificationControllerTest {
 
         CursorPageResponseNotificationDto response = new CursorPageResponseNotificationDto(
                 notificationDtoList,
-                "2023-08-01T10:00:00",
-                LocalDateTime.now(),
+                nextCursor,
+                nextAfter,
                 size,
                 2L,
                 false
         );
-        given(notificationService.getAllNotifications(userId,LocalDateTime.now(),size)).willReturn(response);
+        given(notificationService.getAllNotifications(nextCursor, userId,nextAfter,size)).willReturn(response);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/notifications")
                         .header("Monew-Request-User-ID",userId)
-                        .param("after", after.toString())
+                        .param("cursor", nextCursor)
+                        .param("after", nextAfter.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                         .param("limit", String.valueOf(size))
                         .accept(MediaType.APPLICATION_JSON)
         );
@@ -101,16 +104,19 @@ public class NotificationControllerTest {
         // given
         UUID nonExistentUserId = UUID.randomUUID();
         LocalDateTime after = LocalDateTime.now().minusDays(1);
+        String nextCursor = LocalDateTime.now().minusHours(3).toString();
+
         int size = 10;
 
-        given(notificationService.getAllNotifications(nonExistentUserId, after, size))
+        given(notificationService.getAllNotifications(nextCursor, nonExistentUserId, after, size))
                 .willThrow(UserNotFoundException.withId(nonExistentUserId));
 
         //when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/notifications")
                         .header("Monew-Request-User-ID",nonExistentUserId.toString())
-                        .param("after", after.toString())
+                        .param("cursor", nextCursor)
+                        .param("after", after.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                         .param("limit", String.valueOf(size))
                         .accept(MediaType.APPLICATION_JSON)
         );
