@@ -25,14 +25,14 @@ public class NotificationCleanupJobConfigTest {
     @DisplayName("Job Spring Bean 등록 테스트")
     public void testJobSpringBean() {
         assertThat(notificationCleanupJob).isNotNull();
-        assertThat(notificationCleanupJob.getName()).isEqualTo("NotificationCleanupJob");
+        assertThat(notificationCleanupJob.getName()).isEqualTo("notificationCleanupJob");
     }
 
     @Test
     @DisplayName("Step Spring Bean 등록 테스트")
     public void testStepSpringBean() {
         assertThat(notificationCleanupStep).isNotNull();
-        assertThat(notificationCleanupStep.getName()).isEqualTo("NotificationCleanupStep");
+        assertThat(notificationCleanupStep.getName()).isEqualTo("notificationCleanupStep");
     }
 
 }
