@@ -122,14 +122,29 @@ jobs:
           container-name: ${{ secrets.ECS_CONTAINER_NAME }}
           image: ${{ secrets.ECR_REPOSITORY_URI }}:${{ needs.build-and-push-to-ecr.outputs.image_tag }}
 
-      # 새 태스크 정의 등록 + ECS 서비스 업데이트
-      - name: 새 태스트 정의 등록
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
-          service: ${{ secrets.ECS_SERVICE }}
-          cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      # 새 태스크 정의 등록
+      - name: 새 태스크 정의 등록
+        id: register-task-def
+        run: |
+          task_def_arn=$(aws ecs register-task-definition --cli-input-json file://${{ steps.render-task-def.outputs.task-definition }} --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "task_definition_arn=$task_def_arn" >> $GITHUB_OUTPUT
+
+      # 서비스 업데이트 및 재시작
+      - name: 서비스 업데이트 및 재시작
+        run: |
+          aws ecs update-service \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --service ${{ secrets.ECS_SERVICE }} \
+            --task-definition ${{ steps.register-task-def.outputs.task_definition_arn }} \
+            --desired-count 1 \
+            --force-new-deployment
+
+      # 새 배포 안정화 대기
+      - name: 새 배포 안정화 대기
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --service ${{ secrets.ECS_SERVICE }}
 
       # 배포 상태 확인
       - name: ECS 배포 상태 확인
