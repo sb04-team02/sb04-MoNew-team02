@@ -105,6 +105,7 @@ public class BasicArticleService implements ArticleService {
 
     @Override
     public ArticleViewDto view(UUID userId, UUID articleId) {
+        log.info("[Article] 기사 뷰 등록 시작, userId: {}, articleId: {}", userId, articleId);
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> {
                     log.error("[Article] 존재하지 않는 뉴스 기사, articleId = {}", articleId);
@@ -166,6 +167,7 @@ public class BasicArticleService implements ArticleService {
 
         long commentCount = commentRepository.countByArticleId(articleId);
 
+        log.info("[Article] 기사 뷰 등록 성공");
         return new ArticleViewDto(
                 UUID.randomUUID(),
                 userId,
@@ -241,7 +243,17 @@ public class BasicArticleService implements ArticleService {
         }
 
         List<ArticleDto> content = articles.stream()
-                .map(articleMapper::toArticleDto)
+                .map(article -> new ArticleDto(
+                        article.getId(),
+                        article.getSource().name(),
+                        article.getSourceUrl(),
+                        article.getTitle(),
+                        article.getPublishDate(),
+                        article.getSummary(),
+                        commentRepository.countByArticleId(article.getId()),
+                        article.getViewCount(),
+                        hasUserViewedArticle(userId, article.getId())
+                ))
                 .toList();
 
         log.info("[Article] 뉴스 기사 목록 조회 성공");
@@ -288,4 +300,11 @@ public class BasicArticleService implements ArticleService {
         log.info("[Article] 물리 삭제 성공");
     }
 
+    // 공통 메서드
+    public boolean hasUserViewedArticle(UUID userId, UUID articleId) {
+        return userActivityRepository.findById(userId)
+                .map(userActivity -> userActivity.getArticleViews().stream()
+                        .anyMatch(view -> view.articleId().equals(articleId)))
+                .orElse(false);
+    }
 }
