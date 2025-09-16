@@ -11,7 +11,7 @@ public record CommentLikeAddEvent (
   UUID commentId,
   UUID articleId,
   String articleTitle,
-  UUID commentUserId,
+  UUID commentUserId, // 댓글 작성자
   String commentUserNickname,
   String commentContent,
   long commentLikeCount,
