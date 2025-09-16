@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -95,7 +96,7 @@ public class CommentController {
             @RequestParam("orderBy") String orderBy,
             @RequestParam("direction") String direction,
             @RequestParam(value = "cursor", required = false) String cursor,
-            @RequestParam(value = "after", required = false) OffsetDateTime after,
+            @RequestParam(value = "after", required = false) LocalDateTime after,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestHeader("Monew-Request-User-ID") UUID requesterUserId
     ) {
