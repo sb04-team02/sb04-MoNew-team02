@@ -158,7 +158,7 @@ public class UserActivityRepositoryCustom {
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
 
         if (result.getMatchedCount() == 0) {
-            log.warn("[사용자 활동] 업데이트 할 사용자 활동 문서를 찾지 못했습니다. userId={}", commentUserId);
+            log.warn("[사용자 활동] 댓글 좋아요 수를 업데이트 할 사용자 활동 문서를 찾지 못했습니다. userId={}", commentUserId);
         }
         if (result.getModifiedCount() > 0) {
             log.info("[사용자 활동] 댓글 좋아요 수 업데이트 완료. userId={}, commentId={}, newLikeCount={}", commentUserId, commentId, newLikeCount);
@@ -177,7 +177,7 @@ public class UserActivityRepositoryCustom {
             throw UserActivityNotFoundException.withId(userId);
         }
         if (result.getModifiedCount() == 0) {
-            log.warn("[사용자 활동] 삭제할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
+            log.warn("[사용자 활동] 좋아요 취소할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
         }
     }
 
