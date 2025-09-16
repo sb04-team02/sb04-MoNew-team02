@@ -1,6 +1,6 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
-import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
+import com.sprint.team2.monew.domain.article.collect.Collector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
@@ -8,7 +8,6 @@ import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
-import com.sprint.team2.monew.domain.article.exception.ArticleCollectFailedException;
 import com.sprint.team2.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.team2.monew.domain.article.exception.ArticleSaveFailedException;
 import com.sprint.team2.monew.domain.article.exception.InvalidParameterException;
@@ -51,7 +50,7 @@ public class BasicArticleService implements ArticleService {
     private final ArticleMapper articleMapper;
     private final ArticleRepository articleRepository;
     private final ArticleRepositoryCustom articleRepositoryCustom;
-    private final NaverApiCollector naverApiCollector;
+    private final List<Collector> collectors;
 
     private final InterestRepository interestRepository;
 
@@ -71,39 +70,43 @@ public class BasicArticleService implements ArticleService {
 
         Interest interest = interestRepository.findById(interestId)
                 .orElseThrow(() -> InterestNotFoundException.notFound(interestId));
+
         for (String keyword : interest.getKeywords()) {
-            List<ArticleDto> articles;
-            try {
-                articles = naverApiCollector.collect(keyword);
-            } catch (RuntimeException e) {
-                log.error("[Article] keyword({}) 수집 실패", keyword, e);
-                throw ArticleCollectFailedException.withKeyword(keyword);
-            }
+            for (Collector collector : collectors) {
+                List<ArticleDto> articles;
+                try {
+                    articles = collector.collect(keyword);
+                } catch (RuntimeException e) {
+                    log.error("[Article] collector {} 수집 실패, keyword = {}", collector.getClass().getName(), keyword, e);
+//                    throw ArticleCollectFailedException.withKeyword(keyword);
+                    continue;
+                }
 
-            for (ArticleDto dto : articles) {
-                if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
-                    Article articleEntity = articleMapper.toEntity(dto);
-                    try {
-                        articleRepository.save(articleEntity);
-                        log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
+                for (ArticleDto dto : articles) {
+                    if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
+                        Article articleEntity = articleMapper.toEntity(dto);
+                        try {
+                            articleRepository.save(articleEntity);
+                            log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
+                                    dto.source(), keyword, dto.title(), dto.sourceUrl());
+
+                            applicationEventPublisher.publishEvent(new InterestArticleRegisteredEvent(
+                                    interestId,
+                                    articleEntity.getId()
+                            ));
+
+                        } catch (Exception e) {
+                            log.error("[Article] {}에서 keyword({}) 저장 실패: {} - {}",
+                                    dto.source(), keyword, dto.title(), dto.sourceUrl(), e);
+                            throw ArticleSaveFailedException.articleSaveFailed();
+                        }
+                    } else {
+                        log.debug("[Article] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}",
                                 dto.source(), keyword, dto.title(), dto.sourceUrl());
-
-                        applicationEventPublisher.publishEvent(new InterestArticleRegisteredEvent(
-                                interestId,
-                                articleEntity.getId()
-                        ));
-
-                    } catch (Exception e) {
-                        log.error("[Article] {}에서 keyword({}) 저장 실패: {} - {}",
-                                dto.source(), keyword, dto.title(), dto.sourceUrl(), e);
-                        throw ArticleSaveFailedException.articleSaveFailed();
                     }
-                } else {
-                    log.debug("[Article] {}에서 keyword({}) 저장 실패(중복 기사): {} - {}",
-                            dto.source(), keyword, dto.title(), dto.sourceUrl());
                 }
             }
-            log.info("[Article] keyword({})로 뉴스 수집 완료, total = {}", keyword, articles.size());
+            log.info("[Article] 뉴스 수집 완료");
         }
     }
 
