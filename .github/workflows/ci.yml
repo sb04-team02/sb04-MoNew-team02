@@ -49,5 +49,5 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build/reports/jacoco/test/jacocoTestReport.
           fail_ci_if_error: true
-#          verbose: true
+          verbose: true
 
