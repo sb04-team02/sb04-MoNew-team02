@@ -22,7 +22,7 @@ public class FileWatchService {
     @PostConstruct
     public void fileMonitoring() throws IOException {
 
-        String dirPath = "/.logs"; // 모니터링 디렉토리
+        String dirPath = ".logs"; // 모니터링 디렉토리
 
         // watchService 생성
         try {

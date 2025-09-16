@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record NotificationDto(
-    UUID notificationId,
+    UUID id,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     boolean confirmed,
