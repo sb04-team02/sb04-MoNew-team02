@@ -6,5 +6,6 @@ import java.util.UUID;
 
 public record CommentLikedEvent (
         UUID commentId,
-        UUID commentUserId
+        UUID receiverId,
+        UUID likedUserId
 ) { }

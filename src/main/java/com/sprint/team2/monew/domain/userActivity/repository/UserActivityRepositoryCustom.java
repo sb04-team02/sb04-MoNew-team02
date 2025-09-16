@@ -154,7 +154,7 @@ public class UserActivityRepositoryCustom {
         Update update = new Update()
             .set("comments.$[elem].likeCount", newLikeCount);
 
-        update.filterArray(Criteria.where("elem.id").is(commentId));
+        update.filterArray(Criteria.where("elem.commentId").is(commentId));
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
 
         if (result.getMatchedCount() == 0) {
@@ -170,7 +170,7 @@ public class UserActivityRepositoryCustom {
         UUID commentId = commentActivityDto.commentId();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update() // for comments array (child)
-            .pull("commentLikes", query(Criteria.where("commentId").is(commentId)));
+            .pull("commentLikes", query(Criteria.where("id").is(commentId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
