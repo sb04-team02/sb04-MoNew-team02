@@ -20,8 +20,7 @@ public class NewsBackupBatchScheduler {
   private final JobLauncher jobLauncher;
   private final Job backupNewsJob;
 
-//  @Scheduled(cron = "0 0 0 * * *")
-  @Scheduled(cron = "0 */1 * * * *")
+  @Scheduled(cron = "0 0 0 * * *")
   public void runBackupNewsSchedulerJob() {
     try {
       String backupDate = LocalDate.now().minusDays(1)
