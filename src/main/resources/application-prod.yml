@@ -28,7 +28,7 @@ spring:
 logging:
   level:
     com.sprint.team2.monew: info
-    org.hibernate.SQL: info
+    org.hibernate.SQL: warn
 
 management:
   endpoint:
