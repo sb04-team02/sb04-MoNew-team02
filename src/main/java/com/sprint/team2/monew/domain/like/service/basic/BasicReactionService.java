@@ -149,7 +149,7 @@ public class BasicReactionService implements ReactionService {
 
             // User Activity 이벤트
             applicationEventPublisher.publishEvent(new CommentLikeCancelEvent(
-                comment.getId(),
+                commentId,
                 comment.getUser().getId(), // author
                 newLikeCount
             ));
