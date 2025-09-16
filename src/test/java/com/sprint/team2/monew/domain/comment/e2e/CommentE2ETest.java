@@ -177,7 +177,7 @@ public class CommentE2ETest {
         });
 
         // 삭제 전 유저의 알림 총 개수(비교용)
-        Long beforeTotalNotification = notificationRepository.countByUserId(user.getId());
+        Long beforeTotalNotification = notificationRepository.countByUserIdAndConfirmedFalse(user.getId());
 
         //삭제 호출
         HttpHeaders hardDelHeaders = new HttpHeaders();
@@ -199,7 +199,7 @@ public class CommentE2ETest {
                 .isFalse();
 
         //총 개수가 1 감소했는지(이번 테스트에서 알림을 1개만 추가했다면 유효)
-        Long afterTotalNotification = notificationRepository.countByUserId(user.getId());
+        Long afterTotalNotification = notificationRepository.countByUserIdAndConfirmedFalse(user.getId());
         assertThat(afterTotalNotification).isEqualTo(beforeTotalNotification - 1);
     }
 
