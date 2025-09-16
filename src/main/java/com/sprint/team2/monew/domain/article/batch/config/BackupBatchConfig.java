@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -26,6 +27,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class BackupBatchConfig {
 
   private final ArticleStorageService articleStorageService;
@@ -99,6 +101,12 @@ public class BackupBatchConfig {
       @Value("#{jobParameters['backupDate']}") String backupDateStr
   ) {
     return articles -> {
+      log.info("[뉴스 기사 백업 (배치)] 날짜 {}: 기사 {}개",
+          backupDateStr, articles.getItems().size());
+
+      if (articles.getItems().isEmpty()) {
+        return;
+      }
       String aggregatedJson = String.join("\n", articles.getItems());
       String filename = String.format("articles-%s/chunk-%s.json",
           backupDateStr,
