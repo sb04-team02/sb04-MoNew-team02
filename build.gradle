@@ -67,6 +67,9 @@ dependencies {
 
     // h2
     testImplementation 'com.h2database:h2'
+
+    // RSS
+    implementation 'org.jsoup:jsoup:1.17.2'
 }
 
 tasks.named('test') {
