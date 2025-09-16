@@ -27,6 +27,8 @@ public class UserActivity {
   private String nickname;
   @CreatedDate
   private LocalDateTime createdAt;
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
 
   private List<SubscriptionDto> subscriptions = new ArrayList<>();
   private List<CommentActivityDto> comments = new ArrayList<>();
