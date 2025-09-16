@@ -1,3 +1,7 @@
+[![CI Workflow - Testing](https://github.com/sb04-team02/sb04-MoNew-team02/actions/workflows/ci.yml/badge.svg)](https://github.com/sb04-team02/sb04-MoNew-team02/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02/graph/badge.svg?token=WTCSKYV5M8)](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02)
+
+
 # **{TEAM2 - MoNew}**
 
 [🔗팀 노션](https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1)
