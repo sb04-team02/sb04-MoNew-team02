@@ -5,8 +5,8 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>.logs/myapp.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>.logs/myapp.%d{yy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
+            <fileNamePattern>.logs/myapp.%d{yy-MM-dd_HH}.log</fileNamePattern>
+            <maxHistory>24</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yy}-%d{MM}-%d{dd} %d{HH}:%d{mm}:%d{ss} [%X{requestIP} | %X{requestId} | %X{requestMethod} | %X{requestUrl}] -
