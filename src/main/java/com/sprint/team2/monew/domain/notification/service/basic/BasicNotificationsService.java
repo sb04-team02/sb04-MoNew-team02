@@ -96,7 +96,7 @@ public class BasicNotificationsService implements NotificationService {
         log.info("[알림] 댓글에 좋아요 눌림 알림 생성 시작");
 
         UUID commentId = event.commentId();
-        UUID receiverId = event.receiverId();
+        UUID receiverId = event.commentUserId();
         UUID likedUserId = event.likedUserId();
 
         Comment comment = commentRepository.findById(commentId)

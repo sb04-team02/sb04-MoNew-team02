@@ -72,8 +72,7 @@ public class BasicReactionService implements ReactionService {
             // 좋아요 생성 시 알림 이벤트 발행
             applicationEventPublisher.publishEvent(new CommentLikedEvent(
                     commentId,
-                    comment.getUser().getId(),
-                    user.getId()
+                    comment.getUser().getId()
             ));
 
             //원자적 +1 (동시성 안전)
@@ -149,7 +148,7 @@ public class BasicReactionService implements ReactionService {
 
             // User Activity 이벤트
             applicationEventPublisher.publishEvent(new CommentLikeCancelEvent(
-                comment.getId(),
+                commentId,
                 comment.getUser().getId(), // author
                 newLikeCount
             ));
