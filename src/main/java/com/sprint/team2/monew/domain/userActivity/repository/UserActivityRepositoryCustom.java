@@ -135,8 +135,8 @@ public class UserActivityRepositoryCustom {
     }
 
     public void addCommentLike(CommentActivityLikeDto commentActivityDto) {
-        UUID userId = commentActivityDto.commentUserId();
-        Query query = new Query(Criteria.where("_id").is(userId));
+        UUID commentUserId = commentActivityDto.commentUserId();
+        Query query = new Query(Criteria.where("_id").is(commentUserId));
         Update update = new Update()
             .push("commentLikes")
             .atPosition(0)
@@ -145,7 +145,23 @@ public class UserActivityRepositoryCustom {
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
-            throw UserActivityNotFoundException.withId(userId);
+            throw UserActivityNotFoundException.withId(commentUserId);
+        }
+    }
+
+    public void updateLikeCountInMyComments(UUID commentUserId, UUID commentId, long newLikeCount) {
+        Query query = new Query(Criteria.where("_id").is(commentUserId));
+        Update update = new Update()
+            .set("comments.$[elem].likeCount", newLikeCount);
+
+        update.filterArray(Criteria.where("elem.commentId").is(commentId));
+        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+
+        if (result.getMatchedCount() == 0) {
+            log.warn("[사용자 활동] 업데이트 할 사용자 활동 문서를 찾지 못했습니다. userId={}", commentUserId);
+        }
+        if (result.getModifiedCount() > 0) {
+            log.info("[사용자 활동] 댓글 좋아요 수 업데이트 완료. userId={}, commentId={}, newLikeCount={}", commentUserId, commentId, newLikeCount);
         }
     }
 

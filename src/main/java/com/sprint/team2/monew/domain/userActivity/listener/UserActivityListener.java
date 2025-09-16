@@ -181,17 +181,27 @@ public class UserActivityListener {
 
     log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId,  = {}",commentId);
     userActivityRepositoryCustom.addCommentLike(commentActivityLikeDto);
+    userActivityRepositoryCustom.updateLikeCountInMyComments(
+        event.commentUserId(),
+        commentId,
+        event.commentLikeCount()
+      );
 
     log.info("[사용자 활동] 댓글 좋아요 추가 완료 - commentId = {}", commentId);
   }
 
   @TransactionalEventListener
   public void handleCommentLikeCancel(CommentLikeCancelEvent event) {
-    UUID commentId = event.id();
+    UUID commentId = event.commentId();
     CommentActivityCancelDto commentActivityCancelDto = userActivityMapper.toCommentActivityCancelDto(event);
 
     log.info("[사용자 활동] 댓글 좋아요 삭제 시작 - commentId = {}", commentId);
     userActivityRepositoryCustom.cancelCommentLike(commentActivityCancelDto);
+    userActivityRepositoryCustom.updateLikeCountInMyComments(
+        event.commentUserId(),
+        commentId,
+        event.commentLikeCount()
+    );
     log.info("[사용자 활동] 댓글 좋아요 삭제 완료 - commentId = {}", commentId);
   }
 
