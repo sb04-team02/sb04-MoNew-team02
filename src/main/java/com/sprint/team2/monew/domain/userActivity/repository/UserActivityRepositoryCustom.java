@@ -154,7 +154,7 @@ public class UserActivityRepositoryCustom {
         Update update = new Update()
             .set("comments.$[elem].likeCount", newLikeCount);
 
-        update.filterArray(Criteria.where("elem.commentId").is(commentId));
+        update.filterArray(Criteria.where("elem.id").is(commentId));
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
 
         if (result.getMatchedCount() == 0) {
