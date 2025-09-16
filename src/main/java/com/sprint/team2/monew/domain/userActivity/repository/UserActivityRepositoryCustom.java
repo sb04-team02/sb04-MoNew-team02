@@ -150,11 +150,12 @@ public class UserActivityRepositoryCustom {
     }
 
     public void updateLikeCountInMyComments(UUID commentUserId, UUID commentId, long newLikeCount) {
-        Query query = new Query(Criteria.where("_id").is(commentUserId));
-        Update update = new Update()
-            .set("comments.$[elem].likeCount", newLikeCount);
+        Query query = new Query(
+            Criteria.where("_id").is(commentUserId)
+                .and("comments.id").is(commentId)
+        );
 
-        update.filterArray(Criteria.where("elem.id").is(commentId));
+        Update update = new Update().set("comments.$.likeCount", newLikeCount);
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
 
         if (result.getMatchedCount() == 0) {
