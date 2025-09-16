@@ -186,7 +186,7 @@ public class UserActivityRepositoryCustom {
         Query query = new Query(Criteria.where("commentLikes.commentId").is(commentId));
         Update update = new Update().pull("commentLikes", Query.query(Criteria.where("commentId").is(commentId)));
 
-        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class); 
+        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class);
         log.info("Removed comment {} likes from {} users", commentId, result.getModifiedCount());
     }
 
