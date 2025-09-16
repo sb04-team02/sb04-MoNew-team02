@@ -14,7 +14,6 @@ import com.sprint.team2.monew.domain.notification.event.CommentLikedEvent;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeAddEvent;
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLikeCancelEvent;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.team2.monew.domain.user.exception.UserNotFoundException.withId;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,7 +37,6 @@ public class BasicReactionService implements ReactionService {
     private final UserRepository userRepository;
     private final ReactionMapper reactionMapper;
 
-    private final ApplicationEventPublisher eventPublisher;
     private final ApplicationEventPublisher applicationEventPublisher;
 
 
@@ -53,15 +49,15 @@ public class BasicReactionService implements ReactionService {
                     return new UserNotFoundException();
                 });
 
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findWithArticleAndUserById(commentId)
                 .orElseThrow(() -> {
                     log.error("좋아요 실패: 댓글 없음 commentId={}", commentId);
                     return ContentNotFoundException.contentNotFoundException(commentId);
                 });
 
         try {
-            // 2) 중복 방지
-            if (reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId())) {
+            //중복 방지
+            if (reactionRepository.existsByUser_IdAndComment_Id(user.getId(), comment.getId())) {
                 log.error("좋아요 실패: 이미 좋아요됨 userId={}, commentId={}", user.getId(), comment.getId());
                 throw ReactionAlreadyExistsException.reactionAlreadyExists(commentId, user.getId());
             }
@@ -79,9 +75,18 @@ public class BasicReactionService implements ReactionService {
                     user.getId()
             ));
 
-            // ★ 원자적 +1 (동시성 안전)
-            long newLikeCount = commentRepository.incrementLikeCountReturning(comment.getId());
-            Comment freshComment = commentRepository.findById(comment.getId())
+            //원자적 +1 (동시성 안전)
+            int updated = commentRepository.incrementLikeCount(comment.getId());
+            if (updated == 0) {
+                throw ContentNotFoundException.contentNotFoundException(commentId);
+            }
+
+            //증가 후 카운트 재조회
+            long newLikeCount = Optional.ofNullable(
+                    commentRepository.findLikeCountById(comment.getId())
+            ).orElse(0L);
+
+            Comment freshComment = commentRepository.findWithArticleAndUserById(comment.getId())
                     .orElseThrow(() -> ContentNotFoundException.contentNotFoundException(commentId));
             reaction.setComment(freshComment);
 
@@ -98,7 +103,7 @@ public class BasicReactionService implements ReactionService {
                 user.getId(),
                 user.getNickname(),
                 comment.getContent(),
-                comment.getLikeCount(),
+                newLikeCount,
                 comment.getCreatedAt()
             ));
 
@@ -126,13 +131,13 @@ public class BasicReactionService implements ReactionService {
                     return ContentNotFoundException.contentNotFoundException(commentId);
                 });
 
-        boolean exists = reactionRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+        boolean exists = reactionRepository.existsByUser_IdAndComment_Id(user.getId(), comment.getId());
         if (!exists) {
             log.error("좋아요 취소 실패: 기존 Reaction 없음 userId={}, commentId={}", user.getId(), comment.getId());
             throw ReactionNotFoundException.forUnlike(comment.getId(), user.getId());
         }
 
-        int deleted = reactionRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+        int deleted = reactionRepository.deleteByUser_IdAndComment_Id(user.getId(), comment.getId());
         if (deleted > 0) {
             int affected = commentRepository.decrementLikeCount(comment.getId());
             if (affected == 0) {
