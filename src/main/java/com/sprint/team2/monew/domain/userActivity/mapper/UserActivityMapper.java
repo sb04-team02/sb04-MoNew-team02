@@ -15,6 +15,7 @@ import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentLik
 import com.sprint.team2.monew.domain.userActivity.events.commentEvent.CommentUpdateEvent;
 import com.sprint.team2.monew.domain.userActivity.events.subscriptionEvent.SubscriptionAddEvent;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserActivityMapper {
@@ -35,6 +36,7 @@ public interface UserActivityMapper {
 
   CommentActivityDto toCommentActivityDto(CommentAddEvent event);
 
+  @Mapping(source = "commentId", target = "id")
   CommentActivityDto toCommentActivityDto(CommentDeleteEvent event);
 
   CommentActivityLikeDto toCommentActivityLikeDto(CommentLikeAddEvent event);
