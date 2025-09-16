@@ -37,3 +37,12 @@ management:
   info:
     env:
       enabled: false
+
+#monew:
+#  backup:
+#    s3:
+#      access-key: ${AWS_ACCESS_KEY_ID}
+#      secret-key: ${AWS_SECRET_ACCESS_KEY}
+#      region: ${AWS_REGION}
+#      bucket: ${AWS_S3_BUCKET}
+#      presigned-url: ${AWS_S3_PRESIGNED_URL_EXPIRATION}

@@ -3,6 +3,7 @@ package com.sprint.team2.monew.global.config.aws;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
@@ -24,6 +25,8 @@ public class AwsConfig {
 //            )
 //        )
 //        .build();
-    return S3Client.builder().build();
+    return S3Client.builder()
+        .region(Region.of(s3Properties.region()))
+        .build();
   }
 }
