@@ -167,7 +167,7 @@ public class UserActivityRepositoryCustom {
 
     public void cancelCommentLike(CommentActivityCancelDto commentActivityDto) {
         UUID userId = commentActivityDto.commentUserId();
-        UUID commentId = commentActivityDto.id();
+        UUID commentId = commentActivityDto.commentId();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update() // for comments array (child)
             .pull("commentLikes", query(Criteria.where("id").is(commentId)));
