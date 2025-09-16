@@ -97,6 +97,7 @@ public class BasicNotificationsService implements NotificationService {
 
         UUID commentId = event.commentId();
         UUID receiverId = event.receiverId();
+        UUID likedUserId = event.likedUserId();
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
@@ -109,7 +110,14 @@ public class BasicNotificationsService implements NotificationService {
                     log.warn("[알림] 알림 이밴트 발행 실패 - 대상자 ID={}에 해당하는 사용자를 찾을 수 없음", receiverId);
                     return UserNotFoundException.withId(receiverId);
                 });
-        String content = String.format("[%s]님이 나의 댓글을 좋아합니다.", receiverUser.getNickname());
+
+        User likerUser = userRepository.findById(likedUserId)
+                .orElseThrow(() -> {
+                    log.warn("[알림] 좋아요 사용자 정보 조회 실패 - 사용자 ID={}", likedUserId);
+                    return UserNotFoundException.withId(likedUserId);
+                });
+
+        String content = String.format("[%s]님이 나의 댓글을 좋아합니다.", likerUser.getNickname());
 
         Notification notification = Notification.builder()
                 .user(receiverUser)
