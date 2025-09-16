@@ -122,7 +122,7 @@ public class UserActivityRepositoryCustom {
         UUID userId = commentActivityDto.userId();
         UUID commentId = commentActivityDto.id();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
-        Update update = new Update() // for comments array (child)
+        Update update = new Update()
             .pull("comments", query(Criteria.where("id").is(commentId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
@@ -180,6 +180,14 @@ public class UserActivityRepositoryCustom {
         if (result.getModifiedCount() == 0) {
             log.warn("[사용자 활동] 좋아요 취소할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
         }
+    }
+
+    public void removeCommentLikeFromAllUsers(UUID commentId) {
+        Query query = new Query(Criteria.where("commentLikes.commentId").is(commentId));
+        Update update = new Update().pull("commentLikes", Query.query(Criteria.where("commentId").is(commentId)));
+
+        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class); 
+        log.info("Removed comment {} likes from {} users", commentId, result.getModifiedCount());
     }
 
     /**
