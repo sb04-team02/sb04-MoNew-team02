@@ -122,7 +122,7 @@ public class UserActivityRepositoryCustom {
         UUID userId = commentActivityDto.userId();
         UUID commentId = commentActivityDto.id();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
-        Update update = new Update() // for comments array (child)
+        Update update = new Update()
             .pull("comments", query(Criteria.where("id").is(commentId)));
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
@@ -135,8 +135,8 @@ public class UserActivityRepositoryCustom {
     }
 
     public void addCommentLike(CommentActivityLikeDto commentActivityDto) {
-        UUID userId = commentActivityDto.commentUserId();
-        Query query = new Query(Criteria.where("_id").is(userId));
+        UUID commentUserId = commentActivityDto.commentUserId();
+        Query query = new Query(Criteria.where("_id").is(commentUserId));
         Update update = new Update()
             .push("commentLikes")
             .atPosition(0)
@@ -145,13 +145,30 @@ public class UserActivityRepositoryCustom {
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
         if (result.getMatchedCount() == 0) {
-            throw UserActivityNotFoundException.withId(userId);
+            throw UserActivityNotFoundException.withId(commentUserId);
+        }
+    }
+
+    public void updateLikeCountInMyComments(UUID commentUserId, UUID commentId, long newLikeCount) {
+        Query query = new Query(
+            Criteria.where("_id").is(commentUserId)
+                .and("comments.id").is(commentId)
+        );
+
+        Update update = new Update().set("comments.$.likeCount", newLikeCount);
+        UpdateResult result = mongoTemplate.updateFirst(query, update, UserActivity.class);
+
+        if (result.getMatchedCount() == 0) {
+            log.warn("[사용자 활동] 댓글 좋아요 수를 업데이트 할 사용자 활동 문서를 찾지 못했습니다. userId={}", commentUserId);
+        }
+        if (result.getModifiedCount() > 0) {
+            log.info("[사용자 활동] 댓글 좋아요 수 업데이트 완료. userId={}, commentId={}, newLikeCount={}", commentUserId, commentId, newLikeCount);
         }
     }
 
     public void cancelCommentLike(CommentActivityCancelDto commentActivityDto) {
         UUID userId = commentActivityDto.commentUserId();
-        UUID commentId = commentActivityDto.id();
+        UUID commentId = commentActivityDto.commentId();
         Query query = new Query(Criteria.where("_id").is(userId)); // parent document
         Update update = new Update() // for comments array (child)
             .pull("commentLikes", query(Criteria.where("id").is(commentId)));
@@ -161,8 +178,16 @@ public class UserActivityRepositoryCustom {
             throw UserActivityNotFoundException.withId(userId);
         }
         if (result.getModifiedCount() == 0) {
-            log.warn("[사용자 활동] 삭제할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
+            log.warn("[사용자 활동] 좋아요 취소할 댓글 ID {}를 활동 내역에서 찾지 못했습니다.", commentId);
         }
+    }
+
+    public void removeCommentLikeFromAllUsers(UUID commentId) {
+        Query query = new Query(Criteria.where("commentLikes.commentId").is(commentId));
+        Update update = new Update().pull("commentLikes", Query.query(Criteria.where("commentId").is(commentId)));
+
+        UpdateResult result = mongoTemplate.updateMulti(query, update, UserActivity.class);
+        log.info("Removed comment {} likes from {} users", commentId, result.getModifiedCount());
     }
 
     /**

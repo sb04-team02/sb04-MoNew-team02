@@ -62,11 +62,17 @@ dependencies {
     implementation 'org.springframework.batch:spring-batch-core'
     testImplementation 'org.springframework.batch:spring-batch-test'
 
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
+
     // metric
     implementation 'io.micrometer:micrometer-core'
 
     // h2
     testImplementation 'com.h2database:h2'
+
+    // RSS
+    implementation 'org.jsoup:jsoup:1.17.2'
 }
 
 tasks.named('test') {

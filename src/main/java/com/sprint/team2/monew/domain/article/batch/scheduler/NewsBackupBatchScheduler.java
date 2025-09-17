@@ -32,9 +32,9 @@ public class NewsBackupBatchScheduler {
           .toJobParameters();
 
       jobLauncher.run(backupNewsJob, params);
-      log.info("[뉴스 기사] 뉴스 기사 백업 배치 실행 완료");
+      log.info("[뉴스 기사 백업] 뉴스 기사 백업 배치 실행 완료");
     } catch (Exception e) {
-      log.error("[뉴스 기사] 뉴스 기사 백업 배치 실행 실패", e);
+      log.error("[뉴스 기사 백업] 뉴스 기사 백업 배치 실행 실패", e);
     }
   }
 }

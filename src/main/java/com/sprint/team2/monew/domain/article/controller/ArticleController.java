@@ -8,6 +8,7 @@ import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -71,12 +72,17 @@ public class ArticleController {
     }
 
     @GetMapping("/restore")
-    public ResponseEntity<ArticleRestoreResultDto> restoreArticles(@RequestParam("from") LocalDateTime from,
+    public ResponseEntity<List<ArticleRestoreResultDto>> restoreArticles(@RequestParam("from") LocalDateTime from,
                                                                    @RequestParam("to") LocalDateTime to
     ) {
+        LocalDate fromDate = from.toLocalDate();
+        LocalDate toDate = to.toLocalDate();
 
-        ArticleRestoreResultDto articleRestoreResultDto = articleStorageService.restoreArticle(from, to);
-        return ResponseEntity.ok(articleRestoreResultDto);
+        ArticleRestoreResultDto articleRestoreResultDto = articleStorageService.restoreArticle(fromDate, toDate);
+        if (articleRestoreResultDto.restoredArticleCount() == 0) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(List.of(articleRestoreResultDto));
     }
 
 

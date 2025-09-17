@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev
+  data:
+    mongodb:
+      uuid-representation: standard
 
   config:
     import: optional:file:.env[.properties]

@@ -5,6 +5,7 @@ import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
 import jakarta.persistence.Id;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,6 @@ public class UserActivity {
   private UUID id; // user id
   private String email;
   private String nickname;
-
   @CreatedDate
   private LocalDateTime createdAt;
   @LastModifiedDate
@@ -39,6 +39,6 @@ public class UserActivity {
     this.id = id;
     this.email = email;
     this.nickname = nickname;
-    this.createdAt = LocalDateTime.now();
+    this.createdAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
   }
 }

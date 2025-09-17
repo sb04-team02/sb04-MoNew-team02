@@ -128,14 +128,16 @@ public class NotificationServiceTest {
             Reaction like = TestLikeFactory.createLike();
             Comment comment = TestCommentFactory.createComment();
             User receiver = like.getComment().getUser();
+            User likedUser = like.getUser();
 
             UUID receiverId = receiver.getId();
             UUID commentId = like.getComment().getId();
+            UUID likedUserId = likedUser.getId();
 
             given(userRepository.findById(receiverId)).willReturn(Optional.of(receiver));
             given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
-            CommentLikedEvent event = new CommentLikedEvent(commentId, receiverId);
+            CommentLikedEvent event = new CommentLikedEvent(commentId, receiverId, likedUserId);
 
             //알림 객체 생성
             Notification notification = Notification.builder()
@@ -160,11 +162,13 @@ public class NotificationServiceTest {
         void shouldThrowWhenReceiverDoesNotExist() {
             // given
             Comment comment = TestCommentFactory.createComment();
+            User likedUser = TestUserFactory.createUser();
 
             UUID commentId = comment.getId();
+            UUID likedUserId = likedUser.getId();
             UUID nonExistentUserId = UUID.randomUUID();
 
-            CommentLikedEvent event = new CommentLikedEvent(commentId, nonExistentUserId);
+            CommentLikedEvent event = new CommentLikedEvent(commentId, nonExistentUserId, likedUserId);
 
             given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
             given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
