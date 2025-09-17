@@ -82,6 +82,8 @@ public class BasicArticleService implements ArticleService {
                 for (ArticleDto dto : articles) {
                     if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
                         Article articleEntity = articleMapper.toEntity(dto);
+                        articleEntity.setInterest(interest);
+
                         try {
                             articleRepository.save(articleEntity);
                             log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
