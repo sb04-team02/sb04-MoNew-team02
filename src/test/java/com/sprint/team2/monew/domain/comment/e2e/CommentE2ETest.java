@@ -10,7 +10,9 @@ import com.sprint.team2.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.team2.monew.domain.comment.dto.response.CursorPageResponseCommentDto;
 import com.sprint.team2.monew.domain.comment.entity.Comment;
 import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
+import com.sprint.team2.monew.domain.like.entity.Reaction;
 import com.sprint.team2.monew.domain.like.repository.ReactionRepository;
+import com.sprint.team2.monew.domain.notification.entity.Notification;
 import com.sprint.team2.monew.domain.notification.entity.ResourceType;
 import com.sprint.team2.monew.domain.notification.repository.NotificationRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
@@ -23,15 +25,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -43,15 +44,22 @@ public class CommentE2ETest {
     ObjectMapper om;
 
     @Autowired
+    PlatformTransactionManager transactionManager;
+
+    @Autowired
+    TransactionTemplate transactionTemplate;
+
+
+    @Autowired
     UserRepository userRepository;
     @Autowired
     ArticleRepository articleRepository;
     @Autowired
     CommentRepository commentRepository;
 
-    @MockitoBean
+    @Autowired
     ReactionRepository reactionRepository;
-    @MockitoBean
+    @Autowired
     NotificationRepository notificationRepository;
 
     User user;
@@ -59,6 +67,9 @@ public class CommentE2ETest {
 
     @BeforeEach
     void setUp() {
+
+        transactionTemplate = new TransactionTemplate(transactionManager);
+
         user = userRepository.save(
                 User.builder()
                         .email("user+" + UUID.randomUUID() + "@ex.com")
@@ -75,14 +86,6 @@ public class CommentE2ETest {
                         .summary("summary")
                         .build()
         );
-
-        // 목록 변환 시 likedByMe 계산: 전부 false로
-        when(reactionRepository.existsByUser_IdAndComment_Id(any(), any()))
-                .thenReturn(false);
-        // 삭제 시 사이드이펙트는 no-op
-        doNothing().when(reactionRepository).deleteByComment_Id(any());
-        doNothing().when(notificationRepository)
-                .deleteByResourceTypeAndResourceId(any(), any());
     }
 
     private void sleepTiny() {
@@ -145,8 +148,38 @@ public class CommentE2ETest {
         ResponseEntity<CommentDto> post2 = restTemplate.postForEntity(
                 "/api/comments", json(register2), CommentDto.class
         );
-        UUID toHardDelete = post2.getBody().id();
+        CommentDto created2 = post2.getBody();
+        assertThat(created2).isNotNull();
+        UUID toHardDelete = created2.id();
 
+        // --- 삭제 대상에 대한 리액션/알림을 실제로 만들어 둔다 ---
+        transactionTemplate.execute(status -> {
+            // 프록시 말고 '실제 엔티티'로 로딩 (동일 트랜잭션 내 managed)
+            User managedUser = userRepository.findById(user.getId()).orElseThrow();
+            Comment managedComment = commentRepository.findById(toHardDelete).orElseThrow();
+
+            reactionRepository.save(
+                    Reaction.builder()
+                            .user(managedUser)
+                            .comment(managedComment)
+                            .build()
+            );
+
+            notificationRepository.save(
+                    Notification.builder()
+                            .user(managedUser)
+                            .resourceType(ResourceType.COMMENT)
+                            .resourceId(toHardDelete)
+                            .confirmed(false)
+                            .build()
+            );
+            return null;
+        });
+
+        // 삭제 전 유저의 알림 총 개수(비교용)
+        Long beforeTotalNotification = notificationRepository.countByUserIdAndConfirmedFalse(user.getId());
+
+        //삭제 호출
         HttpHeaders hardDelHeaders = new HttpHeaders();
         hardDelHeaders.set("Monew-Request-User-ID", user.getId().toString());
         ResponseEntity<Void> hardDelRes = restTemplate.exchange(
@@ -154,14 +187,20 @@ public class CommentE2ETest {
                 HttpMethod.DELETE,
                 new HttpEntity<>(hardDelHeaders),
                 Void.class,
-                java.util.Map.of("id", toHardDelete.toString())
+                toHardDelete
         );
         assertThat(hardDelRes.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(commentRepository.findById(toHardDelete)).isEmpty();
+        assertThat(reactionRepository.existsByUser_IdAndComment_Id(user.getId(), toHardDelete)).isFalse();
 
-        verify(reactionRepository).deleteByComment_Id(eq(toHardDelete));
-        verify(notificationRepository)
-                .deleteByResourceTypeAndResourceId(eq(ResourceType.COMMENT), eq(toHardDelete));
+        List<Notification> unconfirmedAfter = notificationRepository.findAllByUserIdAndConfirmedIsFalse(user.getId());
+        assertThat(unconfirmedAfter.stream()
+                .anyMatch(n -> n.getResourceType() == ResourceType.COMMENT && toHardDelete.equals(n.getResourceId())))
+                .isFalse();
+
+        //총 개수가 1 감소했는지(이번 테스트에서 알림을 1개만 추가했다면 유효)
+        Long afterTotalNotification = notificationRepository.countByUserIdAndConfirmedFalse(user.getId());
+        assertThat(afterTotalNotification).isEqualTo(beforeTotalNotification - 1);
     }
 
     // ------------------------ 목록/커서(LIKE DESC) ------------------------
