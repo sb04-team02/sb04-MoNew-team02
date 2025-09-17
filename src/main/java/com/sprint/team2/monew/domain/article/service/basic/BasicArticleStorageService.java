@@ -90,8 +90,8 @@ public class BasicArticleStorageService implements ArticleStorageService {
     for (LocalDate date = from; !date.isAfter(to); date = date.plusDays(1)) {
       List<Article> articlesFromS3 = new ArrayList<>();
       String prefix = String.format(
-          "test-articles-%s/", // local
-//          "articles-%s/", // prod
+//          "test-articles-%s/", // local
+          "articles-%s/", // prod
           date.format(DateTimeFormatter.ISO_LOCAL_DATE)
       );
 
