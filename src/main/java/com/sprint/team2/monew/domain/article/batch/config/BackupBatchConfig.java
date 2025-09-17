@@ -49,13 +49,13 @@ public class BackupBatchConfig {
   @Bean
   public Step newsBackupStep(
       JpaPagingItemReader<Article> newsBackupReader,
-      ItemProcessor<Article, String> newsBackupProcessor,
-      ItemWriter<String> newsBackupWriter,
+      ItemProcessor<Article, Article> newsBackupProcessor,
+      ItemWriter<Article> newsBackupWriter,
       JobRepository jobRepository,
       PlatformTransactionManager transactionManager
   ) {
     return new StepBuilder("newsBackupStep", jobRepository)
-        .<Article, String>chunk(chunkSize, transactionManager)
+        .<Article, Article>chunk(chunkSize, transactionManager)
         .reader(newsBackupReader)
         .processor(newsBackupProcessor)
         .writer(newsBackupWriter)
@@ -89,15 +89,15 @@ public class BackupBatchConfig {
 
   // Processor - 각 Article 객체를 JSON으로 변환
   @Bean
-  public ItemProcessor<Article, String> newsBackupProcessor() {
-    // return article -> objectMapper.writeValueAsString(article)
-    return objectMapper::writeValueAsString;
+  public ItemProcessor<Article, Article> newsBackupProcessor() {
+//    return objectMapper::writeValueAsString;
+    return article -> article;
   }
 
   // Writer - 변환된 데이터(JSON)를 AWS S3에 파일로 기록 (배치 방식으로 S3에 백업)
   @Bean
   @StepScope
-  public ItemWriter<String> newsBackupWriter(
+  public ItemWriter<Article> newsBackupWriter(
       @Value("#{jobParameters['backupDate']}") String backupDateStr
   ) {
     return articles -> {
@@ -107,12 +107,22 @@ public class BackupBatchConfig {
       if (articles.getItems().isEmpty()) {
         return;
       }
-      String aggregatedJson = String.join("\n", articles.getItems());
+//      String aggregatedJson = String.join("\n", articles.getItems());
+
+      /** 저장되는 포맷:
+       * [
+       *   {"id": "...", "title": "첫 번째 기사"},
+       *   {"id": "...", "title": "두 번째 기사"},
+       *   {"id": "...", "title": "세 번째 기사"}
+       * ]
+       */
+      String aggregatedJsonArray = objectMapper.writeValueAsString(articles.getItems());
+
       String filename = String.format("articles-%s/chunk-%s.json",
           backupDateStr,
           UUID.randomUUID()
           );
-      articleStorageService.backupToS3(filename, aggregatedJson);
+      articleStorageService.backupToS3(filename, aggregatedJsonArray);
     };
   }
 

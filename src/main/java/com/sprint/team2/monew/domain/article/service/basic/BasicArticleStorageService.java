@@ -80,6 +80,8 @@ public class BasicArticleStorageService implements ArticleStorageService {
         from.atStartOfDay(), // 하루 시작
         to.plusDays(1).atStartOfDay() // 다음날 하루 시작
     );
+    log.info("[뉴스 기사 복구] 기간: {} ~ {}. repository에 저장된 기사 url들: {}",
+        from, to, existingArticleUrls);
     log.info("[뉴스 기사 복구] S3로부터 뉴스 기사 복구 시작. 기간: {} ~ {}", from, to);
 
     // from, to 사이에 있는 날짜 루프
@@ -137,7 +139,9 @@ public class BasicArticleStorageService implements ArticleStorageService {
       return new ArticleRestoreResultDto(LocalDateTime.now(), new ArrayList<>(), 0);
     }
 
+    missingArticlesTotal.forEach(Article::setIdToNull);
     articleRepository.saveAll(missingArticlesTotal);
+
     log.info("[뉴스 기사 복구] 총 {}개의 뉴스 기사를 DB에 저장했습니다.", missingArticlesTotal.size());
     List<UUID> savedArticleIdsTotal = missingArticlesTotal.stream()
         .map(BaseEntity::getId)
