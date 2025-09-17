@@ -170,7 +170,7 @@ class BasicArticleServiceTest {
         when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userActivityRepository.findById(userId)).thenReturn(Optional.of(userActivity));
-        when(commentRepository.countByArticle_Id(articleId)).thenReturn(0L);
+        when(commentRepository.countByArticle_IdAndNotDeleted(articleId)).thenReturn(0L);
 
         // when
         ArticleViewDto result = basicArticleService.view(userId, articleId);

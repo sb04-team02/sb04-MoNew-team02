@@ -141,7 +141,7 @@ public class BasicArticleService implements ArticleService {
             viewedDate = userActivityRepositoryCustom.findByArticleId(userId ,articleId).createdAt();
         }
 
-        articleCommentCount = commentRepository.countByArticle_Id(articleId);
+        articleCommentCount = commentRepository.countByArticle_IdAndNotDeleted(articleId);
 
         log.info("[Article] 기사 뷰 등록 성공");
         ArticleViewDto articleViewDto = new ArticleViewDto(
@@ -231,7 +231,7 @@ public class BasicArticleService implements ArticleService {
                         article.getTitle(),
                         article.getPublishDate(),
                         article.getSummary(),
-                        commentRepository.countByArticle_Id(article.getId()),
+                        commentRepository.countByArticle_IdAndNotDeleted(article.getId()),
                         article.getViewCount(),
                         hasUserViewedArticle(userId, article.getId())
                 ))
