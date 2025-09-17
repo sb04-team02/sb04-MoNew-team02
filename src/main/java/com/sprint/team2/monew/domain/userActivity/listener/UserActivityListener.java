@@ -2,6 +2,7 @@ package com.sprint.team2.monew.domain.userActivity.listener;
 
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.comment.dto.response.CommentActivityDto;
+import com.sprint.team2.monew.domain.comment.entity.Comment;
 import com.sprint.team2.monew.domain.subscription.dto.SubscriptionDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityCancelDto;
 import com.sprint.team2.monew.domain.userActivity.dto.CommentActivityLikeDto;
@@ -74,6 +75,7 @@ public class UserActivityListener {
         email,
         nickname
     );
+    newUserActivity.setCreatedAt(event.createdAt());
     log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
     userActivityRepository.save(newUserActivity);
     log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
@@ -171,6 +173,7 @@ public class UserActivityListener {
 
     log.info("[사용자 활동] 댓글 삭제 시작 - commentId = {}", commentId);
     userActivityRepositoryCustom.deleteComment(commentActivityDto);
+    userActivityRepositoryCustom.removeCommentLikeFromAllUsers(commentId);
     log.info("[사용자 활동] 댓글 삭제 완료- commentId = {}", commentId);
   }
 
@@ -181,17 +184,27 @@ public class UserActivityListener {
 
     log.info("[사용자 활동] 댓글 좋아요 추가 시작 - commentId,  = {}",commentId);
     userActivityRepositoryCustom.addCommentLike(commentActivityLikeDto);
+    userActivityRepositoryCustom.updateLikeCountInMyComments(
+        event.commentUserId(),
+        commentId,
+        event.commentLikeCount()
+      );
 
     log.info("[사용자 활동] 댓글 좋아요 추가 완료 - commentId = {}", commentId);
   }
 
   @TransactionalEventListener
   public void handleCommentLikeCancel(CommentLikeCancelEvent event) {
-    UUID commentId = event.id();
+    UUID commentId = event.commentId();
     CommentActivityCancelDto commentActivityCancelDto = userActivityMapper.toCommentActivityCancelDto(event);
 
     log.info("[사용자 활동] 댓글 좋아요 삭제 시작 - commentId = {}", commentId);
     userActivityRepositoryCustom.cancelCommentLike(commentActivityCancelDto);
+    userActivityRepositoryCustom.updateLikeCountInMyComments(
+        event.commentUserId(),
+        commentId,
+        event.commentLikeCount()
+    );
     log.info("[사용자 활동] 댓글 좋아요 삭제 완료 - commentId = {}", commentId);
   }
 

@@ -101,8 +101,8 @@ public class BasicReactionService implements ReactionService {
                 comment.getId(),
                 comment.getArticle().getId(),
                 comment.getArticle().getTitle(),
-                user.getId(),
-                user.getNickname(),
+                comment.getUser().getId(),
+                comment.getUser().getNickname(),
                 comment.getContent(),
                 newLikeCount,
                 comment.getCreatedAt()
@@ -145,11 +145,13 @@ public class BasicReactionService implements ReactionService {
                 log.warn("decrementLikeCount 미적용(이미 0이었을 가능성): commentId={}", comment.getId());
             }
             log.info("댓글 좋아요 취소 성공: userId={}, commentId={}", user.getId(), comment.getId());
+            long newLikeCount = commentRepository.findLikeCountById(comment.getId());
 
             // User Activity 이벤트
             applicationEventPublisher.publishEvent(new CommentLikeCancelEvent(
-                comment.getId(),
-                user.getId()
+                commentId,
+                comment.getUser().getId(), // author
+                newLikeCount
             ));
 
         } else {

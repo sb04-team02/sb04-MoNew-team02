@@ -199,7 +199,7 @@ public class BasicNotificationsService implements NotificationService {
             nextCursor = notifications.get(notifications.size() - 1).getCreatedAt().toString();
         }
 
-        Long totalElements = notificationRepository.countByUserId((userId));
+        Long totalElements = notificationRepository.countByUserIdAndConfirmedFalse(userId);
 
         log.info("[알림] 응답 생성 완료 - contentSize={}, totalElements={}, hasNext={}",
                 content.size(), totalElements, slice.hasNext());

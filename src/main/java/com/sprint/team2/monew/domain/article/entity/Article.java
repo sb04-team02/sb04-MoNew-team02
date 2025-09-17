@@ -47,4 +47,8 @@ public class Article extends DeletableEntity {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    public void setIdToNull() {
+        this.id = null;
+    }
 }

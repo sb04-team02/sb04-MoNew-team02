@@ -113,5 +113,6 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
            """)
     int softDeleteById(@Param("id") UUID id);
 
-    long countByArticle_Id(UUID articleId);
+//    하드 삭제 후 전체 댓글 수 조회용 메서드
+//    long countByArticle_Id(UUID articleId);
 }

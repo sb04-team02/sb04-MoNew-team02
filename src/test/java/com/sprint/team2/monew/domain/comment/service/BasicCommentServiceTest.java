@@ -36,14 +36,12 @@ import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.sprint.team2.monew.domain.article.entity.ArticleSource.NAVER;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -442,7 +440,7 @@ public class BasicCommentServiceTest {
         int size = 3;
         boolean asc = false;
 
-        OffsetDateTime after = null;
+        LocalDateTime after = null;
         LocalDateTime afterDate = null;
 
         LocalDateTime t3 = LocalDateTime.parse("2025-09-10T10:10:00");
@@ -518,7 +516,7 @@ public class BasicCommentServiceTest {
         int size = 2;
         boolean asc = false;
 
-        OffsetDateTime after = null;
+        LocalDateTime after = null;
         LocalDateTime afterDate = null;
 
         LocalDateTime t1 = LocalDateTime.parse("2025-09-10T09:00:00");
@@ -581,7 +579,7 @@ public class BasicCommentServiceTest {
         UUID articleId = UUID.randomUUID();
         int size = 2;
 
-        OffsetDateTime after = null;
+        LocalDateTime after = null;
         LocalDateTime afterDate = null;
 
         Comment c1 = mock(Comment.class);

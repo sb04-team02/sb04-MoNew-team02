@@ -20,7 +20,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -287,8 +286,8 @@ public class CommentControllerTest {
         String cursor    = "10|2025-09-10T12:34:56";
         int    limit     = 2;
 
-        // after(OffsetDateTime) 파라미터 준비
-        OffsetDateTime after = OffsetDateTime.parse("2025-09-10T12:00:00Z");
+        // after(LocalDateTime) 파라미터 준비
+        LocalDateTime after = LocalDateTime.parse("2025-09-10T12:00:00");
 
         CursorPageResponseCommentDto body = new CursorPageResponseCommentDto(
                 List.of(mock(CommentDto.class)),
@@ -353,7 +352,7 @@ public class CommentControllerTest {
         int limit = 20;
 
         given(commentService.getAllArticleComment(
-                eq(articleId), eq(requesterId), isNull(String.class), eq(limit), isNull(OffsetDateTime.class),
+                eq(articleId), eq(requesterId), isNull(String.class), eq(limit), isNull(LocalDateTime.class),
                 eq(CommentSortType.DATE), eq(true))
         ).willThrow(new RuntimeException("unexpected"));
 

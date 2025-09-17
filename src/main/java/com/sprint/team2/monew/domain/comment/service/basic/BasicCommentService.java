@@ -239,7 +239,7 @@ public class BasicCommentService implements CommentService {
             UUID requesterUserId,
             String cursor,
             int size,
-            OffsetDateTime after,
+            LocalDateTime after,
             CommentSortType sortType,
             boolean asc
     ) {
@@ -255,7 +255,7 @@ public class BasicCommentService implements CommentService {
         }
 
         // === after 보정 및 플래그 ===
-        final LocalDateTime afterDate = (after != null) ? after.toLocalDateTime() : null;
+        final LocalDateTime afterDate = after;
         final boolean hasAfter = (afterDate != null);
 
         // === cursor 파싱 및 플래그 ===
@@ -347,6 +347,5 @@ public class BasicCommentService implements CommentService {
                 hasNext
         );
     }
-
 
 }
