@@ -1,5 +1,6 @@
 package com.sprint.team2.monew.domain.article.service.basic;
 
+import com.sprint.team2.monew.domain.article.collect.NaverApiCollector;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
@@ -14,6 +15,9 @@ import com.sprint.team2.monew.domain.comment.repository.CommentRepository;
 import com.sprint.team2.monew.domain.user.entity.User;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
 import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleDeleteEvent;
+import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
+import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -32,6 +37,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,13 +54,18 @@ class BasicArticleServiceTest {
     @Mock
     private UserActivityRepositoryCustom userActivityRepositoryCustom;
     @Mock
-    private UserActivity userActivity;
+    private UserActivityMapper userActivityMapper;
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private CommentRepository commentRepository;
+
+    @Mock
+    private NaverApiCollector naverApiCollector;
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     @InjectMocks
     private BasicArticleService basicArticleService;
@@ -142,13 +153,24 @@ class BasicArticleServiceTest {
                 .build();
 
         UserActivity userActivity = new UserActivity(userId, user.getEmail(), user.getNickname());
-        userActivity.setId(UUID.randomUUID());
+        ArticleViewDto articleViewDto = new ArticleViewDto(
+                UUID.randomUUID(),userId,LocalDateTime.now(),
+                articleId,"source","sourceUrl",
+                "Title",LocalDateTime.now(),"summary",
+                0L,0L);
+        ArticleViewEvent articleViewEvent = new ArticleViewEvent(
+                articleViewDto.id(),userId,LocalDateTime.now(),
+                articleId,"source","sourceUrl",
+                "Title",LocalDateTime.now(),"summary",
+                0L,0L);
+        given(userActivityMapper.toArticleViewEvent(any(ArticleViewDto.class))).willReturn(articleViewEvent);
+        willDoNothing().given(publisher).publishEvent(articleViewEvent);
+        given(userActivityRepository.findById(userId)).willReturn(Optional.of(userActivity));
 
         when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userActivityRepository.findById(userId)).thenReturn(Optional.of(userActivity));
-        when(userActivityRepository.save(any(UserActivity.class))).thenReturn(userActivity);
-        when(commentRepository.countByArticle_Id(articleId)).thenReturn(0L);
+        when(commentRepository.countByArticle_IdAndNotDeleted(articleId)).thenReturn(0L);
 
         // when
         ArticleViewDto result = basicArticleService.view(userId, articleId);
@@ -159,7 +181,7 @@ class BasicArticleServiceTest {
         assertThat(result.articleCommentCount()).isEqualTo(0);
 
         verify(articleRepository, times(1)).save(any(Article.class));
-        verify(userActivityRepository, times(1)).save(any(UserActivity.class));
+        verify(userActivityRepository, times(1)).findById(any(UUID.class));
     }
 
     @Test
@@ -176,6 +198,7 @@ class BasicArticleServiceTest {
                 .viewCount(10)
                 .build();
 
+        willDoNothing().given(publisher).publishEvent(new ArticleDeleteEvent(articleId));
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
 
         // when
@@ -202,6 +225,8 @@ class BasicArticleServiceTest {
                 .build();
 
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+        willDoNothing().given(publisher).publishEvent(new ArticleDeleteEvent(articleId));
+        willDoNothing().given(articleRepository).delete(article);
 
         // when
         basicArticleService.hardDelete(articleId);
@@ -209,6 +234,5 @@ class BasicArticleServiceTest {
         // then
         verify(articleRepository, times(1)).findById(articleId);
         verify(articleRepository, times(1)).delete(article);
-        verify(userActivityRepositoryCustom, times(1)).deleteByArticleId(articleId);
     }
 }

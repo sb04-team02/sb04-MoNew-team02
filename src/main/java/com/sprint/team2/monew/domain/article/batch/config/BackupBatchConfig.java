@@ -31,7 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class BackupBatchConfig {
 
   private final ArticleStorageService articleStorageService;
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
   private final int chunkSize = 100;
 
   // ===================== Job =====================

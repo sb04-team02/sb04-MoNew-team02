@@ -32,7 +32,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     List<Notification> findAllByConfirmedIsTrueAndUpdatedAtBefore(LocalDateTime threshold);
 
-    Long countByUserId(UUID userId);
+    Long countByUserIdAndConfirmedFalse(UUID userId);
 
     void deleteByResourceTypeAndResourceId(ResourceType resourceType, UUID resourceId);
 }

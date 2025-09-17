@@ -20,12 +20,10 @@ public class NewsBackupBatchScheduler {
   private final JobLauncher jobLauncher;
   private final Job backupNewsJob;
 
-//  @Scheduled(cron = "0 0 0 * * *")
-  @Scheduled(cron = "0 */1 * * * *")
+  @Scheduled(cron = "0 0 0 * * *")
   public void runBackupNewsSchedulerJob() {
     try {
-//      String backupDate = LocalDate.now().minusDays(1)
-      String backupDate = LocalDate.now() // 날짜 오늘로 바꿈
+      String backupDate = LocalDate.now().minusDays(1)
           .format(DateTimeFormatter.ISO_LOCAL_DATE);
 
       JobParameters params = new JobParametersBuilder()

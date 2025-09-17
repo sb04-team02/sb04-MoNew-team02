@@ -22,7 +22,7 @@ public class FileWatchService {
     @PostConstruct
     public void fileMonitoring() throws IOException {
 
-        String dirPath = "/.logs"; // 모니터링 디렉토리
+        String dirPath = ".logs"; // 모니터링 디렉토리
 
         // watchService 생성
         try {
@@ -60,7 +60,8 @@ public class FileWatchService {
                             Path dir = Paths.get(dirPath);
 
                             if (kind.equals(StandardWatchEventKinds.ENTRY_CREATE)) {
-                                Path changedPath = dir.resolve((Path) watchEvent.context());
+                                log.info("파일 생성 감지 : {}", paths.toString());
+                                Path changedPath = dir.resolve(paths);
                                 String filename = changedPath.getFileName().toString();
                                 // System.out.println("Uploading " + changedPath + " to S3...");
                                 if (filename.matches("myapp\\.\\d{2}-\\d{2}-\\d{2}\\.log")) {
