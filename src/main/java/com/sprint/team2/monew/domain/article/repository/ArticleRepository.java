@@ -25,10 +25,10 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
 
     @Modifying
     @Query("UPDATE Article a SET a.commentCount = a.commentCount + 1 WHERE a.id = :articleId")
-    long increaseCommentCount(@Param("articleId") UUID articleId);
+    void increaseCommentCount(@Param("articleId") UUID articleId);
 
     @Modifying
     @Query("UPDATE Article a SET a.commentCount = a.commentCount - 1 WHERE a.id = :articleId AND a.commentCount > 0")
-    long decreaseCommentCount(@Param("articleId") UUID articleId);
+    void decreaseCommentCount(@Param("articleId") UUID articleId);
 }
 
