@@ -89,16 +89,19 @@ public class BasicCommentService implements CommentService {
                 saved.getId(), request.articleId(), request.userId());
         CommentDto result = commentMapper.toDto(saved, false);// 좋아요 도메인 미구현이므로 false
 
+        // article의 댓글 수 증가 반영
+        articleRepository.increaseCommentCount(article.getId());
+
         // ============== User Activity 이벤트 추가 ==============
         publisher.publishEvent(new CommentAddEvent(
-            comment.getId(),
-            comment.getArticle().getId(),
-            comment.getArticle().getTitle(),
-            user.getId(),
-            user.getNickname(),
-            comment.getContent(),
-            comment.getLikeCount(),
-            comment.getCreatedAt()
+                comment.getId(),
+                comment.getArticle().getId(),
+                comment.getArticle().getTitle(),
+                user.getId(),
+                user.getNickname(),
+                comment.getContent(),
+                comment.getLikeCount(),
+                comment.getCreatedAt()
         ));
 
         return result;
@@ -142,14 +145,14 @@ public class BasicCommentService implements CommentService {
 
         // ============== User Activity 이벤트 추가 ==============
         publisher.publishEvent(new CommentUpdateEvent(
-            comment.getId(),
-            comment.getArticle().getId(),
-            comment.getArticle().getTitle(),
-            comment.getUser().getId(),
-            comment.getUser().getNickname(),
-            comment.getContent(),
-            comment.getLikeCount(),
-            comment.getCreatedAt()
+                comment.getId(),
+                comment.getArticle().getId(),
+                comment.getArticle().getTitle(),
+                comment.getUser().getId(),
+                comment.getUser().getNickname(),
+                comment.getContent(),
+                comment.getLikeCount(),
+                comment.getCreatedAt()
         ));
 
         return dto;
@@ -182,10 +185,13 @@ public class BasicCommentService implements CommentService {
 
         log.info("댓글 논리 삭제 성공: commentId={}, requesterUserId={}", commentId, requesterUserId);
 
+        // article 관련 댓글 수 감소
+        articleRepository.decreaseCommentCount(comment.getArticle().getId());
+
         // ============== User Activity 이벤트 추가 ==============
         publisher.publishEvent(new CommentDeleteEvent(
-            comment.getId(),
-            requesterUserId
+                comment.getId(),
+                requesterUserId
         ));
     }
 
@@ -221,8 +227,8 @@ public class BasicCommentService implements CommentService {
 
         // ============== User Activity 이벤트 추가 ==============
         publisher.publishEvent(new CommentDeleteEvent(
-            comment.getId(),
-            requesterUserId
+                comment.getId(),
+                requesterUserId
         ));
     }
 
