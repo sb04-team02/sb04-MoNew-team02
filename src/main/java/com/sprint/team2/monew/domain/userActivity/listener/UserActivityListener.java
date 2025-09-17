@@ -75,6 +75,7 @@ public class UserActivityListener {
         email,
         nickname
     );
+    newUserActivity.setCreatedAt(event.createdAt());
     log.info("[사용자 활동] (로그인) 생성 시작 - id = {}",id);
     userActivityRepository.save(newUserActivity);
     log.info("[사용자 활동] (로그인) 생성 완료 - id = {}", id);
