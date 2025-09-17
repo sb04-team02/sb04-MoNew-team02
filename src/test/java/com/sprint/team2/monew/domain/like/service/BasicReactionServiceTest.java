@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -202,15 +203,21 @@ public class BasicReactionServiceTest {
         basicReactionService.unlikeComment(commentId, requesterUserId);
 
         //then
-        then(userRepository).should().findById(requesterUserId);
-        then(commentRepository).should().findById(commentId);
-        then(reactionRepository).should().existsByUser_IdAndComment_Id(user.getId(), comment.getId());
-        then(reactionRepository).should().deleteByUser_IdAndComment_Id(user.getId(), comment.getId());
-        then(commentRepository).should().decrementLikeCount(comment.getId());
+        InOrder inOrder = inOrder(userRepository, commentRepository, reactionRepository);
 
-        then(userRepository).shouldHaveNoMoreInteractions();
-        then(commentRepository).shouldHaveNoMoreInteractions();
-        then(reactionRepository).shouldHaveNoMoreInteractions();
+        inOrder.verify(userRepository).findById(requesterUserId);
+        inOrder.verify(commentRepository).findById(commentId);
+        inOrder.verify(reactionRepository).existsByUser_IdAndComment_Id(user.getId(), comment.getId());
+        inOrder.verify(reactionRepository).deleteByUser_IdAndComment_Id(user.getId(), comment.getId());
+        inOrder.verify(commentRepository).decrementLikeCount(comment.getId());
+
+// 금지하고 싶은 것만 명시적으로 막기
+        verify(commentRepository, never()).incrementLikeCount(any());
+        verify(commentRepository, never()).deleteById(any());
+        verify(commentRepository, never()).softDeleteById(any());
+
+// commentRepository 에 대해서는 no-more-interactions을 제거
+        verifyNoMoreInteractions(userRepository, reactionRepository);
     }
 
     @Test
