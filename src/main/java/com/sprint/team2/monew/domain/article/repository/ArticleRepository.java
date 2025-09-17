@@ -14,8 +14,9 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
 
     boolean existsBySourceUrlAndDeletedAtIsNull(String sourceUrl);
 
+    // gets non deleted (no soft delete)
     @Query("SELECT a.sourceUrl FROM Article a"
-        + " WHERE a.createdAt >= :startDate AND a.createdAt < :endDate ")
+        + " WHERE a.createdAt >= :startDate AND a.createdAt < :endDate AND a.deletedAt IS NULL")
     Set<String> findArticleUrlsBetweenDates(
         @Param("startDate") LocalDateTime start,
         @Param("endDate") LocalDateTime end);
