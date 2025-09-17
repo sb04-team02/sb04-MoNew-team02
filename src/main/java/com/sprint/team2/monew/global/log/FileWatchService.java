@@ -64,7 +64,7 @@ public class FileWatchService {
                                 Path changedPath = dir.resolve(paths);
                                 String filename = changedPath.getFileName().toString();
                                 // System.out.println("Uploading " + changedPath + " to S3...");
-                                if (filename.matches("myapp\\.\\d{2}-\\d{2}-\\d{2}_\\d{2}\\.log")) {
+                                if (filename.matches("myapp\\.\\d{2}-\\d{2}-\\d{2}\\.log")) {
                                     log.info("[S3업로드] filename : {}", filename);
                                     s3Uploader.uploadFile(changedPath, "/logs");
                                 }
