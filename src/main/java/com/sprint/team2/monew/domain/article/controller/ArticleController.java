@@ -45,8 +45,8 @@ public class ArticleController {
                                                                     @RequestParam(required = false) String keyword,
                                                                     @RequestParam(required = false) UUID interestId,
                                                                     @RequestParam(required = false) List<ArticleSource> sourceIn,
-                                                                    @RequestParam(required = false) LocalDateTime publishedDateFrom,
-                                                                    @RequestParam(required = false) LocalDateTime publishedDateTo,
+                                                                    @RequestParam(required = false) LocalDateTime publishDateFrom,
+                                                                    @RequestParam(required = false) LocalDateTime publishDateTo,
                                                                     @RequestParam(defaultValue = "publishDate") ArticleOrderBy orderBy,
                                                                     @RequestParam(defaultValue = "DESC") ArticleDirection direction,
                                                                     @RequestParam(required = false) String cursor,
@@ -55,7 +55,7 @@ public class ArticleController {
         CursorPageResponseArticleDto result = articleService.read(
                 userId, orderBy, direction, limit,
                 keyword,
-                interestId, sourceIn, publishedDateFrom, publishedDateTo,
+                interestId, sourceIn, publishDateFrom, publishDateTo,
                 cursor, after
         );
 

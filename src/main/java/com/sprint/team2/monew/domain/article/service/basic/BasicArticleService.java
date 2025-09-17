@@ -169,8 +169,8 @@ public class BasicArticleService implements ArticleService {
                                              String keyword,
                                              UUID interestId,
                                              List<ArticleSource> sourceIn,
-                                             LocalDateTime publishedDateFrom,
-                                             LocalDateTime publishedDateTo,
+                                             LocalDateTime publishDateFrom,
+                                             LocalDateTime publishDateTo,
                                              String cursor,
                                              LocalDateTime after) {
 
@@ -189,7 +189,7 @@ public class BasicArticleService implements ArticleService {
         }
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
+                keyword, interestId, sourceIn, publishDateFrom, publishDateTo,
                 orderBy, direction, cursor, after, limit
         );
 
@@ -240,7 +240,7 @@ public class BasicArticleService implements ArticleService {
                 nextCursor,
                 nextAfter,
                 content.size(),
-                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo),
+                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishDateFrom, publishDateTo),
                 hasNext
         );
     }
