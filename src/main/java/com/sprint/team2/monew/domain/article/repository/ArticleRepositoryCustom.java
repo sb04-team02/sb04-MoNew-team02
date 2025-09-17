@@ -20,8 +20,8 @@ public class ArticleRepositoryCustom {
             String keyword,
             UUID interestId,
             List<ArticleSource> sourceIn,
-            LocalDateTime publishedDateFrom,
-            LocalDateTime publishedDateTo,
+            LocalDateTime publishDateFrom,
+            LocalDateTime publishDateTo,
             ArticleOrderBy orderBy,
             ArticleDirection direction,
             String cursor,
@@ -29,54 +29,36 @@ public class ArticleRepositoryCustom {
             int limit
     ) {
         QArticle article = QArticle.article;
-        BooleanBuilder builder = build(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
-        );
+        BooleanBuilder builder = build(keyword, interestId, sourceIn, publishDateFrom, publishDateTo);
 
         if (cursor != null) {
             switch (orderBy) {
-                case commentCount -> {
-                    long cursorValue = Long.parseLong(cursor);
-                    if (after != null) {
+                case commentCount:
+                    long commentCursor = Long.parseLong(cursor);
+                    builder.and(direction == ArticleDirection.ASC ?
+                            article.commentCount.gt(commentCursor) : article.commentCount.lt(commentCursor));
+                    if (after != null)
                         builder.and(direction == ArticleDirection.ASC ?
-                                article.commentCount.gt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.gt(after))) :
-                                article.commentCount.lt(cursorValue).or(article.commentCount.eq(cursorValue).and(article.createdAt.lt(after))));
-                    } else {
-                        builder.and(direction == ArticleDirection.ASC ?
-                                article.commentCount.gt(cursorValue) :
-                                article.commentCount.lt(cursorValue));
-                    }
-                }
+                                article.createdAt.gt(after) : article.createdAt.lt(after));
+                    break;
 
-                case viewCount -> {
-                    long cursorValue = Long.parseLong(cursor);
-                    if (after != null) {
+                case viewCount:
+                    long viewCursor = Long.parseLong(cursor);
+                    builder.and(direction == ArticleDirection.ASC ?
+                            article.viewCount.gt(viewCursor) : article.viewCount.lt(viewCursor));
+                    if (after != null)
                         builder.and(direction == ArticleDirection.ASC ?
-                                article.viewCount.gt(cursorValue)
-                                        .or(article.viewCount.eq(cursorValue).and(article.createdAt.gt(after))) :
-                                article.viewCount.lt(cursorValue)
-                                        .or(article.viewCount.eq(cursorValue).and(article.createdAt.lt(after))));
-                    } else {
-                        builder.and(direction == ArticleDirection.ASC ?
-                                article.viewCount.gt(cursorValue) :
-                                article.viewCount.lt(cursorValue));
-                    }
-                }
+                                article.createdAt.gt(after) : article.createdAt.lt(after));
+                    break;
 
-                default -> {
+                default: // publishDate
                     LocalDateTime cursorDate = LocalDateTime.parse(cursor);
-                    if (after != null) {
+                    builder.and(direction == ArticleDirection.ASC ?
+                            article.publishDate.gt(cursorDate) : article.publishDate.lt(cursorDate));
+                    if (after != null)
                         builder.and(direction == ArticleDirection.ASC ?
-                                article.publishDate.gt(cursorDate)
-                                        .or(article.publishDate.eq(cursorDate).and(article.createdAt.gt(after))) :
-                                article.publishDate.lt(cursorDate)
-                                        .or(article.publishDate.eq(cursorDate).and(article.createdAt.lt(after))));
-                    } else {
-                        builder.and(direction == ArticleDirection.ASC ?
-                                article.publishDate.gt(cursorDate) :
-                                article.publishDate.lt(cursorDate));
-                    }
-                }
+                                article.createdAt.gt(after) : article.createdAt.lt(after));
+                    break;
             }
         }
 
@@ -99,13 +81,11 @@ public class ArticleRepositoryCustom {
             String keyword,
             UUID interestId,
             List<ArticleSource> sourceIn,
-            LocalDateTime publishedDateFrom,
-            LocalDateTime publishedDateTo
+            LocalDateTime publishDateFrom,
+            LocalDateTime publishDateTo
     ) {
         QArticle article = QArticle.article;
-        BooleanBuilder builder = build(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo
-        );
+        BooleanBuilder builder = build(keyword, interestId, sourceIn, publishDateFrom, publishDateTo);
 
         Long total = jpaQueryFactory
                 .select(article.count())
@@ -121,8 +101,8 @@ public class ArticleRepositoryCustom {
             String keyword,
             UUID interestId,
             List<ArticleSource> sourceIn,
-            LocalDateTime publishedDateFrom,
-            LocalDateTime publishedDateTo
+            LocalDateTime publishDateFrom,
+            LocalDateTime publishDateTo
     ) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
@@ -138,8 +118,15 @@ public class ArticleRepositoryCustom {
         if (sourceIn != null && !sourceIn.isEmpty()) {
             builder.and(article.source.in(sourceIn));
         }
-        if (publishedDateFrom != null && publishedDateTo != null) {
-            builder.and(article.publishDate.between(publishedDateFrom, publishedDateTo));
+
+        if (publishDateFrom != null && publishDateTo != null) {
+            builder.and(article.publishDate.between(publishDateFrom, publishDateTo));
+        }
+        if (publishDateFrom != null) {
+            builder.and(article.publishDate.goe(publishDateFrom));
+        }
+        if (publishDateTo != null) {
+            builder.and(article.publishDate.loe(publishDateTo));
         }
 
         return builder;

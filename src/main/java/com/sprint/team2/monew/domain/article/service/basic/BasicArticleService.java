@@ -21,10 +21,7 @@ import com.sprint.team2.monew.domain.interest.exception.InterestNotFoundExceptio
 import com.sprint.team2.monew.domain.interest.repository.InterestRepository;
 import com.sprint.team2.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.team2.monew.domain.user.repository.UserRepository;
-import com.sprint.team2.monew.domain.userActivity.entity.UserActivity;
 import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleDeleteEvent;
-import com.sprint.team2.monew.domain.userActivity.events.articleEvent.ArticleViewEvent;
-import com.sprint.team2.monew.domain.userActivity.exception.UserActivityNotFoundException;
 import com.sprint.team2.monew.domain.userActivity.mapper.UserActivityMapper;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepository;
 import com.sprint.team2.monew.domain.userActivity.repository.UserActivityRepositoryCustom;
@@ -85,6 +82,8 @@ public class BasicArticleService implements ArticleService {
                 for (ArticleDto dto : articles) {
                     if (!articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl())) {
                         Article articleEntity = articleMapper.toEntity(dto);
+                        articleEntity.setInterest(interest);
+
                         try {
                             articleRepository.save(articleEntity);
                             log.info("[Article] {}에서 keyword({}) 저장 성공: {} - {}",
@@ -128,7 +127,6 @@ public class BasicArticleService implements ArticleService {
         boolean alreadyViewed = hasUserViewedArticle(userId, articleId);
 
         LocalDateTime viewedDate;
-        long articleCommentCount = 0L;
         long articleViewCount = article.getViewCount();
 
         if (!alreadyViewed) {
@@ -138,10 +136,8 @@ public class BasicArticleService implements ArticleService {
 
             articleRepository.save(article);
         } else {
-            viewedDate = userActivityRepositoryCustom.findByArticleId(userId ,articleId).createdAt();
+            viewedDate = userActivityRepositoryCustom.findByArticleId(userId, articleId).createdAt();
         }
-
-        articleCommentCount = commentRepository.countByArticle_IdAndNotDeleted(articleId);
 
         log.info("[Article] 기사 뷰 등록 성공");
         ArticleViewDto articleViewDto = new ArticleViewDto(
@@ -154,8 +150,8 @@ public class BasicArticleService implements ArticleService {
                 article.getTitle(),
                 article.getPublishDate(),
                 article.getSummary(),
-                articleCommentCount,
-                articleViewCount
+                article.getCommentCount(),
+                article.getViewCount()
         );
 
         // publish event
@@ -173,8 +169,8 @@ public class BasicArticleService implements ArticleService {
                                              String keyword,
                                              UUID interestId,
                                              List<ArticleSource> sourceIn,
-                                             LocalDateTime publishedDateFrom,
-                                             LocalDateTime publishedDateTo,
+                                             LocalDateTime publishDateFrom,
+                                             LocalDateTime publishDateTo,
                                              String cursor,
                                              LocalDateTime after) {
 
@@ -193,7 +189,7 @@ public class BasicArticleService implements ArticleService {
         }
 
         List<Article> articles = articleRepositoryCustom.searchArticles(
-                keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo,
+                keyword, interestId, sourceIn, publishDateFrom, publishDateTo,
                 orderBy, direction, cursor, after, limit
         );
 
@@ -231,7 +227,7 @@ public class BasicArticleService implements ArticleService {
                         article.getTitle(),
                         article.getPublishDate(),
                         article.getSummary(),
-                        commentRepository.countByArticle_IdAndNotDeleted(article.getId()),
+                        article.getCommentCount(),
                         article.getViewCount(),
                         hasUserViewedArticle(userId, article.getId())
                 ))
@@ -244,7 +240,7 @@ public class BasicArticleService implements ArticleService {
                 nextCursor,
                 nextAfter,
                 content.size(),
-                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishedDateFrom, publishedDateTo),
+                articleRepositoryCustom.countArticles(keyword, interestId, sourceIn, publishDateFrom, publishDateTo),
                 hasNext
         );
     }
@@ -267,7 +263,7 @@ public class BasicArticleService implements ArticleService {
         log.info("[Article] 논리 삭제 성공, articleId = {}, deletedAt = {}", articleId, article.getDeletedAt());
 
         applicationEventPublisher.publishEvent(new ArticleDeleteEvent(
-            articleId
+                articleId
         ));
     }
 
@@ -280,7 +276,7 @@ public class BasicArticleService implements ArticleService {
                 });
 
         applicationEventPublisher.publishEvent(new ArticleDeleteEvent(
-            articleId
+                articleId
         ));
 
         articleRepository.delete(article);

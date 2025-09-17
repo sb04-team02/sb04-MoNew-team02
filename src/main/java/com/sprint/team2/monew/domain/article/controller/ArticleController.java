@@ -8,7 +8,9 @@ import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
 import com.sprint.team2.monew.domain.article.service.ArticleService;
+
 import java.time.LocalDate;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,17 +45,17 @@ public class ArticleController {
                                                                     @RequestParam(required = false) String keyword,
                                                                     @RequestParam(required = false) UUID interestId,
                                                                     @RequestParam(required = false) List<ArticleSource> sourceIn,
-                                                                    @RequestParam(required = false) LocalDateTime publishedDateFrom,
-                                                                    @RequestParam(required = false) LocalDateTime publishedDateTo,
+                                                                    @RequestParam(required = false) LocalDateTime publishDateFrom,
+                                                                    @RequestParam(required = false) LocalDateTime publishDateTo,
                                                                     @RequestParam(defaultValue = "publishDate") ArticleOrderBy orderBy,
-                                                                    @RequestParam(defaultValue = "ASC") ArticleDirection direction,
+                                                                    @RequestParam(defaultValue = "DESC") ArticleDirection direction,
                                                                     @RequestParam(required = false) String cursor,
                                                                     @RequestParam(required = false) LocalDateTime after,
                                                                     @RequestParam(defaultValue = "50") int limit) {
         CursorPageResponseArticleDto result = articleService.read(
                 userId, orderBy, direction, limit,
                 keyword,
-                interestId, sourceIn, publishedDateFrom, publishedDateTo,
+                interestId, sourceIn, publishDateFrom, publishDateTo,
                 cursor, after
         );
 
@@ -73,7 +75,7 @@ public class ArticleController {
 
     @GetMapping("/restore")
     public ResponseEntity<List<ArticleRestoreResultDto>> restoreArticles(@RequestParam("from") LocalDateTime from,
-                                                                   @RequestParam("to") LocalDateTime to
+                                                                         @RequestParam("to") LocalDateTime to
     ) {
         LocalDate fromDate = from.toLocalDate();
         LocalDate toDate = to.toLocalDate();
