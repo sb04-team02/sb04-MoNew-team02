@@ -58,16 +58,6 @@ public class RssCollector implements Collector {
                             String description = textOrEmpty(item, "description");
                             String contentStr = getTagText(item, "content:encoded");
                             String pubDateStr = textOrEmpty(item, "pubDate");
-
-                            String content = "";
-                            if (!contentStr.isBlank()) {
-                                Document contentDoc = Jsoup.parse(contentStr);
-                                Element element = contentDoc.selectFirst("p");
-                                if (element != null) {
-                                    content = element.text();
-                                }
-                            }
-
                             LocalDateTime publishDate;
                             try {
                                 publishDate = ZonedDateTime.parse(pubDateStr, DateTimeFormatter.RFC_1123_DATE_TIME)
@@ -80,10 +70,13 @@ public class RssCollector implements Collector {
                             String summary;
                             if (!description.isBlank()) {
                                 summary = description;
-                            } else if (!content.isBlank()) {
-                                summary = content;
                             } else {
-                                summary = title;
+                                String content = extractFirstParagragh(contentStr);
+                                if (!content.isBlank()) {
+                                    summary = content;
+                                } else {
+                                    summary = title;
+                                }
                             }
 
                             Article article = Article.builder()
@@ -119,5 +112,14 @@ public class RssCollector implements Collector {
     private static String getTagText(Element item, String tag) {
         Element el = item.getElementsByTag(tag).first();
         return el != null ? el.text() : "";
+    }
+
+    private static String extractFirstParagragh(String html) {
+        if (html == null || html.isBlank()) {
+            return "";
+        }
+        Document doc = Jsoup.parse(html);
+        Element element = doc.selectFirst("p");
+        return element != null ? element.text() : "";
     }
 }
