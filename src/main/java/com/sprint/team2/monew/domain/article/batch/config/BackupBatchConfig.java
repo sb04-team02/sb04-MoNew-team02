@@ -80,8 +80,10 @@ public class BackupBatchConfig {
     return new JpaPagingItemReaderBuilder<Article>()
         .name("articleJpaPagingItemReader")
         .entityManagerFactory(entityManagerFactory)
+//        .queryString("SELECT a FROM Article a "
+//            + "WHERE a.createdAt >= :startDate AND a.createdAt < :endDate")
         .queryString("SELECT a FROM Article a "
-            + "WHERE a.createdAt >= :startDate AND a.createdAt < :endDate")
+            + "WHERE a.publishDate >= :startDate AND a.publishDate < :endDate")
         .parameterValues(parameters)
         .pageSize(chunkSize)
         .build();
