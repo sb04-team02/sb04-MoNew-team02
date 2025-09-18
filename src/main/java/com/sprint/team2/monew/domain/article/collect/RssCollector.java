@@ -56,8 +56,8 @@ public class RssCollector implements Collector {
                             String title = textOrEmpty(item, "title");
                             String link = textOrEmpty(item, "link");
                             String description = textOrEmpty(item, "description");
+                            String contentStr = getTagText(item, "content:encoded");
                             String pubDateStr = textOrEmpty(item, "pubDate");
-
                             LocalDateTime publishDate;
                             try {
                                 publishDate = ZonedDateTime.parse(pubDateStr, DateTimeFormatter.RFC_1123_DATE_TIME)
@@ -67,12 +67,24 @@ public class RssCollector implements Collector {
                                 publishDate = LocalDateTime.now();
                             }
 
+                            String summary;
+                            if (!description.isBlank()) {
+                                summary = description;
+                            } else {
+                                String content = extractFirstParagragh(contentStr);
+                                if (!content.isBlank()) {
+                                    summary = content;
+                                } else {
+                                    summary = title;
+                                }
+                            }
+
                             Article article = Article.builder()
                                     .source(source)
                                     .sourceUrl(link)
                                     .title(title)
                                     .publishDate(publishDate)
-                                    .summary(description)
+                                    .summary(summary)
                                     .build();
 
                             return articleMapper.toArticleDto(article);
@@ -95,5 +107,19 @@ public class RssCollector implements Collector {
     private static String textOrEmpty(Element item, String tag) {
         Element el = item.selectFirst(tag);
         return el != null ? el.text() : "";
+    }
+
+    private static String getTagText(Element item, String tag) {
+        Element el = item.getElementsByTag(tag).first();
+        return el != null ? el.text() : "";
+    }
+
+    private static String extractFirstParagragh(String html) {
+        if (html == null || html.isBlank()) {
+            return "";
+        }
+        Document doc = Jsoup.parse(html);
+        Element element = doc.selectFirst("p");
+        return element != null ? element.text() : "";
     }
 }
