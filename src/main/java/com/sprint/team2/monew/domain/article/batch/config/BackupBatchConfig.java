@@ -118,8 +118,8 @@ public class BackupBatchConfig {
       String aggregatedJsonArray = objectMapper.writeValueAsString(articles.getItems());
 
       String filename = String.format(
-//          "test-articles-%s/chunk-%s.json", // local
-          "articles-%s/chunk-%s.json", // test
+          "test-articles-%s/chunk-%s.json", // local
+//          "articles-%s/chunk-%s.json", // test
           backupDateStr,
           UUID.randomUUID()
           );

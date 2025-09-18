@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -95,8 +96,8 @@ public class BasicArticleStorageService implements ArticleStorageService {
     // from - to 날짜를 하루씩 루프
     for (LocalDate date = from; !date.isAfter(to); date = date.plusDays(1)) {
       String prefix = String.format(
-          "articles-%s/", // prod
-//          "test-articles-%s/", // local
+//          "articles-%s/", // prod
+          "test-articles-%s/", // local
           date.format(DateTimeFormatter.ISO_LOCAL_DATE)
       );
 
@@ -131,10 +132,18 @@ public class BasicArticleStorageService implements ArticleStorageService {
       }
     } // S3 루프 끝
 
+    Collection<Article> uniqueS3Articles = allS3Articles.stream()
+        .collect(Collectors.toMap(
+            Article::getSourceUrl,      // Key: 중복 기준이 될 sourceUrl
+            article -> article,         // Value: 기사 객체 자체
+            (existingValue, newValue) -> existingValue // 만약 Key가 중복되면, 기존 값을 유지
+        ))
+        .values();
+
     List<Article> articlesToUndelete = new ArrayList<>(); // soft delete된 기사들
     List<Article> articlesToInsert = new ArrayList<>(); // hard delete된 기사들
 
-    for (Article s3Article : allS3Articles) {
+    for (Article s3Article : uniqueS3Articles) {
       // 현재 db에서 가져온 기사
       Article dbArticle = dbArticleMap.get(s3Article.getSourceUrl());
 
