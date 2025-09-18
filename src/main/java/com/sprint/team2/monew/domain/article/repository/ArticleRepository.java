@@ -3,6 +3,7 @@ package com.sprint.team2.monew.domain.article.repository;
 import com.sprint.team2.monew.domain.article.entity.Article;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,12 +18,7 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
 
     boolean existsBySourceUrlAndDeletedAtIsNull(String sourceUrl);
 
-    // gets non deleted (no soft delete)
-    @Query("SELECT a.sourceUrl FROM Article a"
-        + " WHERE a.createdAt >= :startDate AND a.createdAt < :endDate AND a.deletedAt IS NULL")
-    Set<String> findArticleUrlsBetweenDates(
-            @Param("startDate") LocalDateTime start,
-            @Param("endDate") LocalDateTime end);
+    List<Article> findByPublishDateBetween(LocalDateTime start, LocalDateTime end);
 
     @Modifying
     @Query("UPDATE Article a SET a.commentCount = a.commentCount + 1 WHERE a.id = :articleId")

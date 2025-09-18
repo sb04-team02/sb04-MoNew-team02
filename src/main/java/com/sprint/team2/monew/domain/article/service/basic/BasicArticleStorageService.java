@@ -14,14 +14,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -73,25 +77,26 @@ public class BasicArticleStorageService implements ArticleStorageService {
   }
 
   @Override
+  @Transactional
   public ArticleRestoreResultDto restoreArticle(LocalDate from, LocalDate to) {
     String bucket = s3Properties.bucket();
-    List<Article> missingArticlesTotal = new ArrayList<>();
+    List<Article> allS3Articles = new ArrayList<>();
 
-    // 날짜 사이에 있는 모든 Article url fetch (non-deleted)
-    Set<String> existingArticleUrls = articleRepository.findArticleUrlsBetweenDates(
-        from.atStartOfDay(), // 하루 시작
-        to.plusDays(1).atStartOfDay() // 다음날 하루 시작
-    );
-    log.info("[뉴스 기사 복구] 기간: {} ~ {}. repository에 저장된 기사 url들: {}",
-        from, to, existingArticleUrls);
+    log.info("[뉴스 기사 복구] DB에서 기간 내 모든 기사(삭제 포함)의 현재 상태를 조회합니다: {} ~ {}", from, to);
+    Map<String, Article> dbArticleMap = articleRepository.findByPublishDateBetween(
+            from.atStartOfDay(),
+            to.plusDays(1).atStartOfDay()
+        ).stream()
+        .collect(Collectors.toMap(Article::getSourceUrl, Function.identity()));
+    log.info("[뉴스 기사 복구] DB에서 {}개의 기존 기사 정보를 확인했습니다.", dbArticleMap.size());
+
     log.info("[뉴스 기사 복구] S3로부터 뉴스 기사 복구 시작. 기간: {} ~ {}", from, to);
 
-    // from, to 사이에 있는 날짜 루프
+    // from - to 날짜를 하루씩 루프
     for (LocalDate date = from; !date.isAfter(to); date = date.plusDays(1)) {
-      List<Article> articlesFromS3 = new ArrayList<>();
       String prefix = String.format(
-//          "test-articles-%s/", // local
           "articles-%s/", // prod
+//          "test-articles-%s/", // local
           date.format(DateTimeFormatter.ISO_LOCAL_DATE)
       );
 
@@ -102,7 +107,6 @@ public class BasicArticleStorageService implements ArticleStorageService {
           .build();
       ListObjectsV2Response listRes = s3Client.listObjectsV2(listReq);
 
-      // 현재 날짜 디렉토리에 있는 파일들 루프
       for (S3Object summary : listRes.contents()) {
         String chunkFileKey = summary.key();
         log.info("[뉴스 기사 복구] 청크 파일 읽는 중: {}", chunkFileKey);
@@ -112,67 +116,53 @@ public class BasicArticleStorageService implements ArticleStorageService {
             .key(chunkFileKey)
             .build();
 
+        // 현재 날짜에 있는 모든 오브젝트를 리스트로 받아오고 allS3Articles에 추가
         try (ResponseInputStream<GetObjectResponse> s3ObjectStream = s3Client.getObject(getReq)) {
           List<Article> articlesFromChunk = objectMapper.readValue(
               s3ObjectStream,
-              new TypeReference<>() {
-              }
+              new TypeReference<>() {}
           );
           if (articlesFromChunk != null && !articlesFromChunk.isEmpty()) {
-            articlesFromS3.addAll(articlesFromChunk);
+            allS3Articles.addAll(articlesFromChunk);
           }
         } catch (S3Exception | IOException e) {
           log.error("[뉴스 기사 복구] S3 prefix에서 파일 읽는 중 오류 발생. Prefix: {}", prefix, e);
         }
       }
+    } // S3 루프 끝
 
-      // DB에 있는거 필터링
-      List<Article> missingArticles = articlesFromS3.stream()
-          .filter(article -> !existingArticleUrls.contains(article.getSourceUrl()))
-          .toList();
+    List<Article> articlesToUndelete = new ArrayList<>(); // soft delete된 기사들
+    List<Article> articlesToInsert = new ArrayList<>(); // hard delete된 기사들
 
-      if (!missingArticles.isEmpty()) {
-        log.info("[뉴스 기사 복구] 날짜 {}에 {}개의 유실된 기사를 찾았습니다.", date, missingArticles.size());
-        missingArticlesTotal.addAll(missingArticles);
+    for (Article s3Article : allS3Articles) {
+      // 현재 db에서 가져온 기사
+      Article dbArticle = dbArticleMap.get(s3Article.getSourceUrl());
+
+      if (dbArticle == null) {
+        // hard-deleted -> INSERT
+        s3Article.setIdToNull();
+        articlesToInsert.add(s3Article);
+      } else if (dbArticle.getDeletedAt() != null) {
+        // soft-deleted (deletedAt != null) -> undelete
+        dbArticle.setDeletedAt(null);
+        articlesToUndelete.add(dbArticle);
       }
-    } // 루프 끝
+    }
 
-    if (missingArticlesTotal.isEmpty()) {
+    if (articlesToInsert.isEmpty() && articlesToUndelete.isEmpty()) {
       log.info("[뉴스 기사 복구] 유실된 기사가 없어 복구를 종료합니다.");
       return new ArticleRestoreResultDto(LocalDateTime.now(), new ArrayList<>(), 0);
     }
 
-//    missingArticlesTotal.forEach(Article::setIdToNull);
-
-    List<Article> articlesToUndelete = new ArrayList<>();
-    List<Article> articlesToInsert = new ArrayList<>();
-
-    for (Article a : missingArticlesTotal) {
-      // soft delete
-      if (a.getDeletedAt() != null) { // if by the time of backup, the article is soft deleted
-        a.setDeletedAt(null);
-        articlesToUndelete.add(a);
-      } else { // hard delete
-        a.setIdToNull();
-        articlesToInsert.add(a);
-      }
+    if (!articlesToUndelete.isEmpty()) {
+      List<Article> uniqueUndeletes = new ArrayList<>(new LinkedHashSet<>(articlesToUndelete));
+      articleRepository.saveAll(uniqueUndeletes);
+      log.info("[뉴스 기사 복구] 총 {}개의 소프트 삭제된 기사를 복구했습니다.", uniqueUndeletes.size());
     }
-
-    if (!articlesToUndelete.isEmpty()) { //update
-      articleRepository.saveAll(articlesToUndelete);
-      log.info("[뉴스 기사 복구] 총 {}개의 소프트 삭제된 기사를 복구했습니다.", articlesToUndelete.size());
-    }
-    if (!articlesToInsert.isEmpty()) { //insert
+    if (!articlesToInsert.isEmpty()) {
       articleRepository.saveAll(articlesToInsert);
       log.info("[뉴스 기사 복구] 총 {}개의 새로운 기사를 DB에 저장했습니다.", articlesToInsert.size());
     }
-
-//    articleRepository.saveAll(missingArticlesTotal);
-
-    log.info("[뉴스 기사 복구] 총 {}개의 뉴스 기사를 DB에 저장했습니다.", missingArticlesTotal.size());
-//    List<UUID> savedArticleIdsTotal = missingArticlesTotal.stream()
-//        .map(BaseEntity::getId)
-//        .toList();
 
     List<UUID> savedArticleIdsTotal = Stream.concat(
             articlesToInsert.stream().map(Article::getId),
@@ -180,7 +170,7 @@ public class BasicArticleStorageService implements ArticleStorageService {
         )
         .collect(Collectors.toList());
 
-    log.info("[뉴스 기사 복구] 총 {}개의 뉴스 기사 복구 완료.기간: {} ~ {}", savedArticleIdsTotal.size(), from, to);
+    log.info("[뉴스 기사 복구] 총 {}개의 뉴스 기사 복구 완료. 기간: {} ~ {}", savedArticleIdsTotal.size(), from, to);
     return new ArticleRestoreResultDto(
         LocalDateTime.now(),
         savedArticleIdsTotal,

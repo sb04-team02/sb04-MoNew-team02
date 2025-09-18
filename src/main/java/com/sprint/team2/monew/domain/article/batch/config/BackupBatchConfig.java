@@ -107,7 +107,6 @@ public class BackupBatchConfig {
       if (articles.getItems().isEmpty()) {
         return;
       }
-//      String aggregatedJson = String.join("\n", articles.getItems());
 
       /** 저장되는 포맷:
        * [
@@ -119,8 +118,8 @@ public class BackupBatchConfig {
       String aggregatedJsonArray = objectMapper.writeValueAsString(articles.getItems());
 
       String filename = String.format(
-//          "test-articles-%s/chunk-%s.json",
-          "articles-%s/chunk-%s.json",
+//          "test-articles-%s/chunk-%s.json", // local
+          "articles-%s/chunk-%s.json", // test
           backupDateStr,
           UUID.randomUUID()
           );
