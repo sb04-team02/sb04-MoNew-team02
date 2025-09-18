@@ -96,8 +96,8 @@ public class BasicArticleStorageService implements ArticleStorageService {
     // from - to 날짜를 하루씩 루프
     for (LocalDate date = from; !date.isAfter(to); date = date.plusDays(1)) {
       String prefix = String.format(
-//          "articles-%s/", // prod
-          "test-articles-%s/", // local
+          "articles-%s/", // prod
+//          "test-articles-%s/", // local
           date.format(DateTimeFormatter.ISO_LOCAL_DATE)
       );
 
