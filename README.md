@@ -35,12 +35,26 @@
 
 ## **기술 스택**
 
-- 기본 개발 환경: IntelliJ, Spring Boot(v3.5.5), Java(v17)
+<!--
+ - 기본 개발 환경: IntelliJ, Spring Boot(v3.5.5), Java(v17)
 - Database: PostgreSQL(v17.5), MongoDB(Atlas), AWS-RDS
 - Storage: AWS-S3
 - 배포: Docker, GitHub Actions(CI/CD), AWS(AWS-ECR, AWS-ECS, AWS-EC2)
 - 추가 스택: Spring Data JPA, Spring Actuator, Spring WebFlux(네이버 API), Jsoup(RSS), Spring Batch, Mockito, micrometer(커스텀 매트릭)  
 - 협업 Tool: Git & Github, Discord, Notion
+ -->
+
+| Category | Stacks |
+| :--- | :--- |
+| **Backend** | <img src="https://img.shields.io/badge/Java-17-007396?logo=java&logoColor=white"> <img src="https://img.shields.io/badge/SpringBoot-3.3.5-6DB33F?logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring Batch-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring WebFlux-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring Actuator-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Jsoup-FB8C00?logo=java&logoColor=white"> |
+| **Database** | <img src="https://img.shields.io/badge/PostgreSQL-17.5-4169E1?logo=postgresql&logoColor=white"> <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white"> <img src="https://img.shields.io/badge/Amazon RDS-527FFF?logo=amazonrds&logoColor=white"> |
+| **Deployment & CI/CD** | <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GitHub Actions-2088FF?logo=githubactions&logoColor=white"> <img src="https://img.shields.io/badge/Amazon EC2-FF9900?logo=amazonec2&logoColor=white"> <img src="https://img.shields.io/badge/Amazon ECS-FF9900?logo=amazon-ecs&logoColor=white"> <img src="https://img.shields.io/badge/Amazon ECR-FF9900?logo=amazon-ecr&logoColor=white"> |
+| **Storage** | <img src="https://img.shields.io/badge/Amazon S3-569A31?logo=amazons3&logoColor=white"> |
+| **Monitoring** | <img src="https://img.shields.io/badge/Micrometer-1081C2?logo=micrometer&logoColor=white"> |
+| **Testing** | <img src="https://img.shields.io/badge/Mockito-8A2BE2?logo=mockito&logoColor=white"> |
+| **Collaboration** | <img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white"> <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?logo=notion&logoColor=white"> |
+| **IDE** | <img src="https://img.shields.io/badge/IntelliJ IDEA-000000?logo=intellijidea&logoColor=white"> |
+
 
 ---
 ## **팀원 구성**
