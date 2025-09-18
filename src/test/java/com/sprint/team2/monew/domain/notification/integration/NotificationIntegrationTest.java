@@ -241,7 +241,7 @@ public class NotificationIntegrationTest {
         .header("MoNew-Request-User-ID", user.getId()))
                 .andExpect(status().isOk());
 
-        List<Notification> notifications = notificationRepository.findAll();
+        List<Notification> notifications = notificationRepository.findAllByUserId(user.getId());
         assertTrue(notifications.stream()
                 .allMatch(Notification ::isConfirmed));
     }
