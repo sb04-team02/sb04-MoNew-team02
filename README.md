@@ -35,12 +35,26 @@
 
 ## **기술 스택**
 
-- 기본 개발 환경: IntelliJ, Spring Boot(v3.5.5), Java(v17)
+<!--
+ - 기본 개발 환경: IntelliJ, Spring Boot(v3.5.5), Java(v17)
 - Database: PostgreSQL(v17.5), MongoDB(Atlas), AWS-RDS
 - Storage: AWS-S3
 - 배포: Docker, GitHub Actions(CI/CD), AWS(AWS-ECR, AWS-ECS, AWS-EC2)
 - 추가 스택: Spring Data JPA, Spring Actuator, Spring WebFlux(네이버 API), Jsoup(RSS), Spring Batch, Mockito, micrometer(커스텀 매트릭)  
 - 협업 Tool: Git & Github, Discord, Notion
+ -->
+
+| Category | Stacks |
+| :--- | :--- |
+| **Backend** | <img src="https://img.shields.io/badge/Java-17-007396?logo=java&logoColor=white"> <img src="https://img.shields.io/badge/SpringBoot-3.3.5-6DB33F?logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring Batch-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring WebFlux-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring Actuator-6DB33F?logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Jsoup-FB8C00?logo=java&logoColor=white"> |
+| **Database** | <img src="https://img.shields.io/badge/PostgreSQL-17.5-4169E1?logo=postgresql&logoColor=white"> <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white"> <img src="https://img.shields.io/badge/Amazon RDS-527FFF?logo=amazonrds&logoColor=white"> |
+| **Deployment & CI/CD** | <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GitHub Actions-2088FF?logo=githubactions&logoColor=white"> <img src="https://img.shields.io/badge/Amazon EC2-FF9900?logo=amazonec2&logoColor=white"> <img src="https://img.shields.io/badge/Amazon ECS-FF9900?logo=amazon-ecs&logoColor=white"> <img src="https://img.shields.io/badge/Amazon ECR-FF9900?logo=amazon-ecr&logoColor=white"> |
+| **Storage** | <img src="https://img.shields.io/badge/Amazon S3-569A31?logo=amazons3&logoColor=white"> |
+| **Monitoring** | <img src="https://img.shields.io/badge/Micrometer-1081C2?logo=micrometer&logoColor=white"> |
+| **Testing** | <img src="https://img.shields.io/badge/Mockito-8A2BE2?logo=mockito&logoColor=white"> |
+| **Collaboration** | <img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white"> <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?logo=notion&logoColor=white"> |
+| **IDE** | <img src="https://img.shields.io/badge/IntelliJ IDEA-000000?logo=intellijidea&logoColor=white"> |
+
 
 ---
 ## **팀원 구성**
@@ -70,15 +84,36 @@
 
 ### **김이준**
 
-활동 내역 관리 + CI/CD(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+활동 내역 관리 + 뉴스 기사 백업/복구 + CI/CD와 배포
 
-- **회원별 권한 관리**
-    - Spring Security를 활용하여 사용자 역할에 따른 권한 설정
-    - 관리자 페이지와 일반 사용자 페이지를 위한 조건부 라우팅 처리
+- **사용자 활동 내역 조회 API**
+  - 사용자 별 활동 내역을 조회 가능
+  - 포함되는 정보
+    - 사용자 정보
+    - 구독 중인 관심사
+    - 최근 작성한 댓글 (최대 10건)
+    - 최근 좋아요를 누른 댓글 (최대 10건)
+    - 최근 본 뉴스 기사 (최대 10건)
+  - Event Listener을 통해 구현, MongoDB Atlas에 저장
+  - Docker Compose를 활용해 로컬 테스트 환경 구축
 
 
-- **반응형 레이아웃 API**
-    - 클라이언트에서 요청된 반응형 레이아웃을 위한 RESTful API 엔드포인트 구현
+- **뉴스 기사 S3 백업/복구 기능**
+    - 백업 
+      - 기사 수집 배치 작업에 따른 데이터 유실에 대비해 뉴스 기사 데이터를 백업하는 기능 구현
+      - Spring Batch와 Scheduler를 이용, S3에 일일 단위 자동 백업 로직 구현
+    - 복구 기능 API
+      - S3 백업 파일과 DB를 비교하여 유실된 데이터를 복구하는 API 개발
+
+
+- **CI/CD 파이프라인과 AWS 배포**
+  - CI/CD 파이프라인
+    - GitHub Actions으로 테스트/빌드/배포 자동화 파이프라인 구축 (Docker, ECR, ECS)
+    - dockerfile을 통해 멀티 스테이지 빌드를 통해 이미지 최적화
+  - AWS 배포
+    - 필요한 IAM user 생성
+    - RDS, ECS, ECR, S3 환경 구축
+
 
 ---
 
