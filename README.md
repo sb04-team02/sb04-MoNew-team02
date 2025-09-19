@@ -1,15 +1,34 @@
 # TEAM2 - MoNew [![codecov](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02/graph/badge.svg)](https://codecov.io/gh/sb04-team02/sb04-MoNew-team02)
 
+## 목차
+1. [링크](#링크)
+2. [프로젝트 소개](#프로젝트-소개)
+3. [기술 스택](#기술-스택)
+4. [프로젝트 실행 가이드](#프로젝트-실행-가이드)
+   - [1. 필수 소프트웨어](#1-필수-소프트웨어)
+   - [2. 환경 변수 설정](#2-환경-변수-설정)
+   - [3. 데이터베이스 설정](#3-데이터베이스-설정)
+   - [4. 외부 API](#4-외부-api)
+   - [5. AWS](#5-aws)
+   - [6. 프로젝트 실행](#6-프로젝트-실행)
+   - [7. 배치/백업 기준](#7-배치백업-기준)
+5. [파일 구조](#파일-구조)
+6. [팀원 구성](#팀원-구성)
+
 ## 링크
 <a href="https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1">
   <img src="https://github.com/user-attachments/assets/b8d5ff15-4c53-49ea-83d4-97b08af86455" width="30" height="30" valign="middle" />
   MoNew 팀 노션
-</a>
-<br><br>
+</a><br><br>
 <a href="http://43.200.245.129/#/login">
-  <img src="https://github.com/user-attachments/assets/3896030e-a5b5-497e-a8d6-9dddeeecffe0" width="30" height="30" valign="middle" />
-  배포 링크 (~2025. ) 논의 후 채우기
-</a>
+  <img src="https://github.com/user-attachments/assets/77090a76-0e05-45f6-b563-b885592b8321" width="30" height="30" valign="middle" />
+  배포 링크 ( 2025.09.22 ~ 10.22 / 2025.12.18 ~ 2026.06.18 )
+</a><br><br>
+<a href="http://sprint-project-1196140422.ap-northeast-2.elb.amazonaws.com/sb/monew/api/swagger-ui/index.html">
+  <img src="https://github.com/user-attachments/assets/3a34ba65-4ba4-4d1b-a170-16b615bf05cb" width="30" height="30" valign="middle" />
+  Swagger API
+</a><br>
+// 발표자료, 회고록 링크 추가
 
 ## **프로젝트 소개**
 
@@ -55,179 +74,94 @@
 | **Collaboration** | <img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white"> <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?logo=notion&logoColor=white"> |
 | **IDE** | <img src="https://img.shields.io/badge/IntelliJ IDEA-000000?logo=intellijidea&logoColor=white"> |
 
+## 프로젝트 실행 가이드
+### 1. 필수 소프트웨어
+- Docker & Docker Compose
+- PostgreSQL (v17.5)
+- Java 17, Gradle
+- 기타: 인터넷 연결 (외부 API 사용)
 
----
-## **팀원 구성**
+### 2. 환경 변수 설정
+1. 프로젝트 루트에 `.env` 파일 생성
+2. 다음을 참고하여 `.env` 파일 채우기
+```
+# (Production) RDS 환경
+RDS_ENDPOINT=
+DB_PORT=
+DATABASE_NAME=
+SPRING_DATASOURCE_URL=
+SPRING_DATASOURCE_USERNAME=
+SPRING_DATASOURCE_PASSWORD=
 
-김민수 (kms_1015@naver.com)\
-김이준 (estherleejunkim@gmail.com)\
-문은서 (munes6034@gmail.com)\
-신은수 (sin9801@naver.com)\
-안중원 (anjoongwon517@gmail.com)\
-이지현 (devlee1011@gmail.com)
+# (Local) PostgreSQL 환경
+POSTGRESQL_DATASOURCE_URL=
+POSTGRESQL_DATASOURCE_USERNAME=
+POSTGRESQL_DATASOURCE_PASSWORD=
 
-## **팀원별 구현 기능 상세**
-// TODO
-### **김민수**
-관심사 관리
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+# Naver API
+NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=
 
-- **소셜 로그인 API**
-    - Google OAuth 2.0을 활용한 소셜 로그인 기능 구현
-    - 로그인 후 추가 정보 입력을 위한 RESTful API 엔드포인트 개발
+# MongoDB URI
+MONGODB_URL=
+MONGODB_DB=
 
+# Application Configuration
+STORAGE_TYPE=s3
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
 
-- **회원 추가 정보 입력 API**
-    - 회원 유형(관리자, 학생)에 따른 조건부 입력 처리 API 구현
+# S3
+AWS_S3_BUCKET=
+AWS_S3_PRESIGNED_URL_EXPIRATION=
+```
+> ⚠️ `.env` 파일은 민감 정보가 포함되어 있으므로 Git에 커밋하지 마세요.
 
----
+### 3. 데이터베이스 설정
 
-### **김이준**
-
-활동 내역 관리 + 뉴스 기사 백업/복구 + CI/CD와 배포
-
-- **사용자 활동 내역 조회 API**
-  - 사용자 별 활동 내역을 조회 가능
-  - 포함되는 정보
-    - 사용자 정보
-    - 구독 중인 관심사
-    - 최근 작성한 댓글 (최대 10건)
-    - 최근 좋아요를 누른 댓글 (최대 10건)
-    - 최근 본 뉴스 기사 (최대 10건)
-  - Event Listener을 통해 구현, MongoDB Atlas에 저장
-  - Docker Compose를 활용해 로컬 테스트 환경 구축
-
-
-- **뉴스 기사 S3 백업/복구 기능**
-    - 백업 
-      - 기사 수집 배치 작업에 따른 데이터 유실에 대비해 뉴스 기사 데이터를 백업하는 기능 구현
-      - Spring Batch와 Scheduler를 이용, S3에 일일 단위 자동 백업 로직 구현
-    - 복구 기능 API
-      - S3 백업 파일과 DB를 비교하여 유실된 데이터를 복구하는 API 개발
-
-
-- **CI/CD 파이프라인과 AWS 배포**
-  - CI/CD 파이프라인
-    - GitHub Actions으로 테스트/빌드/배포 자동화 파이프라인 구축 (Docker, ECR, ECS)
-    - dockerfile을 통해 멀티 스테이지 빌드를 통해 이미지 최적화
-  - AWS 배포
-    - 필요한 IAM user 생성
-    - RDS, ECS, ECR, S3 환경 구축
-
-
----
-
-### **문은서**
-
-알림 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
-
-- **수강생 정보 관리 API**
-    - `GET` 요청을 사용하여 학생의 수강 정보를 조회하는 API 엔드포인트 개발
-    - 학생 정보의 CRUD 처리 (Spring Data JPA 사용)
-
-
-- **공용 Button API**
-    - 공통으로 사용할 버튼 기능을 처리하는 API 엔드포인트 구현
-
-
----
-
-### **신은수**
-
-댓글 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
-
-- **댓글 API**
-    - 댓글 작성
-      - 댓글 입력 창에 댓글을 작성하여 엔터키를 누르면 뉴스기사 하단에 댓글이 등록되는 기능
-      - 각 뉴스 기사별로 등록이 가능
-    - 댓글 수정
-      - 본인이 작성한 댓글만 수정 가능
-    - 댓글 삭제
-      - 논리 삭제
-        - deletedAt 필드를 업데이트하여 댓글 목록에 deletedAt 필드가 없는 댓글만 나타나도록 구현
-        - 목록에선 사라지지만 실제 데이터베이스에선 삭제되지 않고 남아있음
-        - 이 프로젝트에선 논리 삭제를 기본 원칙으로 함
-      - 물리 삭제
-        - 데이터 베이스에서 해당 댓글과 관련된 정보(알림, 좋아요 등)를 완전히 삭제
-    - 댓글 목록 조회
-      - 뉴스 기사 별로 목록 조회 가능
-      - 날짜와 좋아요 수 중 1개의 속성을 기준으로 정렬할 수 있음
-      - 커서를 내리면 댓글 목록을 불러오도록 커서 페이지네이션으로 목록조회를 구현
-
-- **댓글 좋아요 API**
-  - 댓글 좋아요
-    - 사용자가 작성한 댓글에 좋아요를 할 수 있음
-    - 좋아요를 누를 때, 좋아요가 성공했다는 표시와 함께 카운트가 1 증가
-  - 댓글 좋아요 취소
-    - 사용자가 작성한 댓글에 좋아요를 취소할 수 있음
-    - 좋아요 표시가 원상태로 돌아오며 좋아요 카운트가 1 감소
-
----
-
-### **안중원**
-
-뉴스 기사 관리(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
-
-- **학생 시간 정보 관리 API**
-    - 학생별 시간 정보를 `GET` 요청을 사용하여 조회하는 API 구현
-    - 실시간 접속 현황을 관리하는 API 엔드포인트
-
-
-- **수정 및 탈퇴 API**
-    - `PATCH`, `DELETE` 요청을 사용하여 수강생의 개인정보 수정 및 탈퇴 처리
-
-
-- **공용 Modal API**
-    - 공통 Modal 컴포넌트를 처리하는 API 구현
-
----
-### **이지현**
-
-
-사용자 관리
-
-- **사용자 생성 API**
-  - 이메일, 패스워드, 닉네임을 입력받아 회원가입 가능
-  - 이메일 중복 불가능
-  - 패스워드 6자~20자, 닉네임 1자~20자 글자수 제한
-
-
-- **로그인 API**
-  - 이메일, 패스워드로 로그인 가능
-  - 로그인을 제외한 모든 화면은 로그인한 사용자만 조회 가능
-
-
-- **사용자 정보 수정 API**
-  - 사용자 정보 업데이트 가능
-  - 로그인한 사용자만 변경 가능
-  - 닉네임만 변경 가능
-
-
-- **사용자 논리적 삭제 API**
-  - deletedAt 필드 업데이트
-  - 실제 데이터베이스에서는 삭제되지 않음
-
-
-- **사용자 물리적 삭제 API**
-  - 데이터베이스에서 해당 사용자를 물리적으로 삭제
-
-
-- **사용자 물리적 삭제 자동 배치 처리**
-  - deletedAt 필드 값이 배치 처리 시작 시간 기준 24시간보다 이전이면 자동으로 DB에서 삭제
-
----
-
-## **프로젝트 회고록**
-
-// TODO
-발표자료 pdf
-회고록 링크
-채우기
-
----
-## **파일 구조**
+#### PostgreSQL
+1. `pg_bigm` 설치
+```bash
+git clone https://github.com/pgbigm/pg_bigm.git
+cd pg_bigm
+make USE_PGXS=1
+make USE_PGXS=1 install
+```
+2. PostgreSQL 콘솔에서 확장 설치
+```
+CREATE EXTENSION pg_bigm;
+```
+#### Mongo DB
+```
+docker compose -f docker-compose.yml up -d
 ```
 
+### 4. 외부 API
+- 뉴스 기사 수집을 위해 네이버 API 사용
+- `.env`에 `NAVER_API_CLIENT_ID`, `NAVER_API_CLIENT_SECRET` 입력 필요
+
+### 5. AWS
+- 운영환경 배포 및 파일 저장을 위해 AWS S3, EC2, ECS 사용
+- .env에 AWS 관련 키 입력 필요
+
+### 6. 프로젝트 실행
+#### 1. Gradle 빌드
+```bash
+./gradlew clean build
+```
+#### 2. 애플리케이션 실행
+```bash
+./gradlew bootRun
+```
+#### 3. 브라우저에서 http://localhost:8080 접속
+
+### 7. 배치/백업 기준
+- 배치: 1시간 주기로 사용자가 관심사로 등록한 키워드를 기준으로 배치 실행
+- 백업: 
+
+## **파일 구조**
+```
 src/main
 ├── java
 │   └── com
@@ -237,288 +171,20 @@ src/main
 │                   ├── MonewApplication.java
 │                   ├── domain
 │                   │   ├── article
-│                   │   │   ├── batch
-│                   │   │   │   ├── config
-│                   │   │   │   │   ├── BackupBatchConfig.java
-│                   │   │   │   │   └── BatchConfig.java
-│                   │   │   │   └── scheduler
-│                   │   │   │       ├── NewsBackupBatchScheduler.java
-│                   │   │   │       └── NewsBatchScheduler.java
-│                   │   │   ├── collect
-│                   │   │   │   ├── Collector.java
-│                   │   │   │   ├── NaverApiCollector.java
-│                   │   │   │   └── RssCollector.java
-│                   │   │   ├── controller
-│                   │   │   │   └── ArticleController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── request
-│                   │   │   │   └── response
-│                   │   │   │       ├── ArticleDto.java
-│                   │   │   │       ├── ArticleRestoreResultDto.java
-│                   │   │   │       ├── ArticleViewDto.java
-│                   │   │   │       └── CursorPageResponseArticleDto.java
-│                   │   │   ├── entity
-│                   │   │   │   ├── Article.java
-│                   │   │   │   ├── ArticleDirection.java
-│                   │   │   │   ├── ArticleOrderBy.java
-│                   │   │   │   └── ArticleSource.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── ArticleCollectFailedException.java
-│                   │   │   │   ├── ArticleErrorCode.java
-│                   │   │   │   ├── ArticleException.java
-│                   │   │   │   ├── ArticleNotFoundException.java
-│                   │   │   │   ├── ArticleSaveFailedException.java
-│                   │   │   │   ├── InvalidParameterException.java
-│                   │   │   │   ├── NaverApiEmptyResponseException.java
-│                   │   │   │   ├── NaverApiFailException.java
-│                   │   │   │   └── S3FailureException.java
-│                   │   │   ├── mapper
-│                   │   │   │   ├── ArticleBackupMapper.java
-│                   │   │   │   └── ArticleMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   ├── ArticleRepository.java
-│                   │   │   │   └── ArticleRepositoryCustom.java
-│                   │   │   └── service
-│                   │   │       ├── ArticleService.java
-│                   │   │       ├── ArticleStorageService.java
-│                   │   │       └── basic
-│                   │   │           ├── BasicArticleService.java
-│                   │   │           └── BasicArticleStorageService.java
 │                   │   ├── base
-│                   │   │   ├── BaseEntity.java
-│                   │   │   ├── DeletableEntity.java
-│                   │   │   └── UpdatableEntity.java
 │                   │   ├── comment
-│                   │   │   ├── controller
-│                   │   │   │   └── CommentController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── CommentDto.java
-│                   │   │   │   ├── request
-│                   │   │   │   │   ├── CommentRegisterRequest.java
-│                   │   │   │   │   └── CommentUpdateRequest.java
-│                   │   │   │   └── response
-│                   │   │   │       ├── CommentActivityDto.java
-│                   │   │   │       └── CursorPageResponseCommentDto.java
-│                   │   │   ├── entity
-│                   │   │   │   ├── Comment.java
-│                   │   │   │   └── CommentSortType.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── CommentContentRequiredException.java
-│                   │   │   │   ├── CommentErrorCode.java
-│                   │   │   │   ├── CommentException.java
-│                   │   │   │   ├── CommentForbiddenException.java
-│                   │   │   │   ├── ContentNotFoundException.java
-│                   │   │   │   └── InvalidPageSizeException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── CommentMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   └── CommentRepository.java
-│                   │   │   └── service
-│                   │   │       ├── CommentService.java
-│                   │   │       └── basic
-│                   │   │           └── BasicCommentService.java
 │                   │   ├── interest
-│                   │   │   ├── controller
-│                   │   │   │   └── InterestController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── InterestDto.java
-│                   │   │   │   ├── request
-│                   │   │   │   │   ├── CursorPageRequestInterestDto.java
-│                   │   │   │   │   ├── InterestRegisterRequest.java
-│                   │   │   │   │   └── InterestUpdateRequest.java
-│                   │   │   │   └── response
-│                   │   │   │       ├── CursorPageResponseInterestDto.java
-│                   │   │   │       └── InterestQueryDto.java
-│                   │   │   ├── entity
-│                   │   │   │   └── Interest.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── InterestAlreadyExistsSimilarityNameException.java
-│                   │   │   │   ├── InterestErrorCode.java
-│                   │   │   │   ├── InterestException.java
-│                   │   │   │   └── InterestNotFoundException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── InterestMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   ├── InterestRepository.java
-│                   │   │   │   ├── InterestRepositoryCustom.java
-│                   │   │   │   └── InterestRepositoryImpl.java
-│                   │   │   └── service
-│                   │   │       ├── InterestService.java
-│                   │   │       └── basic
-│                   │   │           └── BasicInterestService.java
 │                   │   ├── like
-│                   │   │   ├── controller
-│                   │   │   │   └── ReactionController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── CommentLikeDto.java
-│                   │   │   │   └── response
-│                   │   │   │       └── CommentLikeActivityDto.java
-│                   │   │   ├── entity
-│                   │   │   │   └── Reaction.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── ReactionAlreadyExistsException.java
-│                   │   │   │   ├── ReactionErrorCode.java
-│                   │   │   │   └── ReactionNotFoundException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── ReactionMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   └── ReactionRepository.java
-│                   │   │   └── service
-│                   │   │       ├── ReactionService.java
-│                   │   │       └── basic
-│                   │   │           └── BasicReactionService.java
 │                   │   ├── notification
-│                   │   │   ├── batch
-│                   │   │   │   ├── config
-│                   │   │   │   │   ├── NotificationCleanupJobConfig.java
-│                   │   │   │   │   └── NotificationCleanupScheduler.java
-│                   │   │   │   └── listener
-│                   │   │   │       ├── NotificationCleanupJobListener.java
-│                   │   │   │       └── NotificationCleanupStepListener.java
-│                   │   │   ├── controller
-│                   │   │   │   └── NotificationController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── request
-│                   │   │   │   │   └── NotificationCreateDto.java
-│                   │   │   │   └── response
-│                   │   │   │       ├── CursorPageResponseNotificationDto.java
-│                   │   │   │       └── NotificationDto.java
-│                   │   │   ├── entity
-│                   │   │   │   ├── Notification.java
-│                   │   │   │   └── ResourceType.java
-│                   │   │   ├── event
-│                   │   │   │   ├── CommentLikedEvent.java
-│                   │   │   │   └── InterestArticleRegisteredEvent.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── InvalidFormatException.java
-│                   │   │   │   ├── NotificationErrorCode.java
-│                   │   │   │   ├── NotificationException.java
-│                   │   │   │   └── NotificationNotFoundException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── NotificationMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   └── NotificationRepository.java
-│                   │   │   └── service
-│                   │   │       ├── NotificationService.java
-│                   │   │       └── basic
-│                   │   │           └── BasicNotificationsService.java
 │                   │   ├── subscription
-│                   │   │   ├── dto
-│                   │   │   │   └── SubscriptionDto.java
-│                   │   │   ├── entity
-│                   │   │   │   └── Subscription.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── SubscriptionAlreadyExistsException.java
-│                   │   │   │   ├── SubscriptionErrorCode.java
-│                   │   │   │   ├── SubscriptionException.java
-│                   │   │   │   └── SubscriptionNotFoundException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── SubscriptionMapper.java
-│                   │   │   └── repository
-│                   │   │       └── SubscriptionRepository.java
 │                   │   ├── user
-│                   │   │   ├── batch
-│                   │   │   │   ├── config
-│                   │   │   │   │   ├── UserCleanupJobConfig.java
-│                   │   │   │   │   └── UserCleanupScheduler.java
-│                   │   │   │   └── listener
-│                   │   │   │       ├── UserCleanupJobListener.java
-│                   │   │   │       └── UserCleanupStepListener.java
-│                   │   │   ├── controller
-│                   │   │   │   └── UserController.java
-│                   │   │   ├── dto
-│                   │   │   │   ├── request
-│                   │   │   │   │   ├── UserLoginRequest.java
-│                   │   │   │   │   ├── UserRegisterRequest.java
-│                   │   │   │   │   └── UserUpdateRequest.java
-│                   │   │   │   └── response
-│                   │   │   │       └── UserDto.java
-│                   │   │   ├── entity
-│                   │   │   │   └── User.java
-│                   │   │   ├── exception
-│                   │   │   │   ├── EmailAlreadyExistsException.java
-│                   │   │   │   ├── ForbiddenUserAuthorityException.java
-│                   │   │   │   ├── LoginFailedException.java
-│                   │   │   │   ├── UserErrorCode.java
-│                   │   │   │   ├── UserException.java
-│                   │   │   │   └── UserNotFoundException.java
-│                   │   │   ├── mapper
-│                   │   │   │   └── UserMapper.java
-│                   │   │   ├── repository
-│                   │   │   │   └── UserRepository.java
-│                   │   │   └── service
-│                   │   │       ├── UserService.java
-│                   │   │       └── basic
-│                   │   │           └── BasicUserService.java
 │                   │   └── userActivity
-│                   │       ├── controller
-│                   │       │   └── UserActivityController.java
-│                   │       ├── dto
-│                   │       │   ├── CommentActivityCancelDto.java
-│                   │       │   ├── CommentActivityLikeDto.java
-│                   │       │   └── response
-│                   │       │       └── UserActivityResponseDto.java
-│                   │       ├── entity
-│                   │       │   └── UserActivity.java
-│                   │       ├── events
-│                   │       │   ├── articleEvent
-│                   │       │   │   ├── ArticleDeleteEvent.java
-│                   │       │   │   └── ArticleViewEvent.java
-│                   │       │   ├── commentEvent
-│                   │       │   │   ├── CommentAddEvent.java
-│                   │       │   │   ├── CommentDeleteEvent.java
-│                   │       │   │   ├── CommentLikeAddEvent.java
-│                   │       │   │   ├── CommentLikeCancelEvent.java
-│                   │       │   │   └── CommentUpdateEvent.java
-│                   │       │   ├── subscriptionEvent
-│                   │       │   │   ├── SubscriptionAddEvent.java
-│                   │       │   │   ├── SubscriptionCancelEvent.java
-│                   │       │   │   ├── SubscriptionDeleteEvent.java
-│                   │       │   │   └── SubscriptionKeywordUpdateEvent.java
-│                   │       │   └── userEvent
-│                   │       │       ├── UserCreateEvent.java
-│                   │       │       ├── UserDeleteEvent.java
-│                   │       │       ├── UserLoginEvent.java
-│                   │       │       └── UserUpdateEvent.java
-│                   │       ├── exception
-│                   │       │   ├── UserActivityErrorCode.java
-│                   │       │   ├── UserActivityException.java
-│                   │       │   └── UserActivityNotFoundException.java
-│                   │       ├── listener
-│                   │       │   └── UserActivityListener.java
-│                   │       ├── mapper
-│                   │       │   └── UserActivityMapper.java
-│                   │       ├── repository
-│                   │       │   ├── UserActivityRepository.java
-│                   │       │   └── UserActivityRepositoryCustom.java
-│                   │       └── service
-│                   │           ├── UserActivityService.java
-│                   │           └── basic
-│                   │               └── BasicUserActivityService.java
 │                   └── global
 │                       ├── api
 │                       ├── config
-│                       │   ├── JpaAuditingConfig.java
-│                       │   ├── JsonConfiguration.java
-│                       │   ├── MDCLoggingInterceptor.java
-│                       │   ├── MongoConfig.java
-│                       │   ├── QuerydslConfig.java
-│                       │   ├── WebClientConfig.java
-│                       │   ├── WebConfig.java
-│                       │   └── aws
-│                       │       ├── AwsConfig.java
-│                       │       └── S3Properties.java
 │                       ├── constant
-│                       │   └── ErrorCode.java
 │                       ├── error
-│                       │   ├── BaseErrorCode.java
-│                       │   ├── BusinessException.java
-│                       │   ├── DomainException.java
-│                       │   ├── ErrorResponse.java
-│                       │   └── GlobalExceptionHandler.java
 │                       └── log
-│                           ├── FileWatchService.java
-│                           └── S3Uploader.java
 └── resources
     ├── application-dev.yml
     ├── application-prod.yml
@@ -532,5 +198,15 @@ src/main
     │   ├── favicon.ico
     │   └── index.html
     └── templates
-
 ```
+
+## **팀원 구성**
+
+| 이름   | 이메일                         | 담당 기능 |
+|--------|--------------------------------|-----------|
+| 김민수 | kms_1015@naver.com             | 관심사 관리 |
+| 김이준 | estherleejunkim@gmail.com      | 활동 내역 관리, 뉴스 기사 백업 및 복구, CI/CD, 배포 |
+| 문은서 | munes6034@gmail.com            | 알림 관리 |
+| 신은수 | sin9801@naver.com              | 댓글 관리 |
+| 안중원 | anjoongwon517@gmail.com        | 뉴스 기사 관리 |
+| 이지현 | devlee1011@gmail.com           | 사용자 관리 |
