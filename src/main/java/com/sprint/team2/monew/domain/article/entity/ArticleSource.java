@@ -18,4 +18,13 @@ public enum ArticleSource {
     public String getDisplayName() {
         return displayName;
     }
+
+    public static ArticleSource from(String value) {
+        for (ArticleSource source : values()) {
+            if (source.displayName.equals(value) || source.name().equalsIgnoreCase(value)) {
+                return source;
+            }
+        }
+        throw new IllegalArgumentException("Unknown ArticleSource: " + value);
+    }
 }
