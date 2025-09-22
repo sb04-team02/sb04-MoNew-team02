@@ -2,7 +2,7 @@ name: CD Workflow - Building & Pushing to ECR
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 jobs:
   # ----------------------------------------------------------------
