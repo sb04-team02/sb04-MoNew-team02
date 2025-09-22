@@ -15,20 +15,27 @@
 5. [파일 구조](#파일-구조)
 6. [팀원 구성](#팀원-구성)
 
+---  
+
 ## 링크
 <a href="https://www.notion.so/2-2472c93d1bbc801e992fc5a874008bf1">
   <img src="https://github.com/user-attachments/assets/b8d5ff15-4c53-49ea-83d4-97b08af86455" width="30" height="30" valign="middle" />
   MoNew 팀 노션
 </a><br><br>
 <a href="http://43.200.245.129/#/login">
-  <img src="https://github.com/user-attachments/assets/77090a76-0e05-45f6-b563-b885592b8321" width="30" height="30" valign="middle" />
-  배포 링크 ( 2025.09.22 ~ 10.22 / 2025.12.18 ~ 2026.06.18 )
+  <img src="https://github.com/user-attachments/assets/3700f539-d6fe-40b7-869b-e5a4c0a01463" width="30" height="30" valign="middle" />
+  배포 링크 ( ~ 2026.06.30 )
 </a><br><br>
 <a href="http://sprint-project-1196140422.ap-northeast-2.elb.amazonaws.com/sb/monew/api/swagger-ui/index.html">
   <img src="https://github.com/user-attachments/assets/3a34ba65-4ba4-4d1b-a170-16b615bf05cb" width="30" height="30" valign="middle" />
   Swagger API
+</a><br><br>
+<a href="https://github.com/user-attachments/files/22457754/2._Monew_.pdf">
+  <img src="https://github.com/user-attachments/assets/77090a76-0e05-45f6-b563-b885592b8321" width="30" height="30" valign="middle" />
+  포트폴리오(pdf)
 </a><br>
-// 발표자료, 회고록 링크 추가
+
+---
 
 ## **프로젝트 소개**
 
@@ -52,6 +59,8 @@
 - S3 로그 관리
   - 날짜 별 로그 파일 AWS S3 적재
 
+---
+
 ## **기술 스택**
 
 <!--
@@ -73,6 +82,8 @@
 | **Testing** | <img src="https://img.shields.io/badge/Mockito-8A2BE2?logo=mockito&logoColor=white"> |
 | **Collaboration** | <img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white"> <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?logo=notion&logoColor=white"> |
 | **IDE** | <img src="https://img.shields.io/badge/IntelliJ IDEA-000000?logo=intellijidea&logoColor=white"> |
+
+--- 
 
 ## 프로젝트 실행 가이드
 ### 1. 필수 소프트웨어
@@ -158,7 +169,9 @@ docker compose -f docker-compose.yml up -d
 
 ### 7. 배치/백업 기준
 - 배치: 1시간 주기로 사용자가 관심사로 등록한 키워드를 기준으로 배치 실행
-- 백업: 
+- 백업: S3에 일일 단위 자동 백업 실행
+
+--- 
 
 ## **파일 구조**
 ```
@@ -200,13 +213,16 @@ src/main
     └── templates
 ```
 
-## **팀원 구성**
+--- 
 
-| 이름   | 이메일                         | 담당 기능 |
-|--------|--------------------------------|-----------|
-| 김민수 | kms_1015@naver.com             | 관심사 관리 |
-| 김이준 | estherleejunkim@gmail.com      | 활동 내역 관리, 뉴스 기사 백업 및 복구, CI/CD, 배포 |
-| 문은서 | munes6034@gmail.com            | 알림 관리 |
-| 신은수 | sin9801@naver.com              | 댓글 관리 |
-| 안중원 | anjoongwon517@gmail.com        | 뉴스 기사 관리 |
-| 이지현 | devlee1011@gmail.com           | 사용자 관리 |
+## **팀원 구성** 
+
+| 이름   | 이메일                         | 담당 기능 | 개인 회고록 |
+|--------|--------------------------------|-----------|-------------|
+| 김민수 | kms_1015@naver.com             | 관심사 관리 | [🦖](https://www.notion.so/codeit/4-2716fd228e8d80d897bcec6123a1c9cb?p=2612c93d1bbc8066864cf2b11b95cb11&pm=s) |
+| 김이준 | estherleejunkim@gmail.com      | 활동 내역 관리, 뉴스 기사 백업 및 복구, CI/CD, 배포 | [🦖](https://www.notion.so/codeit/4-2716fd228e8d80d897bcec6123a1c9cb?p=2612c93d1bbc80f08e54f6513fa4036c&pm=s) |
+| 문은서 | munes6034@gmail.com            | 알림 관리 | [👾](https://www.notion.so/codeit/4-2716fd228e8d80d897bcec6123a1c9cb?p=2612c93d1bbc80c7b2daeb32750d77a4&pm=s) |
+| 신은수 | sin9801@naver.com              | 댓글 관리 | [⚙️](https://www.notion.so/codeit/4-2716fd228e8d80d897bcec6123a1c9cb?p=2612c93d1bbc80f790c0cb57acca7398&pm=s) |
+| 안중원 | anjoongwon517@gmail.com        | 팀장, 뉴스 기사 관리 | [😎](https://www.notion.so/2472c93d1bbc80c59344cf7c46116a51?pvs=24) |
+| 이지현 | devlee1011@gmail.com           | 사용자 관리 | [⛱️](https://www.notion.so/codeit/4-2716fd228e8d80d897bcec6123a1c9cb?p=2612c93d1bbc805393eff591997532da&pm=s) |
+
