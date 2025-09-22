@@ -24,7 +24,7 @@
 </a><br><br>
 <a href="http://43.200.245.129/#/login">
   <img src="https://github.com/user-attachments/assets/3700f539-d6fe-40b7-869b-e5a4c0a01463" width="30" height="30" valign="middle" />
-  배포 링크 ( ~25.09.30 / 25.12.18 ~ 16.06.30  )
+  배포 링크 ( ~25.09.30 / 25.12.18 ~ 26.06.30  )
 </a><br><br>
 <a href="http://sprint-project-1196140422.ap-northeast-2.elb.amazonaws.com/sb/monew/api/swagger-ui/index.html">
   <img src="https://github.com/user-attachments/assets/3a34ba65-4ba4-4d1b-a170-16b615bf05cb" width="30" height="30" valign="middle" />
