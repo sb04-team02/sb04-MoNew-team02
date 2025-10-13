@@ -1,7 +1,9 @@
 package com.sprint.team2.monew.domain.article.service;
 
+import com.sprint.team2.monew.domain.article.dto.response.ArticleDto;
 import com.sprint.team2.monew.domain.article.dto.response.ArticleViewDto;
 import com.sprint.team2.monew.domain.article.dto.response.CursorPageResponseArticleDto;
+import com.sprint.team2.monew.domain.article.entity.Article;
 import com.sprint.team2.monew.domain.article.entity.ArticleDirection;
 import com.sprint.team2.monew.domain.article.entity.ArticleOrderBy;
 import com.sprint.team2.monew.domain.article.entity.ArticleSource;
@@ -27,4 +29,7 @@ public interface ArticleService {
 
     void hardDelete(UUID articleId);
 
+    List<Article> saveAll(List<ArticleDto> articles, UUID interestId, String keyword);
+
+    void deleteAllByInterest(UUID interestId, String keyword);
 }

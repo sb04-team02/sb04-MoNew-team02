@@ -283,6 +283,34 @@ public class BasicArticleService implements ArticleService {
         log.info("[Article] 물리 삭제 성공");
     }
 
+    @Transactional
+    @Override
+    public List<Article> saveAll(List<ArticleDto> articles, UUID interestId, String keyword) {
+        Interest interest = interestRepository.findById(interestId)
+                .orElseThrow(() -> InterestNotFoundException.notFound(interestId));
+
+        List<Article> entities = articles.stream()
+                .filter(dto -> !articleRepository.existsBySourceUrlAndDeletedAtIsNull(dto.sourceUrl()))
+                .map(dto -> {
+                    Article a = articleMapper.toEntity(dto);
+                    a.setInterest(interest);
+                    return a;
+                })
+                .toList();
+
+        List<Article> saved = articleRepository.saveAll(entities);
+
+        log.info("[Article|Saga] saveAll: {}개 저장 완료 (interest = {}, keyword = {})", saved.size(), interestId, keyword);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllByInterest(UUID interestId, String keyword) {
+        articleRepository.deleteAllByInterestId(interestId, keyword);
+        log.info("[Article|Saga] rollback: 관심사({})의 키워드 '{}' 관련 기사 삭제 완료", interestId, keyword);
+    }
+
     // 공통 메서드
     public boolean hasUserViewedArticle(UUID userId, UUID articleId) {
         return userActivityRepository.findById(userId)

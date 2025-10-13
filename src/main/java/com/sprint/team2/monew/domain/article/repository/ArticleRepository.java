@@ -4,7 +4,6 @@ import com.sprint.team2.monew.domain.article.entity.Article;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -27,5 +26,7 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
     @Modifying
     @Query("UPDATE Article a SET a.commentCount = a.commentCount - 1 WHERE a.id = :articleId AND a.commentCount > 0")
     void decreaseCommentCount(@Param("articleId") UUID articleId);
+
+    void deleteAllByInterestId(UUID interestId, String keyword);
 }
 
